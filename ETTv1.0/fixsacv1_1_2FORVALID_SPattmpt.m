@@ -12,6 +12,9 @@ function [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(x,y,d,sr,gapdata
 %   'smooth pursuit'
 %   [SH] - 01/23/14:  adjusted fix and sac index updating, incorporated
 %   smooth as overwriting fix & sac.
+%   [SH] - 02/03/14:  removed sustructures from outputs (fixinfo,
+%   sacinfo...).  Replaced with matrices:  1st row = means, 2nd = variance,
+%   3rd = max
 
 classinfo = [];
 pointinfo = [];
@@ -628,10 +631,10 @@ else
         fixinfo.durations = fix_durations;
         fixinfo.onsets = fix_keep_begin;
         fixinfo.centroids = fix_centroids;
-        fixinfo.velocities.average = fix_avg_velos;
-        fixinfo.velocities.variance = fix_avg_velos_var;
-        fixinfo.accelerations.average = fix_avg_accel;
-        fixinfo.accelerations.variance = fix_avg_accel_var;
+        fixinfo.velocities(1,1:fixinfo.nfix) = fix_avg_velos;
+        fixinfo.velocities(2,1:fixinfo.nfix) = fix_avg_velos_var;
+        fixinfo.accelerations(1,1:fixinfo.nfix) = fix_avg_accel;
+        fixinfo.accelerations(2,1:fixinfo.nfix) = fix_avg_accel_var;
     else
         fixinfo.nfix = [];
         fixinfo.durations = [];
@@ -641,12 +644,12 @@ else
         sacinfo.nsac = length(sac_keep_begin);
         sacinfo.durations = sac_durations;
         sacinfo.onsets = sac_keep_begin;
-        sacinfo.velocities.average = sac_avg_velos;
-        sacinfo.velocities.max = sac_max_velos;
-        sacinfo.velocities.variance = sac_avg_velos_var;
-        sacinfo.accelerations.average = sac_avg_accel;
-        sacinfo.accelerations.max = sac_max_accel;
-        sacinfo.accelerations.variance = sac_avg_accel_var;
+        sacinfo.velocities(1,1:sacinfo.nsac) = sac_avg_velos;        
+        sacinfo.velocities(2,1:sacinfo.nsac) = sac_avg_velos_var;
+        sacinfo.velocities(3,1:sacinfo.nsac) = sac_max_velos;
+        sacinfo.accelerations(1,1:sacinfo.nsac) = sac_avg_accel;
+        sacinfo.accelerations(2,1:sacinfo.nsac) = sac_avg_accel_var;
+        sacinfo.accelerations(3,1:sacinfo.nsac) = sac_max_accel;        
         sacinfo.displacement = sac_displacement';
         sacinfo.displacement_degrees = (atand((sac_displacement'/2)./(d(sac_keep_begin)*pix_to_angle_const))*2)*1000/st;
     else
@@ -658,10 +661,10 @@ else
         spinfo.nsp = length(sp_keep_begin);
         spinfo.durations = sp_durations;
         spinfo.onsets = sp_keep_begin;
-        spinfo.velocities.average = sp_avg_velos;
-        spinfo.velocities.variance = sp_avg_velos_var;
-        spinfo.accelerations.average = sp_avg_accel;
-        spinfo.accelerations.variance = sp_avg_accel_var;
+        spinfo.velocities(1,1:spinfo.nsp) = sp_avg_velos;
+        spinfo.velocities(2,1:spinfo.nsp) = sp_avg_velos_var;
+        spinfo.accelerations(1,1:spinfo.nsp) = sp_avg_accel;
+        spinfo.accelerations(2,1:spinfo.nsp) = sp_avg_accel_var;
     else
         spinfo.nsp = [];
         spinfo.durations = [];
@@ -671,10 +674,10 @@ else
         blinkinfo.nblink = length(blink_keep_begin);
         blinkinfo.durations = blink_durations;
         blinkinfo.onsets = blink_keep_begin;
-        blinkinfo.velocities.average = blink_avg_velos;
-        blinkinfo.velocities.variance = blink_avg_velos_var;
-        blinkinfo.accelerations.average = blink_avg_accel;
-        blinkinfo.accelerations.variance = blink_avg_accel_var;
+        blinkinfo.velocities(1,1:blinkinfo.nblink) = blink_avg_velos;
+        blinkinfo.velocities(2,1:blinkinfo.nblink) = blink_avg_velos_var;
+        blinkinfo.accelerations(1,1:blinkinfo.nblink) = blink_avg_accel;
+        blinkinfo.accelerations(2,1:blinkinfo.nblink) = blink_avg_accel_var;
     else
         blinkinfo.nblink = [];
         blinkinfo.durations = [];
@@ -684,10 +687,10 @@ else
         otherinfo.nother = length(other_keep_begin);
         otherinfo.durations = other_durations;
         otherinfo.onsets = other_keep_begin;
-        otherinfo.velocities.average = other_avg_velos;
-        otherinfo.velocities.variance = other_avg_velos_var;
-        otherinfo.accelerations.average = other_avg_accel;
-        otherinfo.accelerations.variance = other_avg_accel_var;
+        otherinfo.velocities(1,1:otherinfo.nother) = other_avg_velos;
+        otherinfo.velocities(2,1:otherinfo.nother) = other_avg_velos_var;
+        otherinfo.accelerations(1,1:otherinfo.nother) = other_avg_accel;
+        otherinfo.accelerations(2,1:otherinfo.nother) = other_avg_accel_var;
     else
         otherinfo.nother = [];
         otherinfo.durations = [];
@@ -697,10 +700,10 @@ else
         unknowninfo.nunknown = length(unknown_keep_begin);
         unknowninfo.durations = unknown_durations;
         unknowninfo.onsets = unknown_keep_begin;
-        unknowninfo.velocities.average = unknown_avg_velos;
-        unknowninfo.velocities.variance = unknown_avg_velos_var;
-        unknowninfo.accelerations.average = unknown_avg_accel;
-        unknowninfo.accelerations.variance = unknown_avg_accel_var;
+        unknowninfo.velocities(1,1:unknowninfo.nunknown) = unknown_avg_velos;
+        unknowninfo.velocities(2,1:unknowninfo.nunknown) = unknown_avg_velos_var;
+        unknowninfo.accelerations(1,1:unknowninfo.nunknown) = unknown_avg_accel;
+        unknowninfo.accelerations(2,1:unknowninfo.nunknown) = unknown_avg_accel_var;
     else
         unknowninfo.nunknown = [];
         unknowninfo.durations = [];
