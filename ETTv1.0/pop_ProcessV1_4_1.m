@@ -137,8 +137,8 @@ for subn = subslist
                 procdata.sub(subn).Trial(trinum).PointInfo = pointinfo;
             else
                 if isfield(procdata.sub(subn).Trial(trinum), 'Classifications')
-                    classinfo = procdata.sub(sub).Trial(trinum).Classifications;
-                    pointinfo = procdata.sub(sub).Trial(trinum).PointInfo;
+                    classinfo = procdata.sub(subn).Trial(trinum).Classifications;
+                    pointinfo = procdata.sub(subn).Trial(trinum).PointInfo;
                 end
             end
             
