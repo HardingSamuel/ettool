@@ -137,7 +137,7 @@ for sub = subslist+2
         PhaseVec = str(bgn:ennd, 23+phc)';
         %Separate out only unique instances (removes repitition), find
         %indices where uniques first occur
-        [~, PhaseIndex] = unique(PhaseVec);
+        [~, PhaseIndex] = unique(PhaseVec, 'first');
         
         %Place Names and Indices in a Structure for reference in the
         %future
