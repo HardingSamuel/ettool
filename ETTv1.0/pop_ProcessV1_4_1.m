@@ -92,6 +92,7 @@ for subn = subslist
                 end
             end
                 
+            procdata.sub(subn).Trial(trinum).usecustom = 0;
             %Define the values to pass along to the clean-up/interpolation script
 
             time = rawdata.sub(subn).Trial(trinum).Time;
@@ -170,6 +171,7 @@ for subn = subslist
             
             if analyoutput(4) && ~isempty(customfileexe)
                 eval(customfileexe)
+                procdata.sub(subn).Trial(trinum).usecustom = 1;
             end
 
         end

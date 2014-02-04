@@ -190,5 +190,5 @@ save(DatafileName, 'rawdata')
 fprintf('\n')
 disp('#### READ-IN COMPLETE! ####')
 
-status = 'Read-In Complete!'
+status = 'Read-In Complete!';
 return

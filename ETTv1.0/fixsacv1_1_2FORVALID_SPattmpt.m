@@ -15,6 +15,9 @@ function [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(x,y,d,sr,gapdata
 %   [SH] - 02/03/14:  removed sustructures from outputs (fixinfo,
 %   sacinfo...).  Replaced with matrices:  1st row = means, 2nd = variance,
 %   3rd = max
+%   [SH] - 02/04/14:  replaced <type>info.nsac, nfix, nsp etc. . . with
+%   generic '.count'.  Also updated onsets to include time, added field
+%   'offsets' with indices and time
 
 classinfo = [];
 pointinfo = [];
@@ -627,85 +630,103 @@ else
     %% Some Calculations
     
     if ~isempty(fix_keep)
-        fixinfo.nfix = length(fix_keep_begin);
+        fixinfo.count = length(fix_keep_begin);
         fixinfo.durations = fix_durations;
         fixinfo.onsets = fix_keep_begin;
+        fixinfo.onsets(2,:) = fixinfo.onsets*st;
+        fixinfo.offsets = fix_keep_end;
+        fixinfo.offsets(2,:) = fixinfo.offsets*st;
         fixinfo.centroids = fix_centroids;
-        fixinfo.velocities(1,1:fixinfo.nfix) = fix_avg_velos;
-        fixinfo.velocities(2,1:fixinfo.nfix) = fix_avg_velos_var;
-        fixinfo.accelerations(1,1:fixinfo.nfix) = fix_avg_accel;
-        fixinfo.accelerations(2,1:fixinfo.nfix) = fix_avg_accel_var;
+        fixinfo.velocities(1,1:fixinfo.count) = fix_avg_velos;
+        fixinfo.velocities(2,1:fixinfo.count) = fix_avg_velos_var;
+        fixinfo.accelerations(1,1:fixinfo.count) = fix_avg_accel;
+        fixinfo.accelerations(2,1:fixinfo.count) = fix_avg_accel_var;
     else
-        fixinfo.nfix = [];
+        fixinfo.count = [];
         fixinfo.durations = [];
         fixinfo.onsets = [];
     end
     if ~isempty(sac_keep)
-        sacinfo.nsac = length(sac_keep_begin);
+        sacinfo.count = length(sac_keep_begin);
         sacinfo.durations = sac_durations;
         sacinfo.onsets = sac_keep_begin;
-        sacinfo.velocities(1,1:sacinfo.nsac) = sac_avg_velos;        
-        sacinfo.velocities(2,1:sacinfo.nsac) = sac_avg_velos_var;
-        sacinfo.velocities(3,1:sacinfo.nsac) = sac_max_velos;
-        sacinfo.accelerations(1,1:sacinfo.nsac) = sac_avg_accel;
-        sacinfo.accelerations(2,1:sacinfo.nsac) = sac_avg_accel_var;
-        sacinfo.accelerations(3,1:sacinfo.nsac) = sac_max_accel;        
+        sacinfo.onsets(2,:) = sacinfo.onsets*st;
+        sacinfo.offsets = sac_keep_end;
+        sacinfo.offsets(2,:) = sacinfo.offsets*st;
+        sacinfo.velocities(1,1:sacinfo.count) = sac_avg_velos;        
+        sacinfo.velocities(2,1:sacinfo.count) = sac_avg_velos_var;
+        sacinfo.velocities(3,1:sacinfo.count) = sac_max_velos;
+        sacinfo.accelerations(1,1:sacinfo.count) = sac_avg_accel;
+        sacinfo.accelerations(2,1:sacinfo.count) = sac_avg_accel_var;
+        sacinfo.accelerations(3,1:sacinfo.count) = sac_max_accel;        
         sacinfo.displacement = sac_displacement';
         sacinfo.displacement_degrees = (atand((sac_displacement'/2)./(d(sac_keep_begin)*pix_to_angle_const))*2)*1000/st;
     else
-        sacinfo.nsac = [];
+        sacinfo.count = [];
         sacinfo.durations = [];
         sacinfo.onsets = [];
     end
     if ~isempty(sp_keep)
-        spinfo.nsp = length(sp_keep_begin);
+        spinfo.count = length(sp_keep_begin);
         spinfo.durations = sp_durations;
         spinfo.onsets = sp_keep_begin;
-        spinfo.velocities(1,1:spinfo.nsp) = sp_avg_velos;
-        spinfo.velocities(2,1:spinfo.nsp) = sp_avg_velos_var;
-        spinfo.accelerations(1,1:spinfo.nsp) = sp_avg_accel;
-        spinfo.accelerations(2,1:spinfo.nsp) = sp_avg_accel_var;
+        spinfo.onsets(2,:) = spinfo.onsets*st;
+        spinfo.offsets = sp_keep_end;
+        spinfo.offsets(2,:) = spinfo.offsets*st;
+        spinfo.velocities(1,1:spinfo.count) = sp_avg_velos;
+        spinfo.velocities(2,1:spinfo.count) = sp_avg_velos_var;
+        spinfo.accelerations(1,1:spinfo.count) = sp_avg_accel;
+        spinfo.accelerations(2,1:spinfo.count) = sp_avg_accel_var;
     else
-        spinfo.nsp = [];
+        spinfo.count = [];
         spinfo.durations = [];
         spinfo.onsets = [];
     end
     if ~isempty(blink_keep)
-        blinkinfo.nblink = length(blink_keep_begin);
+        blinkinfo.count = length(blink_keep_begin);
         blinkinfo.durations = blink_durations;
         blinkinfo.onsets = blink_keep_begin;
-        blinkinfo.velocities(1,1:blinkinfo.nblink) = blink_avg_velos;
-        blinkinfo.velocities(2,1:blinkinfo.nblink) = blink_avg_velos_var;
-        blinkinfo.accelerations(1,1:blinkinfo.nblink) = blink_avg_accel;
-        blinkinfo.accelerations(2,1:blinkinfo.nblink) = blink_avg_accel_var;
+        blinkinfo.onsets(2,:) = blinkinfo.onsets*st;
+        blinkinfo.offsets = blink_keep_end;
+        blinkinfo.offsets(2,:) = blinkinfo.offsets*st;
+        blinkinfo.velocities(1,1:blinkinfo.count) = blink_avg_velos;
+        blinkinfo.velocities(2,1:blinkinfo.count) = blink_avg_velos_var;
+        blinkinfo.accelerations(1,1:blinkinfo.count) = blink_avg_accel;
+        blinkinfo.accelerations(2,1:blinkinfo.count) = blink_avg_accel_var;
     else
-        blinkinfo.nblink = [];
+        blinkinfo.count = [];
         blinkinfo.durations = [];
         blinkinfo.onsets = [];
     end
     if ~isempty(other_keep)
-        otherinfo.nother = length(other_keep_begin);
+        otherinfo.count = length(other_keep_begin);
         otherinfo.durations = other_durations;
         otherinfo.onsets = other_keep_begin;
-        otherinfo.velocities(1,1:otherinfo.nother) = other_avg_velos;
-        otherinfo.velocities(2,1:otherinfo.nother) = other_avg_velos_var;
-        otherinfo.accelerations(1,1:otherinfo.nother) = other_avg_accel;
-        otherinfo.accelerations(2,1:otherinfo.nother) = other_avg_accel_var;
+        otherinfo.onsets(2,:) = otherinfo.onsets*st;
+        otherinfo.offsets = other_keep_end;
+        otherinfo.offsets(2,:) = otherinfo.offsets*st;
+        otherinfo.velocities(1,1:otherinfo.count) = other_avg_velos;
+        otherinfo.velocities(2,1:otherinfo.count) = other_avg_velos_var;
+        otherinfo.accelerations(1,1:otherinfo.count) = other_avg_accel;
+        otherinfo.accelerations(2,1:otherinfo.count) = other_avg_accel_var;
     else
-        otherinfo.nother = [];
+        otherinfo.count = [];
         otherinfo.durations = [];
         otherinfo.onsets = [];
     end
     if ~isempty(unknown_keep)
-        unknowninfo.nunknown = length(unknown_keep_begin);
+        unknowninfo.count = length(unknown_keep_begin);
         unknowninfo.durations = unknown_durations;
         unknowninfo.onsets = unknown_keep_begin;
-        unknowninfo.velocities(1,1:unknowninfo.nunknown) = unknown_avg_velos;
-        unknowninfo.velocities(2,1:unknowninfo.nunknown) = unknown_avg_velos_var;
-        unknowninfo.accelerations(1,1:unknowninfo.nunknown) = unknown_avg_accel;
-        unknowninfo.accelerations(2,1:unknowninfo.nunknown) = unknown_avg_accel_var;
+        unknowninfo.onsets(2,:) = unknowninfo.onsets*st;
+        unknowninfo.offsets = unknown_keep_end;
+        unknowninfo.offsets(2,:) = unknowninfo.offsets*st;
+        unknowninfo.velocities(1,1:unknowninfo.count) = unknown_avg_velos;
+        unknowninfo.velocities(2,1:unknowninfo.count) = unknown_avg_velos_var;
+        unknowninfo.accelerations(1,1:unknowninfo.count) = unknown_avg_accel;
+        unknowninfo.accelerations(2,1:unknowninfo.count) = unknown_avg_accel_var;
     else
-        unknowninfo.nunknown = [];
+        unknowninfo.count = [];
         unknowninfo.durations = [];
         unknowninfo.onsets = [];
     end

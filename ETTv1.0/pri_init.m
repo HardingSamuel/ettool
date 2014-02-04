@@ -27,7 +27,7 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         sub_text = 'All Subjects';
     end
     switch mode
-        case [1,2]
+        case {1,2}
             sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
         case 3
             sub_text = [modetext, ' All Subjects: '];
@@ -41,7 +41,7 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         case 2
             [status] = pop_ProcessV1_4_1(DIRECT,subslist,analyoutput,customfileexe);
         case 3
-            [status] = pop_SummaryV1_1(DIRECT, subslist, coldata);
+            [status] = pop_SummaryV1_1(DIRECT);
     end
     
     set(statustext, 'String', status);
