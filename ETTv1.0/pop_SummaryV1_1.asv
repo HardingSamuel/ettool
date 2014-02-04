@@ -61,7 +61,7 @@ for writesub = 2:length(procdata.sub)
                 for writefield = 1:length(ft)
                     if ~strcmp(fn(writefield), 'Processed') && ~strcmp(fn(writefield), 'Time') && ...
                             ~strcmp(fn(writefield), 'WhatsOn') && ~strcmp(fn(writefield), 'eye') && ...
-                            ~strcmp(fn(writefield), 'PointInfo') && ~strcmp(fn(writefield), 'proportions')
+                            ~strcmp(fn(writefield), 'PointInfo')
                         if strcmp(ft(writefield), 'struct')
                             fieldout(writefield) = extractstruct(procdata.sub(writesub).Trial(writetrial).(char(fn(writefield))));
                         else
@@ -83,15 +83,15 @@ for writesub = 2:length(procdata.sub)
             else
                 if ~exist('user_can_cont')
                     user_can_cont = input(['Error: Detected inconsistencies between subject procdata for Subject: ' num2str(writesub) ' Trial: ' num2str(writetrial) '.' ...
-                    '\n' 'Recommend aborting & reprocessing all subjects.' '\n' 'Continue summarizing, but skipping this inconsistency? [(A)bort and Fix || (C)ontinue but skip]' '\n'],'s');
+                    '\n' 'Recommend aborting & reprocessing all subjects.' '\n' 'Continue summarizing, but skipping this inconsistency? [(A)bort and Fix || (C)ontinue but skip]' '\n'],'s')
                 end
-                keyboard
+                
                 switch user_can_cont
-                    case ['a','A',a]
+                    case ['a','A']
                         Disp('Aborting Summary.  Reprocess all subjects and try again')
-                        status = 'Summary Aborted, Rerun Process';
-                        return
-                    case ['c','C',c]
+                        break
+                        
+                    case ['c','C']
                         Disp('Continuing Summary but skipping inconsistent trials.  You will not see this message again')
                         continue
                 end

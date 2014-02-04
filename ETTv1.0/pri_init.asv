@@ -30,8 +30,7 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         case [1,2]
             sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
         case 3
-            sub_text = [modetext, ' All Subjects: '];
-    end
+            sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
     
     statustext = uicontrol('Style', 'text', 'Position', [10 10 474 112], 'String', sub_text, 'BackgroundColor', [.2 .7 .2], 'FontSize', 12, 'ForegroundColor', [1 1 1]);
     pause(.5)

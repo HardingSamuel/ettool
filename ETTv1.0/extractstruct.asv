@@ -1,0 +1,24 @@
+function [strucout] = extractstruct(structure)
+
+fn = fieldnames(structure);
+ft = gettypes(structure,1,1);
+fv = cell(length(fn),1);
+
+persistent strucout
+
+for getfield = 1:length(fn)
+    if ~strcmp(fn(getfield), 'Processed') && ~strcmp(fn(getfield), 'Time') && ...
+                        ~strcmp(fn(getfield), 'WhatsOn') && ~strcmp(fn(getfield), 'eye') && ...
+                        ~strcmp(fn(getfield), 'PointInfo')
+                    if ~strcmp(ft(getfield), 'struct')
+                        fv(getfield) = {structure.(char(fn(getfield)))};
+                    else
+                        strucout{loops} = extractstruct(structure.(char(fn(getfield))));                                                 
+                        loops = loops + 1 
+                    end
+    end
+end
+% keyboard
+fn(cellfun(@isempty,fv)) = [];
+fv(cellfun(@isempty,fv)) = [];
+strucout{loops} = {[fn,fv]};
