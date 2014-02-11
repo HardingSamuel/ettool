@@ -99,7 +99,6 @@ end
 % 1-low-pass
 % 0-no filter
 % 2-savitzky olay filter of 2nd order polynomial (RECOMMENDED)
-keyboard
 switch fff
     case 1
         fx = filtfilt(fir1(10,[0.1]), 1, x(~isnan(x)));
