@@ -43,6 +43,8 @@ ft = gettypes(procdata.sub(1).Trial(1));
 writeme = [{'Subject'}, {'TrialNum'}, {'SampleRate'}, fn(~cellfun(@(x) strcmp(x, 'struct'), ft) & ~cellfun(@(x) strcmp(x, 'Time'), fn) & ~cellfun(@(x) strcmp(x, 'usecustom'), fn))'];
 writefixsac = [{'Subject'},{'TrialNum'},{'Count'},{'Type'},{'Number'},{'OnsetInd'},{'OnsetTime'},{'DurationPts'},{'DurationTime'},{'OffsetInd'},{'OffsetTime'},{'CentroidX'},{'CentroidY'},{'SaccadePeakVelo'}];
 subfixsac = nan(0,14);
+subfixt = single(zeros(0,3));
+
 
 for subn = 1:length(procdata.sub)
     
@@ -51,22 +53,23 @@ for subn = 1:length(procdata.sub)
         sr = procdata.sub(subn).SampleRate;
         subwrite = cell(length(procdata.sub(subn).Trial), 3+length(fn(~cellfun(@(x) strcmp(x, 'struct'), ft) & ~cellfun(@(x) strcmp(x, 'Time'), fn) & ~cellfun(@(x) strcmp(x, 'usecustom'), fn))));
         subjectnumber = procdata.sub(subn).SubjectNumber;
-        
+        disp(['Summarizing Subject Number:  ' num2str(subjectnumber)])
         for trinum = 1:length(procdata.sub(subn).Trial)
+            
             fnt = fieldnames(procdata.sub(subn).Trial(trinum));
             if size(fn)==size(fnt) & all(cellfun(@isequal, fn, fnt))
                 
-                ft = gettypes(procdata.sub(subn).Trial(trinum));
+                ftt = gettypes(procdata.sub(subn).Trial(trinum));
                 
-                for writefield = 1:length(ft)
-                    if ~strcmp(fn(writefield), 'Processed') && ~strcmp(fn(writefield), 'Time') && ...
-                            ~strcmp(fn(writefield), 'WhatsOn') && ~strcmp(fn(writefield), 'eye') && ...
-                            ~strcmp(fn(writefield), 'PointInfo') && ~strcmp(fn(writefield), 'proportions') ...
-                            && ~strcmp(fn(writefield), 'usecustom')
-                        if strcmp(ft(writefield), 'struct')
-                            fieldout(writefield) = extractstruct(procdata.sub(subn).Trial(trinum).(char(fn(writefield))));
+                for writefield = 1:length(ftt)
+                    if ~strcmp(fnt(writefield), 'Processed') && ~strcmp(fnt(writefield), 'Time') && ...
+                            ~strcmp(fnt(writefield), 'WhatsOn') && ~strcmp(fnt(writefield), 'eye') && ...
+                            ~strcmp(fnt(writefield), 'PointInfo') && ~strcmp(fnt(writefield), 'proportions') ...
+                            && ~strcmp(fnt(writefield), 'usecustom')
+                        if strcmp(ftt(writefield), 'struct')
+                            fieldout(writefield) = extractstruct(procdata.sub(subn).Trial(trinum).(char(fnt(writefield))));
                         else
-                            fieldout(writefield) = {procdata.sub(subn).Trial(trinum).(char(fn(writefield)))};
+                            fieldout(writefield) = {procdata.sub(subn).Trial(trinum).(char(fnt(writefield)))};
                         end
                     else
                         fieldout(writefield) = {[]};
@@ -80,7 +83,7 @@ for subn = 1:length(procdata.sub)
                 
             else
                 
-                status = 'Inconsistent Trial Information.  ReProcesses all subjects and try again';
+                status = 'Inconsistent Trial Information.  ReProcess all subjects and try again';
                 return
                 
             end
@@ -91,8 +94,20 @@ for subn = 1:length(procdata.sub)
             if add_outputs(1)
                 if ~isempty(procdata.sub(subn).Trial(trinum).Classifications.fixations);
                     [nitems,fixsacout] = summ_fixsac(procdata.sub(subn).Trial(trinum).Classifications);
-                    fixsacout = [repmat(subn,nitems,1), repmat(trinum,nitems,1),fixsacout];
+                    fixsacout = [repmat(subjectnumber,nitems,1), repmat(trinum,nitems,1),fixsacout];
                     subfixsac = [subfixsac; fixsacout];
+                end
+                if ~isempty(procdata.sub(subn).Trial(trinum).fixtarget)
+                    writefixt = [{'Subject'}, {'Trial'}, {'FixN_OnTarget'}];
+                    currdir = cd;
+                    cd(['Z:\Current_Studies\Manuela\Faces & EyeGaze\MATLAB'])
+                    fixtout = [];
+                    fixtout = summ_fixtarget(procdata.sub(subn).Trial(trinum).fixtarget,procdata.sub(subn).Trial(trinum).T_Location);
+                    if ~isempty(fixtout)
+                        fixtout = single([repmat(subjectnumber,size(fixtout,1),1), repmat(trinum,size(fixtout,1),1),fixtout]);
+                        subfixt = [subfixt; fixtout];
+                    end
+                    cd(currdir);                    
                 end
             end
             if add_outputs(2)
@@ -101,7 +116,6 @@ for subn = 1:length(procdata.sub)
             if add_outputs(3)
                 %                 custom_output = eval(
             end
-            
             subwrite(trinum, 1:3+size(fieldout,2)) = [subjectnumber, trinum, sr, fieldout];
             
         end
@@ -116,6 +130,13 @@ if ~isempty(subfixsac)
     pause(1)
     xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], subfixsac, 'FixationSaccadeData', ['A2:N' num2str(lastrow)])
 end
+if ~isempty(subfixt)
+    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writefixt, 'FixTarget', 'B1:D1')
+    lastrow = 1 + size(subfixt,1);
+    pause(1)
+    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], subfixt, 'FixTarget',  ['B2:D' num2str(lastrow)])
+end
+    
 
 
 status = 'Summary Complete';

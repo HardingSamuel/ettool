@@ -20,36 +20,27 @@ function [status] = pop_ProcessV1_3_1(Direct, subslist, analyoutput, customfilee
 %                        4 returns Fix/Sac, + SP
 %   [SH] - 01/28/14:  Added custom Processing for study-specific analyses.
 
-
-
-
-VersionNumber = 1.1;
-VersionNumberString = '1_4_1';
+VersionNumber = 1.0;
+VersionNumberString = '1_0';
 currenttime = clock;
 
+sla = strfind(Direct, '\');
+StudyName = Direct(sla(end)+1:end);
 
-%Directory of RAWDATA Files
-s = [Direct '\MATLAB\INPUT\RAWDATA'];
-D = dir(s);
-CurrentDir = Direct;
-sla = strfind(CurrentDir, '\');
-StudyName = CurrentDir(sla(end)+1:end);
-
-
-%load most-recently calculated file
+%load most-recently calculated RAWDATA file
 disp('Loading RAW Data File')
+s = [Direct '\MATLAB\INPUT\RAWDATA'];
 cd(s)
 D = dir('*.mat');
 try 
     dates = [D.datenum];
-    [~,mostrecent] = max(dates);
+    [~,mostrecent] = max(dates);    
     load([s, '\', D(mostrecent).name])
 catch
     status = 'Cannot Locate RAW data file in \MATLAB\INPUT\RAWDATA';
     return
 end
     
-
 disp('Loading Proc Data File')
 s = [Direct '\MATLAB\INPUT\PROCDATA\'];
 cd(s)
@@ -170,8 +161,12 @@ for subn = subslist
             end
             
             if analyoutput(4) && ~isempty(customfileexe)
+                try
                 eval(customfileexe)
                 procdata.sub(subn).Trial(trinum).usecustom = 1;
+                catch
+                    keyboard
+                end
             end
 
         end
@@ -181,25 +176,26 @@ for subn = subslist
     fprintf('\n')
 end
 
-DatafileName = [Direct, '\MATLAB\INPUT\PROCDATA\PROCDATA_', StudyName '_VersionNumber_', VersionNumberString, '_', date, '_', num2str(currenttime(4)), num2str(currenttime(5))];
+
+[filename,currenttime] = updatefileinfo(Direct, StudyName, 2); 
 
 if ~isfield(procdata, 'version')
-    procdata.version.CreationDate = [date, '-', num2str(currenttime(4)), ':', num2str(currenttime(5)), ':', num2str(currenttime(6))];
-    procdata.version.EditLog = {[date, '-', num2str(currenttime(4)), ':', num2str(currenttime(5)), ':', num2str(currenttime(6))], VersionNumber, ChangedSubs};
+    procdata.version.CreationDate = currenttime;
+    procdata.version.EditLog = {currenttime, VersionNumber, ChangedSubs};
 else
-procdata.version.EditLog = [procdata.version.EditLog; {[date, '-', num2str(currenttime(4)), ':', num2str(currenttime(5)), ':', num2str(currenttime(6))], VersionNumber, ChangedSubs}];
+    procdata.version.EditLog = [procdata.version.EditLog; {currenttime, VersionNumber, ChangedSubs}];
 end
-procdata.version.LastEdit = [date, '-', num2str(currenttime(4)), ':', num2str(currenttime(5)), ':', num2str(currenttime(6))];
+procdata.version.LastEdit = currenttime;
 
 fprintf('\n')
 fprintf('\n')
 disp('Saving')
 
-save(DatafileName, 'procdata')     
+save(filename, 'procdata')     
 
 fprintf('\n')
 disp('#### PROCESS COMPLETE! ####')
 
 
-status = 'Process Complete!'
+status = 'Process Complete!';
 return

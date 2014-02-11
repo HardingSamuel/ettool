@@ -21,8 +21,11 @@ VersionNumberString = '1_0';
 sla = strfind(Direct, '\');
 StudyName = Direct(sla(end)+1:end);
 
+
+
 %Directory of XLS Files
 s = [Direct '\MATLAB\INPUT\DATA\XLSDATA'];
+D = dir(s);
 
 try
     [subnum, substr, subraw] = xlsread([Direct, '\EXCEL\' StudyName ' SUMMARY.xlsx'], 'Participants');

@@ -18,9 +18,21 @@ function [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(x,y,d,sr,gapdata
 %   [SH] - 02/04/14:  replaced <type>info.nsac, nfix, nsp etc. . . with
 %   generic '.count'.  Also updated onsets to include time, added field
 %   'offsets' with indices and time
+%   [SH] - 02/11/14:  Fixed returned values when insufficient data
+%   detected.
 
-classinfo = [];
-pointinfo = [];
+fixinfo = []; sacinfo = []; spinfo = []; blinkinfo = []; otherinfo = []; unknowninfo = [];
+
+classinfo.fixations = fixinfo;
+classinfo.saccades = sacinfo;
+classinfo.smoothpursuit = spinfo;
+classinfo.blinks = blinkinfo;
+classinfo.others = otherinfo;
+classinfo.unknown = unknowninfo;
+
+pointinfo.initial = [];
+pointinfo.hmm = [];
+pointinfo.bayes = [];
 
 
 %% Deal with incoming gap information
@@ -80,19 +92,6 @@ bin_velocities_by = 5; % to do velocity probability calculations.  smaller = mor
 %% Up-front check that we have enough data in this trial to even try to classify
 % 50 is arbitrary
 if length(fx)< 50 | length(fy)< 50 | length(fd) < 50
-    %     disp('Not enough data')
-    fixinfo = []; sacinfo = []; spinfo = []; blinkinfo = []; otherinfo = []; unknowninfo = [];     
-    
-    classinfo.fixations = fixinfo;
-    classinfo.saccades = sacinfo;
-    classinfo.smoothpursuit = spinfo;
-    classinfo.blinks = blinkinfo;
-    classinfo.others = otherinfo;
-    classinfo.unknown = unknowninfo;
-    
-    pointinfo.initial = [];
-    pointinfo.hmm = [];
-    pointinfo.bayes = [];
     return
 end
 
@@ -100,6 +99,7 @@ end
 % 1-low-pass
 % 0-no filter
 % 2-savitzky olay filter of 2nd order polynomial (RECOMMENDED)
+keyboard
 switch fff
     case 1
         fx = filtfilt(fir1(10,[0.1]), 1, x(~isnan(x)));
@@ -117,10 +117,16 @@ switch fff
         
         
     case 2
-        
-        fx = sgolayfilt(fx, 2, windowsize);
-        fy = sgolayfilt(fy, 2, windowsize);
-        fd = sgolayfilt(fd, 2, windowsize);
+        try
+            fx = sgolayfilt(fx, 2, windowsize);
+            fy = sgolayfilt(fy, 2, windowsize);
+            fd = sgolayfilt(fd, 2, windowsize);
+        catch
+            fillin = [0.0100    0.0249    0.0668    0.1249    0.1756    0.1957    0.1756    0.1249    0.0668    0.0249    0.0100];
+            fx = filter(fillin, 1, x(~isnan(x)));
+            fy = filter(fillin, 1, y(~isnan(y)));
+            fd = d(~isnan(x));
+        end
 end
 
 
@@ -167,15 +173,6 @@ sac_index(ismember(sac_index, fix_index)) = [];
 % further calculations assume that there will be at least one of each so if
 % this isn't the case, return to the caller
 if ~length(sac_index) > 0 || ~length(fix_index) > 0
-    %     disp('Solitary output')
-    fixinfo = []; sacinfo = []; spinfo = []; blinkinfo = []; otherinfo = []; unknowninfo = [];     
-    
-    classinfo.fixations = fixinfo;
-    classinfo.saccades = sacinfo;
-    classinfo.smoothpursuit = spinfo;
-    classinfo.blinks = blinkinfo;
-    classinfo.others = otherinfo;
-    classinfo.unknown = unknowninfo;
     return
 end
 
@@ -476,7 +473,7 @@ else
         sac_keep = find(st_hold == 3);
     end
     
-
+    
     %% Tag and Audit Smooth Pursuit
     % correct indices for velo and accel
     dsfinal = nan(1, length(x));
@@ -653,12 +650,12 @@ else
         sacinfo.onsets(2,:) = sacinfo.onsets*st;
         sacinfo.offsets = sac_keep_end;
         sacinfo.offsets(2,:) = sacinfo.offsets*st;
-        sacinfo.velocities(1,1:sacinfo.count) = sac_avg_velos;        
+        sacinfo.velocities(1,1:sacinfo.count) = sac_avg_velos;
         sacinfo.velocities(2,1:sacinfo.count) = sac_avg_velos_var;
         sacinfo.velocities(3,1:sacinfo.count) = sac_max_velos;
         sacinfo.accelerations(1,1:sacinfo.count) = sac_avg_accel;
         sacinfo.accelerations(2,1:sacinfo.count) = sac_avg_accel_var;
-        sacinfo.accelerations(3,1:sacinfo.count) = sac_max_accel;        
+        sacinfo.accelerations(3,1:sacinfo.count) = sac_max_accel;
         sacinfo.displacement = sac_displacement';
         sacinfo.displacement_degrees = (atand((sac_displacement'/2)./(d(sac_keep_begin)*pix_to_angle_const))*2)*1000/st;
     else
