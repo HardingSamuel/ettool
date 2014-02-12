@@ -6,6 +6,7 @@ fig = figure('Position', [38 509 560 420], 'Name', 'Eyetracking Tool v0.1', 'Num
 subslist = [];
 customfileexe = [];
 
+
 Title = uicontrol('Style', 'text', 'Position', [25 380 510 25], 'String', 'Eyetracking Toolkit', ...
     'BackgroundColor', [.2 .7 .2], 'FontSize', 16, 'ForegroundColor', [1 1 1]);
 %%%%
@@ -41,6 +42,6 @@ AdditionalAnalysis = uicontrol('Style', 'pushbutton', 'Position', [30 160 150 40
 Process = uicontrol('Style', 'pushbutton', 'Position', [202.5 160 150 40], 'String', 'Process', 'Callback', 'pri_init(DIRECT,2,subslist,analyoutput,customfileexe)', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
 
 
-Summarize = uicontrol('Style', 'pushbutton', 'Position', [30 80 150 40], 'String', 'Summarize', 'Callback', 'pri_init(DIRECT,3,subslist,analyoutput)', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
+Summarize = uicontrol('Style', 'pushbutton', 'Position', [30 80 150 40], 'String', 'Summarize', 'Callback', 'pri_init(DIRECT,3,subslist)', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
         
     
