@@ -41,7 +41,7 @@ SubProcDiv = uicontrol('Style', 'frame', 'Position', [5 220 550 2], 'ForegroundC
 AdditionalAnalysis = uicontrol('Style', 'pushbutton', 'Position', [30 160 150 40], 'String', 'Analyses', 'Callback', '[analyoutput,customfileexe] = pop_analysisselectv2;', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
 Process = uicontrol('Style', 'pushbutton', 'Position', [202.5 160 150 40], 'String', 'Process', 'Callback', 'pri_init(DIRECT,2,subslist,analyoutput,customfileexe)', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
 
-
+%%%
 Summarize = uicontrol('Style', 'pushbutton', 'Position', [30 80 150 40], 'String', 'Summarize', 'Callback', 'pri_init(DIRECT,3,subslist)', 'BackgroundColor', [.7 .7 .7], 'FontSize', 12, 'ForegroundColor', [.2 .2 .2]);
         
     

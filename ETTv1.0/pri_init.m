@@ -14,7 +14,6 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         customfileexe = varargin{2};
         case 3
         modetext = 'Summarizing';
-        coldata = varargin{1};
     end
     
     for i = 3:length(directory)
