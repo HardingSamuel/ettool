@@ -57,7 +57,7 @@ for subn = 1:length(procdata.sub)
         for trinum = 1:length(procdata.sub(subn).Trial)
             
             fnt = fieldnames(procdata.sub(subn).Trial(trinum));
-            if size(fn)==size(fnt) & all(cellfun(@isequal, fn, fnt))
+            if size(fn)==size(fnt) & all(cellfun(@isequal, sort(fn), sort(fnt)))
                 
                 ftt = gettypes(procdata.sub(subn).Trial(trinum));
                 
