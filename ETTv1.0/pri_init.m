@@ -1,5 +1,5 @@
 function [done] = pri_init(DIRECT, mode, subslist, varargin)
-    status = figure('Position', [72 604 494 132], 'Name', 'Calculating, Please Wait', 'NumberTitle', 'off', 'MenuBar', 'none', 'Color', [.1 .5 .1]);
+    statusfig = figure('Position', [72 604 494 132], 'Name', 'Calculating, Please Wait', 'NumberTitle', 'off', 'MenuBar', 'none', 'Color', [.1 .5 .1]);
 
     directory = dir([DIRECT, '/MATLAB/INPUT/DATA/XLSDATA/']);
     
@@ -25,12 +25,12 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
     else
         sub_text = 'All Subjects';
     end
-    switch mode
-        case {1,2}
+%     switch mode
+%         case {1,2}
             sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
-        case 3
-            sub_text = [modetext, ' All Subjects: '];
-    end
+%         case 3
+%             sub_text = [modetext, ' All Subjects: '];
+%     end
     
     statustext = uicontrol('Style', 'text', 'Position', [10 10 474 112], 'String', sub_text, 'BackgroundColor', [.2 .7 .2], 'FontSize', 12, 'ForegroundColor', [1 1 1]);
     pause(.5)
@@ -40,12 +40,12 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         case 2
             [status] = pop_ProcessV1_4_1(DIRECT,subslist,analyoutput,customfileexe);
         case 3
-            [status] = pop_SummaryV1_1(DIRECT);
+            [status] = pop_SummaryV1_1(DIRECT, subslist);
     end
     
     set(statustext, 'String', status);
-    
-    Finished = uicontrol('Style', 'pushbutton', 'Position', [150 20 194 40], 'String', 'Return', 'BackgroundColor', [.7 .7 .7], 'FontSize', 16, 'ForegroundColor', [.2 .2 .2], 'Callback', 'close');
+    figure(statusfig)
+    uicontrol('Style', 'pushbutton', 'Position', [150 20 194 40], 'String', 'Return', 'BackgroundColor', [.7 .7 .7], 'FontSize', 16, 'ForegroundColor', [.2 .2 .2], 'Callback', 'close');
     
     
 end

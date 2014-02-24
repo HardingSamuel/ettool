@@ -53,11 +53,13 @@ blink_index = [];
 for bfill = 1:length(blink.begin)
     blink_index = [blink_index, blink.begin(bfill):blink.begin(bfill) + blink.duration(bfill) - 1];
 end
+blink_index(blink_index > length(x)) = [];
 % for each other.begin, interpolate indices across the entire duration
 other_index = [];
 for ofill = 1:length(other.begin)
     other_index = [other_index, other.begin(ofill):other.begin(ofill) + other.duration(ofill) - 1];
 end
+other_index(other_index > length(x)) = [];
 
 %% Create new matrices without gaps
 % now that we know where the gaps are, remove them so we can filter.

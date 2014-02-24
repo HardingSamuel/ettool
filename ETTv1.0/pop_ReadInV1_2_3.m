@@ -13,6 +13,10 @@ function [status] = pop_ReadIn(Direct, subslist, coldata)
 %   [SH] - 10/28/13:  Importing columns from coldata
 %   [SH] - 11/08/13:  Fixed to read Summary based on study name (line32)
 %   [SH] - 01/14/14:  Corrected path issue for \INPUT\RAWDATA
+%   [SH] - 02/18/14:  Changed beginning index name for WhatsOn Phase
+%   information from "Indices" to "Begindices," added new Phase information
+%   for the end of the trial "Endices".
+
 
 
 VersionNumber = 1.0;
@@ -77,7 +81,7 @@ for sub = subslist+2
     [BRR, BRC] = find(isnan(num(:, 17:22)));
     num(BRR, 17:22) = repmat([-1 -1 -1 -1 -1 -1], length(BRR), 1);
     
-    %Find Indices where new trials begin
+    %Find Begindices where new trials begin
     NewTrialIndex = [2, find(diff(num(1:end, 23+tnc)) ~= 0)'+2];
     TotalTrials = length(NewTrialIndex);
     
@@ -132,13 +136,15 @@ for sub = subslist+2
         %Grab the 'WhatsOn / PhaseOfTheTrial' Information
         PhaseVec = str(bgn:ennd, 23+phc)';
         %Separate out only unique instances (removes repitition), find
-        %indices where uniques first occur
+        %Begindices where uniques first occur
         [~, PhaseIndex] = unique(PhaseVec, 'first');
+        [~, PhaseIndexEnd] = unique(PhaseVec, 'last');
         
-        %Place Names and Indices in a Structure for reference in the
+        %Place Names and Begindices in a Structure for reference in the
         %future
         rawdata.sub(subn).Trial(t_iter).WhatsOn.Names = PhaseVec(sort(PhaseIndex))';
-        rawdata.sub(subn).Trial(t_iter).WhatsOn.Indices = sort(PhaseIndex);
+        rawdata.sub(subn).Trial(t_iter).WhatsOn.Begindices = sort(PhaseIndex);
+        rawdata.sub(subn).Trial(t_iter).WhatsOn.Endices = sort(PhaseIndexEnd);
         
         %Place condition information into matrix
         for input_conditions = 1:size(coldata, 2)
