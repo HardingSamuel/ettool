@@ -12,7 +12,7 @@ function [proportions] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
 
 %   [SH] - 12/12/13:  Generalized for ETTool
 
-
+keyboard
 VersionNumber = 1.0;
 
 %   Colors for displaying gaze & aois
@@ -26,32 +26,23 @@ edgebuff = .1;
 % Convert time relative to start point and into ms to compare gazedata with
 % aoi coding displayed
 
-vecbegin = wo.Indices(find(cellfun(@(x) strcmp(x, 'Video'), wo.Names)));
-if find(cellfun(@(x) strcmp(x, 'Video'), wo.Names)) < length(wo.Names)
-    vecend = wo.Indices(find(cellfun(@(x) strcmp(x, 'Video'), wo.Names))+1);
-else
-    vecend = length(x);
-end
 
-xvec = x(vecbegin:vecend);
 % normalize x
-xvec = xvec / 1920;
-yvec = y(vecbegin:vecend);
+x = x / 1920;
 % normalize y
-yvec = yvec / 1080;
-tvec = t(vecbegin:vecend);
-tvec = tvec - tvec(1);
+y = y / 1080;
+t = t - t(1);
 % keyboard
 fvec = [1:size(aoimat.data(:,:,:,stimcode),2)]*(1000/vfr);
 fvec = fvec- fvec(1);
 
-tfvec = cell2mat(arrayfun(@(x) find(x >= fvec, 1, 'last'), tvec, 'uni', 0));
+tfvec = cell2mat(arrayfun(@(x) find(x >= fvec, 1, 'last'), t, 'uni', 0));
 
 aoimat.data(find(aoimat.data==0)) = NaN;
 
 % calculate logicals for in_aoi?
-xlog = (repmat(xvec, [1 1 size(aoimat.data, 3)]) >= aoimat.data(1,tfvec,:,stimcode)) & (repmat(xvec, [1 1 size(aoimat.data, 3)]) <= aoimat.data(3,tfvec,:,stimcode));
-ylog = (repmat(yvec, [1 1 size(aoimat.data, 3)]) >= aoimat.data(2,tfvec,:,stimcode)) & (repmat(yvec, [1 1 size(aoimat.data, 3)]) <= aoimat.data(4,tfvec,:,stimcode));
+xlog = (repmat(x, [1 1 size(aoimat.data, 3)]) >= aoimat.data(1,tfvec,:,stimcode)) & (repmat(x, [1 1 size(aoimat.data, 3)]) <= aoimat.data(3,tfvec,:,stimcode));
+ylog = (repmat(y, [1 1 size(aoimat.data, 3)]) >= aoimat.data(2,tfvec,:,stimcode)) & (repmat(y, [1 1 size(aoimat.data, 3)]) <= aoimat.data(4,tfvec,:,stimcode));
 proportions = mean((xlog & ylog), 2);
 % keyboard
 
