@@ -12,7 +12,7 @@ function [proportions] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
 
 %   [SH] - 12/12/13:  Generalized for ETTool
 
-keyboard
+
 VersionNumber = 1.0;
 
 %   Colors for displaying gaze & aois
