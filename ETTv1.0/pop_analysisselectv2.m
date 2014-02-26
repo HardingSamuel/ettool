@@ -27,9 +27,7 @@ function varargour = done_button_callback(donebut, eventdata)
         [filename, pathname, filterindex] = uigetfile( ...
        {'*.m','M-files (*.m)'}, ...
         'Pick a file', 'Untitled.mat');
-        cd(pathname)
-        filename = [filename(1:end-2), '(1);'];
-        eval(['customfileexe = ' filename]);
+        customfileexe = strcat(pathname, filename);
     end   
         
     close

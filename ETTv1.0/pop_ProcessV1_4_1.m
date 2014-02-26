@@ -212,7 +212,7 @@ for subn = subslist
             
             if analyoutput(4) && ~isempty(customfileexe)
                 try
-                    eval(customfileexe)
+                    run(customfileexe)
                     procdata.sub(subn).Trial(trinum).usecustom = 1;
                 catch
                     keyboard
