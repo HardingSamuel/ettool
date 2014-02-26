@@ -157,8 +157,8 @@ plot(st*find(xqual), x(find(xqual)), 'go', 'markersize', 3);
 ax = axis;
 ax(2) = st*length(x);
 axis(ax)
-for arfill = 1:length(whatson.Indices)
-    rectangle('pos',[st*whatson.Indices(arfill), ax(3), 5, ax(4)-ax(3)])
+for arfill = 1:length(whatson.Begindices)
+    rectangle('pos',[st*whatson.Begindices(arfill), ax(3), 5, ax(4)-ax(3)])
 end
 xlabel('Time (ms)')
 ylabel('Pixel Position')
@@ -522,7 +522,7 @@ uiwait
     function PhaseFig(auditmain_menu1_2, eventdata, whatson)
         phasefig = figure('position', [100 500 200 225], 'numbertitle', 'off', 'name', 'Phase Information', 'menubar', 'none', 'color', [.7 .7 .7]);
         phasedatnames = uicontrol('style', 'text', 'pos', [10 10 85 205], 'string', whatson.Names);
-        phasedatindex = uicontrol('style', 'text', 'pos', [105 10 85 205], 'string', st*whatson.Indices);
+        phasedatindex = uicontrol('style', 'text', 'pos', [105 10 85 205], 'string', st*whatson.Begindices);
     end
 
 

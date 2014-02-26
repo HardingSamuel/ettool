@@ -174,7 +174,7 @@ for subn = subslist
             end            
             
             if analyoutput(1) || analyoutput(5)              
-                [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(xtrial,ytrial,dtrial,sr,gapdata,2,40,150,procdata.sub(subn).Trial(trinum).WhatsOn, analyoutput(5));
+                [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(x,y,d,sr,gapdata,2,40,150,procdata.sub(subn).Trial(trinum).WhatsOn, analyoutput(5));
                 procdata.sub(subn).Trial(trinum).Classifications = classinfo;
                 procdata.sub(subn).Trial(trinum).PointInfo = pointinfo;
             else
