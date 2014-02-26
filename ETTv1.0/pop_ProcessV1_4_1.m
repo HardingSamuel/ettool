@@ -55,12 +55,11 @@ end
 
 ChangedSubs = 0;
 
-phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-phasedata = guihandles(phasefig);
+
 phasedata.PhaseKeep = {[]};
 phasedata.PhaseIndx = {[]};
 phasedata.PhaseReject = {[]};
-guidata(phasefig,phasedata)
+
 
 for subn = subslist
     
@@ -92,12 +91,7 @@ for subn = subslist
             
             if ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))) && ...
                     ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseReject(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseReject)))
-                figure(phasefig)
-                uicontrol('parent', phasefig, 'style', 'text', 'String', 'Do you want to analyze trials with this Phase Structure?', 'pos', [10 150 340 60], 'fontsize', 14);
-                phaselist = uicontrol('parent', phasefig, 'style', 'listbox', 'String', char(rawdata.sub(subn).Trial(trinum).WhatsOn.Names), 'pos', [10 10 165 130], 'fontsize', 10, 'max', length(rawdata.sub(subn).Trial(trinum).WhatsOn.Names), 'value', []);
-                uicontrol('parent', phasefig, 'style', 'pushbutton', 'String', 'Yes', 'pos', [185 80 165 60], 'fontsize', 10, 'callback', {@phase_keep,1,rawdata.sub(subn).Trial(trinum).WhatsOn.Names})
-                uicontrol('parent', phasefig, 'style', 'pushbutton', 'String', 'No', 'pos', [185 10 165 60], 'fontsize', 10, 'callback', {@phase_keep,0,rawdata.sub(subn).Trial(trinum).WhatsOn.Names})
-                uiwait
+                phasedata = phase_keep(phasedata,procdata.sub(subn).Trial(trinum).WhatsOn.Names);
             end
             
             keep_reject = [any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))), ...
@@ -206,7 +200,8 @@ for subn = subslist
                 stimcode = find(strcmp(procdata.sub(subn).Trial(trinum).VideoType, vidnames));
                 
                 vfr = 30;
-                procdata.sub(subn).Trial(trinum).proportions = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
+                [procdata.sub(subn).Trial(trinum).proportions, ...
+                    procdata.sub(subn).Trial(trinum).proportions_gooddata] = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
                 
             end
             
@@ -248,26 +243,7 @@ disp('#### PROCESS COMPLETE! ####')
 
 status = 'Process Complete!';
 
-    function phase_keep(~,~,keepreject,PhaseValues)
-        switch keepreject
-            case 1
-                phasedata.PhaseKeep = [phasedata.PhaseKeep, {PhaseValues}];
-                if isempty(get(phaselist, 'value'))
-                    phaseval = 1:size(get(phaselist, 'string'),1);
-                else
-                    phaseval = get(phaselist, 'value');
-                end
-                    
-                phasedata.PhaseIndx = [phasedata.PhaseIndx, {phaseval}];                
-                close(phasefig)
-                phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-%                 uiresume
-            case 0
-                phasedata.PhaseReject = [phasedata.PhaseReject, {PhaseValues}];
-                close(phasefig)
-                phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-%                 uiresume
-        end
-    end
+    
+
 end
 

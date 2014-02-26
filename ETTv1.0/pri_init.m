@@ -42,7 +42,7 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         case 3
             [status] = pop_SummaryV1_1(DIRECT, subslist);
     end
-    
+    done = 1;
     set(statustext, 'String', status);
     figure(statusfig)
     uicontrol('Style', 'pushbutton', 'Position', [150 20 194 40], 'String', 'Return', 'BackgroundColor', [.7 .7 .7], 'FontSize', 16, 'ForegroundColor', [.2 .2 .2], 'Callback', 'close');
