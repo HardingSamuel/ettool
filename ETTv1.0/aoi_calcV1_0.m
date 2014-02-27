@@ -1,4 +1,4 @@
-function [proportions] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
+function [proportions,goodprops] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
 
 %%  AOI_Calc
 %   Calculate the percentage of gaze points that land within various
@@ -21,18 +21,12 @@ color = [{'r', 'b', 'g', 'y', 'm', 'c', 'w', 'k'}, [1 .4 .6], [.75 .75 .75]];
 %   How much to expand the AOIs to include errant edge points?
 edgebuff = .1;
 
-
-
-% Convert time relative to start point and into ms to compare gazedata with
-% aoi coding displayed
-
-
 % normalize x
 x = x / 1920;
 % normalize y
 y = y / 1080;
 t = t - t(1);
-% keyboard
+
 fvec = [1:size(aoimat.data(:,:,:,stimcode),2)]*(1000/vfr);
 fvec = fvec- fvec(1);
 
@@ -43,7 +37,11 @@ aoimat.data(find(aoimat.data==0)) = NaN;
 % calculate logicals for in_aoi?
 xlog = (repmat(x, [1 1 size(aoimat.data, 3)]) >= aoimat.data(1,tfvec,:,stimcode)) & (repmat(x, [1 1 size(aoimat.data, 3)]) <= aoimat.data(3,tfvec,:,stimcode));
 ylog = (repmat(y, [1 1 size(aoimat.data, 3)]) >= aoimat.data(2,tfvec,:,stimcode)) & (repmat(y, [1 1 size(aoimat.data, 3)]) <= aoimat.data(4,tfvec,:,stimcode));
-proportions = mean((xlog & ylog), 2);
+
+goodxlog = xlog(:,~isnan(x),:); goodylog = ylog(:,~isnan(y),:);
+proportions = squeeze(mean((xlog & ylog), 2));
+goodprops = squeeze(mean((goodxlog & goodylog),2));
+
 % keyboard
 
 %% 
