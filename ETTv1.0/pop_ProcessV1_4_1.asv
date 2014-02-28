@@ -17,7 +17,7 @@
 %   pop_analysisselect:  1 returns Fix/Sac, no SP
 %                        4 returns Fix/Sac, + SP
 %   [SH] - 01/28/14:  Added custom Processing for study-specific analyses.
-%   [SH] - 02/17/14:  Added Phase Selection
+%   [SH] - 02/17/14:  Added Trialtype and Phase Selection
 
 function [status] = pop_ProcessV1_4_1(Direct, subslist, analyoutput, customfileexe)
 
@@ -55,12 +55,11 @@ end
 
 ChangedSubs = 0;
 
-phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-phasedata = guihandles(phasefig);
+
 phasedata.PhaseKeep = {[]};
 phasedata.PhaseIndx = {[]};
 phasedata.PhaseReject = {[]};
-guidata(phasefig,phasedata)
+
 
 for subn = subslist
     
@@ -92,12 +91,7 @@ for subn = subslist
             
             if ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))) && ...
                     ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseReject(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseReject)))
-                figure(phasefig)
-                uicontrol('parent', phasefig, 'style', 'text', 'String', 'Do you want to analyze trials with this Phase Structure?', 'pos', [10 150 340 60], 'fontsize', 14);
-                phaselist = uicontrol('parent', phasefig, 'style', 'listbox', 'String', char(rawdata.sub(subn).Trial(trinum).WhatsOn.Names), 'pos', [10 10 165 130], 'fontsize', 10, 'max', length(rawdata.sub(subn).Trial(trinum).WhatsOn.Names));
-                uicontrol('parent', phasefig, 'style', 'pushbutton', 'String', 'Yes', 'pos', [185 80 165 60], 'fontsize', 10, 'callback', {@phase_keep,1,rawdata.sub(subn).Trial(trinum).WhatsOn.Names})
-                uicontrol('parent', phasefig, 'style', 'pushbutton', 'String', 'No', 'pos', [185 10 165 60], 'fontsize', 10, 'callback', {@phase_keep,0,rawdata.sub(subn).Trial(trinum).WhatsOn.Names})
-                uiwait
+                phasedata = phase_keep(phasedata,procdata.sub(subn).Trial(trinum).WhatsOn.Names);
             end
             
             keep_reject = [any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))), ...
@@ -137,28 +131,28 @@ for subn = subslist
             
             % define new variables that are easier to send off to other
             % scripts
-            x = processed.GazeX;
-            y = processed.GazeY;
-            d = processed.Distance;
-            V = processed.Validity;
-            p = processed.Pupil;
-            t = procdata.sub(subn).Trial(trinum).Time;
-            wo = procdata.sub(subn).Trial(trinum).WhatsOn;
             
             phasenum = find(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep)));
             phasenames = phasedata.PhaseKeep{phasenum};
             phasenamesindx = phasedata.PhaseIndx{phasenum};
             phase_beg_name = phasenames{phasenamesindx(1)}; 
             phase_end_name = phasenames{phasenamesindx(length(phasenamesindx))};
-           
             
-            xtrial = x(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
-            ytrial = y(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
-            dtrial = d(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
-            Vtrial = V(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
-            ptrial = p(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
-            ttrial = t(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            wo = procdata.sub(subn).Trial(trinum).WhatsOn;
+            x = processed.GazeX(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            y = processed.GazeY(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            d = processed.Distance(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            V = processed.Validity(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            p = processed.Pupil(wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
+            t = procdata.sub(subn).Trial(trinum).Time(:,wo.Begindices(strcmp(phase_beg_name, wo.Names)):wo.Endices(strcmp(phase_end_name, wo.Names)));
             
+            
+            %remove gaps calculated from before or after the trial phase
+            %and adjust indices.  It would be possible to only interpolate
+            %the trial data excluding the non-trial phases, but there is a
+            %chance valuable trial information could be extracted by
+            %interpolating over these edges.  For now, we will messily
+            %adjust the indices after the fact.
             try
                 gaptrialadj = gapdata(1,:) < wo.Begindices(strcmp(phase_beg_name, wo.Names));
                 if ~isempty(gapdata(:,gaptrialadj))
@@ -174,7 +168,7 @@ for subn = subslist
             end            
             
             if analyoutput(1) || analyoutput(5)              
-                [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(xtrial,ytrial,dtrial,sr,gapdata,2,40,150,procdata.sub(subn).Trial(trinum).WhatsOn, analyoutput(5));
+                [classinfo, pointinfo] = fixsacv1_1_2FORVALID_SPattmpt(x,y,d,sr,gapdata,2,40,150,procdata.sub(subn).Trial(trinum).WhatsOn, analyoutput(5));
                 procdata.sub(subn).Trial(trinum).Classifications = classinfo;
                 procdata.sub(subn).Trial(trinum).PointInfo = pointinfo;
             else
@@ -206,13 +200,14 @@ for subn = subslist
                 stimcode = find(strcmp(procdata.sub(subn).Trial(trinum).VideoType, vidnames));
                 
                 vfr = 30;
-                procdata.sub(subn).Trial(trinum).proportions = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
+                [procdata.sub(subn).Trial(trinum).proportions, ...
+                    procdata.sub(subn).Trial(trinum).proportions_gooddata] = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
                 
             end
             
             if analyoutput(4) && ~isempty(customfileexe)
                 try
-                    eval(customfileexe)
+                    run(customfileexe)
                     procdata.sub(subn).Trial(trinum).usecustom = 1;
                 catch
                     keyboard
@@ -248,20 +243,7 @@ disp('#### PROCESS COMPLETE! ####')
 
 status = 'Process Complete!';
 
-    function phase_keep(~,~,keepreject,PhaseValues)
-        switch keepreject
-            case 1
-                phasedata.PhaseKeep = [phasedata.PhaseKeep, {PhaseValues}];
-                phasedata.PhaseIndx = [phasedata.PhaseIndx, {get(phaselist, 'value')}];                
-                close(phasefig)
-                phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-                uiresume
-            case 0
-                phasedata.PhaseReject = [phasedata.PhaseReject, {PhaseValues}];
-                close(phasefig)
-                phasefig = figure('pos', [138 609 360 220], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'off');
-                uiresume
-        end
-    end
+    
+
 end
 

@@ -123,17 +123,19 @@ for subn = subslist
     end
 end
 % xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writeme, 'MasterData')
+
+% keyboard
 summ_xlswrite(Direct,StudyName,'MasterData',writeme,summ_sizetorange('A1',writeme))
 pause(1)
 if ~isempty(subfixsac)
     summ_xlswrite(Direct,StudyName,'FixationSaccadeData', writefixsac, summ_sizetorange('A1',writefixsac))
     pause(1)
-    summ_xlswrite(Direct,StudyName,'FixationSaccadeData', subfixsac, 'FixationSaccadeData', summ_sizetorange('A2',subfixsac))
+    summ_xlswrite(Direct,StudyName,'FixationSaccadeData', subfixsac, summ_sizetorange('A2',subfixsac))
 end
 if ~isempty(subfixt)
     summ_xlswrite(Direct,StudyName,'FixTarget', writefix, summ_sizetorange('B1',writefix))
     pause(1)
-    summ_xlswrite(Direct,StudyName,'FixTarget', subfixt, 'FixTarget', summ_sizetorange('B2',subfixt))
+    summ_xlswrite(Direct,StudyName,'FixTarget', subfixt, summ_sizetorange('B2',subfixt))
 end
     
 

@@ -1,40 +1,44 @@
 function [done] = pri_init(DIRECT, mode, subslist, varargin)
-    statusfig = figure('Position', [72 604 494 132], 'Name', 'Calculating, Please Wait', 'NumberTitle', 'off', 'MenuBar', 'none', 'Color', [.1 .5 .1]);
+statusfig = figure('Position', [72 604 494 132], 'Name', 'Calculating, Please Wait', 'NumberTitle', 'off', 'MenuBar', 'none', 'Color', [.1 .5 .1]);
 
-    directory = dir([DIRECT, '/MATLAB/INPUT/DATA/XLSDATA/']);
-    
-      
-    switch mode
-        case 1
+directory = dir([DIRECT, '/MATLAB/INPUT/DATA/XLSDATA/']);
+
+
+switch mode
+    case 1
         modetext = 'Reading In';
+        errortext = 'ReadIn';
         coldata = varargin{1};
-        case 2
+    case 2
         modetext = 'Processing';
+        errortext = 'Process';
         analyoutput = varargin{1};
         customfileexe = varargin{2};
-        case 3
+    case 3
         modetext = 'Summarizing';
-    end
-    
-    for i = 3:length(directory)
-        sublist(i-2) = str2num(directory(i).name(end-9:end-7));
-    end
-    
-    if ~isempty(subslist)
-        sub_text = sublist(subslist);
-    else
-        sub_text = 'All Subjects';
-    end
+        errortext = 'Summary';
+end
+
+for i = 3:length(directory)
+    sublist(i-2) = str2num(directory(i).name(end-9:end-7));
+end
+
+if ~isempty(subslist)
+    sub_text = sublist(subslist);
+else
+    sub_text = 'All Subjects';
+end
 %     switch mode
 %         case {1,2}
-            sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
+sub_text = [modetext, ' Subjects: ', num2str(sub_text)];
 %         case 3
 %             sub_text = [modetext, ' All Subjects: '];
 %     end
-    
-    statustext = uicontrol('Style', 'text', 'Position', [10 10 474 112], 'String', sub_text, 'BackgroundColor', [.2 .7 .2], 'FontSize', 12, 'ForegroundColor', [1 1 1]);
-    pause(.5)
-    switch mode
+
+statustext = uicontrol('Style', 'text', 'Position', [10 10 474 112], 'String', sub_text, 'BackgroundColor', [.2 .7 .2], 'FontSize', 12, 'ForegroundColor', [1 1 1]);
+pause(.5)
+% try
+    switch mode        
         case 1
             [status] = pop_ReadInV1_2_3(DIRECT, subslist, coldata);
         case 2
@@ -42,10 +46,15 @@ function [done] = pri_init(DIRECT, mode, subslist, varargin)
         case 3
             [status] = pop_SummaryV1_1(DIRECT, subslist);
     end
-    done = 1;
-    set(statustext, 'String', status);
-    figure(statusfig)
-    uicontrol('Style', 'pushbutton', 'Position', [150 20 194 40], 'String', 'Return', 'BackgroundColor', [.7 .7 .7], 'FontSize', 16, 'ForegroundColor', [.2 .2 .2], 'Callback', 'close');
-    
-    
+% catch
+%     keyboard
+%     error(['Error Running ' errortext])
+%     
+% end
+done = 1;
+set(statustext, 'String', status);
+figure(statusfig)
+uicontrol('Style', 'pushbutton', 'Position', [150 20 194 40], 'String', 'Return', 'BackgroundColor', [.7 .7 .7], 'FontSize', 16, 'ForegroundColor', [.2 .2 .2], 'Callback', 'close');
+
+
 end

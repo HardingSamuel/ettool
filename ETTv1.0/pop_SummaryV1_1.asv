@@ -9,8 +9,8 @@ function [status] = pop_SummaryV1_1(Direct, subslist, coldata)
 %   [SH] - 02/03/14:  Generalized for all studies
 
 
-VersionNumber = 1.1;
-VersionNumberString = '1_1';
+VersionNumber = 1.0;
+VersionNumberString = '1_0';
 currenttime = clock;
 
 
@@ -46,27 +46,27 @@ subfixsac = nan(0,14);
 subfixt = single(zeros(0,3));
 
 
-for subn = 1:length(procdata.sub)
+for subn = subslist
     
     if ~isempty(procdata.sub(subn)) & ~isempty(procdata.sub(subn).Trial(1))
         
         sr = procdata.sub(subn).SampleRate;
         subwrite = cell(length(procdata.sub(subn).Trial), 3+length(fn(~cellfun(@(x) strcmp(x, 'struct'), ft) & ~cellfun(@(x) strcmp(x, 'Time'), fn) & ~cellfun(@(x) strcmp(x, 'usecustom'), fn))));
         subjectnumber = procdata.sub(subn).SubjectNumber;
-        disp(['Summarizing Subject Number:  ' num2str(subjectnumber)]
+        disp(['Summarizing Subject Number:  ' num2str(subjectnumber)])
         for trinum = 1:length(procdata.sub(subn).Trial)
             
             fnt = fieldnames(procdata.sub(subn).Trial(trinum));
-            if size(fn)==size(fnt) & all(cellfun(@isequal, fn, fnt))
+            if size(fn)==size(fnt) & all(cellfun(@isequal, sort(fn), sort(fnt)))
                 
-                ft = gettypes(procdata.sub(subn).Trial(trinum));
+                ftt = gettypes(procdata.sub(subn).Trial(trinum));
                 
-                for writefield = 1:length(ft)
+                for writefield = 1:length(ftt)
                     if ~strcmp(fnt(writefield), 'Processed') && ~strcmp(fnt(writefield), 'Time') && ...
                             ~strcmp(fnt(writefield), 'WhatsOn') && ~strcmp(fnt(writefield), 'eye') && ...
                             ~strcmp(fnt(writefield), 'PointInfo') && ~strcmp(fnt(writefield), 'proportions') ...
                             && ~strcmp(fnt(writefield), 'usecustom')
-                        if strcmp(ft(writefield), 'struct')
+                        if strcmp(ftt(writefield), 'struct')
                             fieldout(writefield) = extractstruct(procdata.sub(subn).Trial(trinum).(char(fnt(writefield))));
                         else
                             fieldout(writefield) = {procdata.sub(subn).Trial(trinum).(char(fnt(writefield)))};
@@ -97,18 +97,18 @@ for subn = 1:length(procdata.sub)
                     fixsacout = [repmat(subjectnumber,nitems,1), repmat(trinum,nitems,1),fixsacout];
                     subfixsac = [subfixsac; fixsacout];
                 end
-                if ~isempty(procdata.sub(subn).Trial(trinum).fixtarget)
-                    writefixt = [{'Subject'}, {'Trial'}, {'FixN_OnTarget'}];
-                    currdir = cd;
-                    cd(['Z:\Current_Studies\Manuela\Faces & EyeGaze\MATLAB'])
-                    fixtout = [];
-                    fixtout = summ_fixtarget(procdata.sub(subn).Trial(trinum).fixtarget,procdata.sub(subn).Trial(trinum).T_Location);
-                    if ~isempty(fixtout)
-                        fixtout = single([repmat(subjectnumber,size(fixtout,1),1), repmat(trinum,size(fixtout,1),1),fixtout]);
-                        subfixt = [subfixt; fixtout];
-                    end
-                    cd(currdir);                    
-                end
+%                 if ~isempty(procdata.sub(subn).Trial(trinum).fixtarget)
+%                     writefixt = [{'Subject'}, {'Trial'}, {'FixN_OnTarget'}];
+%                     currdir = cd;
+%                     cd(['Z:\Current_Studies\Manuela\Faces & EyeGaze\MATLAB'])
+%                     fixtout = [];
+%                     fixtout = summ_fixtarget(procdata.sub(subn).Trial(trinum).fixtarget,procdata.sub(subn).Trial(trinum).T_Location);
+%                     if ~isempty(fixtout)
+%                         fixtout = single([repmat(subjectnumber,size(fixtout,1),1), repmat(trinum,size(fixtout,1),1),fixtout]);
+%                         subfixt = [subfixt; fixtout];
+%                     end
+%                     cd(currdir);                    
+%                 end
             end
             if add_outputs(2)
                 summ_props(procdata.sub(subn).Trial(trinum).proportions);
@@ -116,30 +116,26 @@ for subn = 1:length(procdata.sub)
             if add_outputs(3)
                 %                 custom_output = eval(
             end
-            
             subwrite(trinum, 1:3+size(fieldout,2)) = [subjectnumber, trinum, sr, fieldout];
-            if size(subwrite,2) > 13
-                keyboard
-            end
             
         end
         writeme = [writeme; subwrite];
     end
 end
-xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writeme, 'MasterData')
+% xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writeme, 'MasterData')
+
+% keyboard
+summ_xlswrite(Direct,StudyName,'MasterData',writeme,summ_sizetorange('A1',writeme))
 pause(1)
 if ~isempty(subfixsac)
-    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writefixsac, 'FixationSaccadeData', 'A1:N1')
-    lastrow = 1 + size(subfixsac,1);
+    summ_xlswrite(Direct,StudyName,'FixationSaccadeData', writefixsac, summ_sizetorange('A1',writefixsac))
     pause(1)
-    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], subfixsac, 'FixationSaccadeData', ['A2:N' num2str(lastrow)])
+    summ_xlswrite(Direct,StudyName,'FixationSaccadeData', subfixsac, summ_sizetorange('A',subfixsac))
 end
-keyboard
 if ~isempty(subfixt)
-    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], writefixt, 'FixTarget', 'B1:D1')
-    lastrow = 1 + size(subfixt,1);
+    summ_xlswrite(Direct,StudyName,'FixTarget', writefix, summ_sizetorange('B1',writefix))
     pause(1)
-    xlswrite([Direct '\EXCEL\' StudyName ' SUMMARY.xlsx'], subfixt, 'FixTarget',  ['B2:D' num2str(lastrow)])
+    summ_xlswrite(Direct,StudyName,'FixTarget', subfixt, summ_sizetorange('B2',subfixt))
 end
     
 

@@ -91,7 +91,7 @@ for subn = subslist
             
             if ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))) && ...
                     ~any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseReject(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseReject)))
-                phasedata = phase_keep(phasedata,procdata.sub(subn).Trial(trinum).WhatsOn.Names);
+                phasedata = phase_keep(phasedata,rawdata.sub(subn).Trial(trinum).WhatsOn.Names);
             end
             
             keep_reject = [any(arrayfun(@(x) cellfun(@isequal,phasedata.PhaseKeep(x),{rawdata.sub(subn).Trial(trinum).WhatsOn.Names}), 1:length(phasedata.PhaseKeep))), ...
