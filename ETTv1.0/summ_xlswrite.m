@@ -27,10 +27,13 @@ usedrange = strrep(usedrange, '$', '');
 e.Quit
 delete(e)
 
-
-usedfirstcol = find(usedrange(1) == alphlist);
-usedlastcol = find(usedrange(strfind(usedrange,':')+1)==alphlist);
 % keyboard
+usedfirstcol = find(usedrange(1) == alphlist);
+if length(usedrange)==2
+    usedrange = strcat(usedrange, ':', usedrange);
+end
+usedlastcol = find(usedrange(strfind(usedrange,':')+1)==alphlist);
+
 if firstcol <= usedlastcol 
     xlsfig = figure('pos', [138 609 360 90], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Select Test Phase', 'visible', 'on');
     uicontrol('style', 'text', 'string', 'Selected Range already has data.  Overwrite?', 'pos', [10 50 340 30]);
