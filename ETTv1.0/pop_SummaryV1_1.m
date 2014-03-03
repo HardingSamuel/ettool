@@ -38,7 +38,7 @@ end
 ChangedSubs = 0;
 
 if isempty(subslist)
-    sublist = 1:length(procdata.sub);
+    subslist = 1:length(procdata.sub);
 end
 
 fn = fieldnames(procdata.sub(1).Trial(1));
@@ -140,8 +140,6 @@ if ~isempty(subfixt)
     pause(1)
     summ_xlswrite(Direct,StudyName,'FixTarget', subfixt, summ_sizetorange('B2',subfixt))
 end
-    
-
 
 status = 'Summary Complete';
 fprintf('\n')
