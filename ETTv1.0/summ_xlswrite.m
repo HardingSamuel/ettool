@@ -27,7 +27,7 @@ usedrange = strrep(usedrange, '$', '');
 e.Quit
 delete(e)
 
-% keyboard
+
 usedfirstcol = find(usedrange(1) == alphlist);
 if length(usedrange)==2
     usedrange = strcat(usedrange, ':', usedrange);
@@ -49,10 +49,12 @@ else
 end
 
 function writexl(~,~,writefile,writesheet,writevalues,writerange)
+
     close(gcf)
     xlsfig = figure('pos', [138 609 360 50], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Writing to Excel', 'visible', 'on');
     uicontrol('style', 'text', 'string', 'Writing Data, please wait', 'pos', [10 10 340 30]);
     uiresume
+    
     try
         xlswrite(writefile,writevalues,writesheet,writerange)    
     catch

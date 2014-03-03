@@ -37,6 +37,9 @@ end
 
 ChangedSubs = 0;
 
+if isempty(subslist)
+    sublist = 1:length(procdata.sub);
+end
 
 fn = fieldnames(procdata.sub(1).Trial(1));
 ft = gettypes(procdata.sub(1).Trial(1));
