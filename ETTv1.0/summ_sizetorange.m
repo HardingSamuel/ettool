@@ -16,7 +16,7 @@ letsat = cell2mat(regexp(startcell,alph));
 rowoffset = str2double(startchar(numsat)) - 1;
 coloffset = find(startchar(letsat) == alphlist) - 1;
 
-rows = [str2double(startchar(numsat))+rowoffset, str2double(startchar(numsat)) + size(data,1) + rowoffset - 1];
+rows = [str2double(startchar(numsat)), str2double(startchar(numsat)) + size(data,1) - 1];
 
 alphloops = ceil((size(data,2)+coloffset)/26);
 if alphloops > 1
