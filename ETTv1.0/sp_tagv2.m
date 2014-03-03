@@ -130,7 +130,7 @@ end
 
 
 %% Plotting, Interface
-close all
+% close all
 auditmain = figure('position', [100 500 700 525], 'numbertitle', 'off', 'name', 'Smooth Pursuit Auditing', 'menubar', 'none', 'color', [.7 .7 .7]);
 auditmainsize = [700 525 700 525];
 datafig = guihandles(auditmain);
