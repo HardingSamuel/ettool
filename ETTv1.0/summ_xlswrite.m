@@ -19,7 +19,11 @@ end
 
 e = actxserver ('Excel.Application');
 ewb = e.Workbooks.Open(outname);
-sheetObj = e.Worksheets.get('Item', SHEETNAME);
+try
+    sheetObj = e.Worksheets.get('Item', SHEETNAME);
+catch
+    error(['Could not location Sheet ' SHEETNAME]);
+end
 num_cols = sheetObj.UsedRange.Columns.Count;
 num_rows = sheetObj.UsedRange.Rows.Count;
 usedrange = sheetObj.UsedRange.Address;
@@ -54,6 +58,7 @@ function writexl(~,~,writefile,writesheet,writevalues,writerange)
     xlsfig = figure('pos', [138 609 360 50], 'menubar', 'none', 'numbertitle', 'off', 'Color', [.1 .5 .1], 'Name', 'Writing to Excel', 'visible', 'on');
     uicontrol('style', 'text', 'string', 'Writing Data, please wait', 'pos', [10 10 340 30]);
     uiresume
+    drawnow
     
     try
         xlswrite(writefile,writevalues,writesheet,writerange)    

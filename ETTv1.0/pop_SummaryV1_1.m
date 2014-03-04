@@ -95,7 +95,7 @@ for subn = subslist
                 procdata.sub(subn).Trial(trinum).usecustom==1];
             
             if add_outputs(1)
-                if ~isempty(procdata.sub(subn).Trial(trinum).Classifications.fixations);
+                if ~isempty(procdata.sub(subn).Trial(trinum).Classifications);
                     [nitems,fixsacout] = summ_fixsac(procdata.sub(subn).Trial(trinum).Classifications);
                     fixsacout = [repmat(subjectnumber,nitems,1), repmat(trinum,nitems,1),fixsacout];
                     subfixsac = [subfixsac; fixsacout];
@@ -116,9 +116,9 @@ for subn = subslist
             if add_outputs(2)
                 summ_props(procdata.sub(subn).Trial(trinum).proportions);
             end
-            if add_outputs(3)
-                %                 custom_output = eval(
-            end
+%             if add_outputs(3)
+%                 %                 custom_output = eval(
+%             end
             subwrite(trinum, 1:3+size(fieldout,2)) = [subjectnumber, trinum, sr, fieldout];
             
         end
