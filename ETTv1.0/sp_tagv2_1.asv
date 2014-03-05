@@ -1,4 +1,4 @@
-function [sp_index_final] = sp_tagv2(x,y,d,velo,sr,varargin)
+function [sp_index_final] = sp_tagv2_1(x,y,d,velo,sr,varargin)
 
 %   [SH] - 01/24/14:  several bug fixes, incorparting fix and sac data from
 %   caller
@@ -16,31 +16,12 @@ function [sp_index_final] = sp_tagv2(x,y,d,velo,sr,varargin)
 %
 
 
-%% Persistents
-
-% persistent data
-% persistent backsp
-% persistent editsize
-% persistent plusb
-% persistent minusb
-% persistent plusplusb
-% persistent minusminusb
-% persistent xcirc
-% persistent ycirc
-% persistent vcirc
-
-% global plusb ;
-% global plusplusb;
-%
-% global minusb;
-% global minusminusb;
-
 %% Define Parameters
 mthresh_low = 1.5;
 mthresh_high = varargin{1};
 rthresh = .75;
-sp_windowsize = 100;
 st = 1000/sr;
+sp_windowsize = floor(100/st);
 pix_to_angle_const = varargin{2};
 if length(varargin) >2
     fixinfo = varargin{3};
@@ -91,10 +72,10 @@ xq_keep_all = [];
 if ~isempty(xqi)
     xq_begin = [xqi(1), xqi(find(diff(xqi)>1)+1)]; %location of beginning of sp
     xq_end = [xqi(find(diff(xqi)>1)), xqi(end)]; %location of end of sp
-    xq_thresh = xq_end - xq_begin + 1 >= floor(sp_windowsize/st); %index of sp beginnings where duration >= threshold
+    xq_thresh = xq_end - xq_begin + 1 >= 0; %index of sp beginnings where duration >= threshold
     xq_keep_begin = xq_begin(xq_thresh); %sp_begin when above threshold
     xq_keep_end = xq_end(xq_thresh); %sp_end when above threshold
-    xq_keep_all = unique(cell2mat(arrayfun(@(x) xq_keep_begin(x):xq_keep_end(x), [1:length(xq_keep_begin)], 'uni', 0))); %every point from keep_begin:keep_end    
+    xq_keep_all = unique(cell2mat(arrayfun(@(x) xq_keep_begin(x):xq_keep_end(x), [1:length(xq_keep_begin)], 'uni', 0))); %every point from keep_begin:keep_end
     xqual(xq_keep_all) = 1; %logical criteria met
 end
 
@@ -120,14 +101,12 @@ yq_keep_all = [];
 if ~isempty(yqi)
     yq_begin = [yqi(1), yqi(find(diff(yqi)>1)+1)];
     yq_end = [yqi(find(diff(yqi)>1)), yqi(end)];
-    yq_thresh = yq_end - yq_begin + 1 >= floor(sp_windowsize/st);
+    yq_thresh = yq_end - yq_begin + 1 >= 0;
     yq_keep_begin = yq_begin(yq_thresh);
     yq_keep_end = yq_end(yq_thresh);
     yq_keep_all = unique(cell2mat(arrayfun(@(y) yq_keep_begin(y):yq_keep_end(y), [1:length(yq_keep_begin)], 'uni', 0)));
     yqual(yq_keep_all) = 1;
 end
-
-
 
 %% Plotting, Interface
 % close all
@@ -158,7 +137,7 @@ ax = axis;
 ax(2) = st*length(x);
 axis(ax)
 for arfill = 1:length(whatson.Begindices)
-    rectangle('pos',[st*whatson.Begindices(arfill), ax(3), 5, ax(4)-ax(3)])
+    rectangle('pos',[st*whatson.Begindices(arfill), ax(3), 2, ax(4)-ax(3)],'edgecolor',[0 0 1])
 end
 xlabel('Time (ms)')
 ylabel('Pixel Position')
@@ -183,11 +162,8 @@ data.sortdat = data.sortdat(b,:);
 if size(data.sortdat,1)==0
     set(auditmain_menu2_2, 'enable', 'off')
 end
-% keyboard
-
-%%
-if ~isempty(data.sortdat)
-    editwin = figure('position', [900 350 700 625], 'numbertitle', 'off', 'name', 'Edit SP Epochs',  'color', [.7 .7 .7], ...
+if ~size(data.sortdat,1)==0
+    editwin = figure('position', [ 809   373   700   625], 'numbertitle', 'off', 'name', 'Edit SP Epochs',  'color', [.7 .7 .7], ...
         'menubar', 'none', 'toolbar', 'figure');
     data.editmainsize = [700 525 700 525];
     %      Plots
@@ -259,20 +235,25 @@ if ~isempty(data.sortdat)
     subplot('position', data.veloplotpos./data.editmainsize)
     axis(data.axis.velo)
     hilite
+    
+    %have main and editing window; have a primitive loop for each sp
+    %epoch, need to add buttons and figure out how to edit
 end
+
+
+PhaseFig(1,1,whatson)
+keyboard
 uiwait
 
-
 %% Functions
-    
-%%
+
     function selcbk(dirbg,eventdata)
         %         disp(dirbg);
         %         disp([eventdata.EventName,'  ',...
         %              get(eventdata.OldValue,'String'),'  ', ...
         %              get(eventdata.NewValue,'String')]);
         %         disp(get(get(dirbg,'SelectedObject'),'String'));
-        LR = get(eventdata.NewValue, 'String')
+        LR = get(eventdata.NewValue, 'String');
         switch LR
             case 'Left'
                 data.LR = 0;
@@ -329,10 +310,10 @@ uiwait
         cla
         subplot('position', data.xychartpos ./ data.editmainsize)
         cla
-%         disp(data.current_sp)
+        %         disp(data.current_sp)
         subplot('position', data.veloplotpos./data.editmainsize);
         plot(st*(1:length(x)), velo, 'k');
-        subplot('position', data.xychartpos ./ data.editmainsize)
+        subplot('position', data.xychartpos ./ data.editmainsize);
         plot(st*(1:length(x)), x, 'b')
         plot(st*(1:length(y)), y, 'r')
         title(['Epoch # ' num2str(data.current_sp), '/' num2str(size(data.sortdat, 1))])
@@ -368,15 +349,15 @@ uiwait
             %             plot(st*(1:length(x)), velo, 'k');
         end
         if data.sortdat(data.current_sp, 3)==1%ismember(data.sortdat(data.current_sp, 1), data.epochs.x(:,1)) && ismember(data.sortdat(data.current_sp, 2), data.epochs.x(:,2))
-%             disp('is x')
-%             disp([num2str(st*(data.sortdat(data.current_sp, 1))) ':' num2str(st*(data.sortdat(data.current_sp, 2)))])
-%             disp([num2str((data.sortdat(data.current_sp, 1))) ':' num2str((data.sortdat(data.current_sp, 2)))])
+            %             disp('is x')
+            %             disp([num2str(st*(data.sortdat(data.current_sp, 1))) ':' num2str(st*(data.sortdat(data.current_sp, 2)))])
+            %             disp([num2str((data.sortdat(data.current_sp, 1))) ':' num2str((data.sortdat(data.current_sp, 2)))])
             xcirc = plot(st*(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), x(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), 'go', 'markersize', 3);
             plot(st*(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), x(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), 'b')
         else
-%             disp('is y')
-%             disp([num2str(st*(data.sortdat(data.current_sp, 1))) ':' num2str(st*(data.sortdat(data.current_sp, 2)))])
-%             disp([num2str((data.sortdat(data.current_sp, 1))) ':' num2str((data.sortdat(data.current_sp, 2)))])
+            %             disp('is y')
+            %             disp([num2str(st*(data.sortdat(data.current_sp, 1))) ':' num2str(st*(data.sortdat(data.current_sp, 2)))])
+            %             disp([num2str((data.sortdat(data.current_sp, 1))) ':' num2str((data.sortdat(data.current_sp, 2)))])
             ycirc = plot(st*(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), y(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), 'go', 'markersize', 3);
             plot(st*(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), y(data.sortdat(data.current_sp, 1):data.sortdat(data.current_sp, 2)), 'r')
         end
@@ -413,20 +394,20 @@ uiwait
             case 0
                 data.plusminus = data.plusminus;
                 data.sortdat(data.current_sp,1) = max(data.sortdat(data.current_sp,1)-data.plusminus, 1);
-                data.sortdat(data.current_sp,1)
+%                 data.sortdat(data.current_sp,1)
                 if ~isempty(xrow)
                     data.epochs.x(xrow,1) = max(data.epochs.x(xrow,1)-data.plusminus, 1);
-                    data.epochs.x(xrow,1)
+%                     data.epochs.x(xrow,1)
                 end
                 if ~isempty(yrow)
                     data.epochs.y(yrow,1) = max(data.epochs.y(yrow,1)-data.plusminus, 1);
                 end
             case 1
                 data.sortdat(data.current_sp,2) = min(data.sortdat(data.current_sp,2)+data.plusminus, length(x));
-                data.sortdat(data.current_sp,2)
+%                 data.sortdat(data.current_sp,2)
                 if ~isempty(xrow)
                     data.epochs.x(xrow,2) = min(data.epochs.x(xrow,2)+data.plusminus, length(x));
-                    data.epochs.x(xrow,2)
+%                     data.epochs.x(xrow,2)
                 end
                 if ~isempty(yrow)
                     data.epochs.y(yrow,2) = min(data.epochs.y(yrow,2)+data.plusminus, length(y));
@@ -438,7 +419,7 @@ uiwait
     end
 
     function delete_sp(removeb, eventdata, nextsp, backsp)
-%         keyboard
+        %         keyboard
         xrow = find(data.sortdat(data.current_sp,1) == data.epochs.x(:,1));
         yrow = find(data.sortdat(data.current_sp,1) == data.epochs.y(:,1));
         if size(data.sortdat,1)>1
@@ -450,15 +431,15 @@ uiwait
                 data.epochs.y(yrow,:) = [];
             end
             %         data.current_sp = data.current_sp -1;
-%             keyboard
+            %             keyboard
             if data.current_sp == size(data.sortdat,1)+1
                 time_back(backsp, eventdata, nextsp)
             else
                 data.current_sp = data.current_sp - 1;
-                time_forward(nextsp, eventdata, backsp)                
+                time_forward(nextsp, eventdata, backsp)
             end
         else
-%             confirm = [];
+            %             confirm = [];
             figconfirm = figure('menubar', 'none', 'numbertitle', 'off', 'pos', [950 300, 300, 200]);
             confirmtext = uicontrol('parent', figconfirm, 'style', 'text', 'string', ['This is the last Epoch:  Delete and save?'], 'pos', [25 140 250 50]);
             yesbut = uicontrol('parent', figconfirm, 'style', 'pushbutton', 'string', 'yes', 'pos', [25 10 110 120], 'callback', {@confirm, 1, figconfirm});
@@ -517,9 +498,9 @@ uiwait
     end
 
     function PhaseFig(auditmain_menu1_2, eventdata, whatson)
-        phasefig = figure('position', [100 500 200 225], 'numbertitle', 'off', 'name', 'Phase Information', 'menubar', 'none', 'color', [.7 .7 .7]);
-        phasedatnames = uicontrol('style', 'text', 'pos', [10 10 85 205], 'string', whatson.Names);
-        phasedatindex = uicontrol('style', 'text', 'pos', [105 10 85 205], 'string', st*whatson.Begindices);
+        phasefig = figure('position', [ 600   372   200    100], 'numbertitle', 'off', 'name', 'Phase Information', 'menubar', 'none', 'color', [.7 .7 .7]);
+        phasedatnames = uicontrol('style', 'text', 'pos', [10 10 85 90], 'string', whatson.Names);
+        phasedatindex = uicontrol('style', 'text', 'pos', [105 10 85 90], 'string', st*whatson.Begindices);
     end
 
 
@@ -528,4 +509,3 @@ uiwait
 % keyboard
 % plot x & y
 end
-

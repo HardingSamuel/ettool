@@ -186,80 +186,79 @@ end
 % keyboard
 
 %%
-if ~isempty(data.sortdat)
-    editwin = figure('position', [900 350 700 625], 'numbertitle', 'off', 'name', 'Edit SP Epochs',  'color', [.7 .7 .7], ...
-        'menubar', 'none', 'toolbar', 'figure');
-    data.editmainsize = [700 525 700 525];
-    %      Plots
-    data.xychartpos = [75 190 550 315];
-    axpix = subplot('position', data.xychartpos ./ data.editmainsize);
-    title('X & Y Positions')
-    hold on
-    plot(st*(1:length(x)), x, 'b')
-    plot(st*(1:length(y)), y, 'r')
-    xcirc = plot(st*find(xqual), x(find(xqual)), 'ko', 'markersize', 3);
-    ycirc = plot(st*find(yqual), y(find(yqual)), 'ko', 'markersize', 3);
-    plot(st*(1:length(x)), x, 'b')
-    plot(st*(1:length(y)), y, 'r')
-    legend('Pix_X', 'Pix_Y')
-    data.ax2 = axis;
-    
-    
-    data.veloplotpos = [75, 90, 550, 75];
-    axvelo = subplot('position', data.veloplotpos./data.editmainsize);
-    plot(st*(1:length(x)), velo, 'k');
-    hold on
-    vcirc = plot(st*find(xqual), velo(find(xqual)), 'ko', 'markersize', 3);
-    plot(st*(1:length(x)), velo, 'k');
-    data.ax3 = axis;
-    data.ax3(3) = 0; data.ax3(4) = mthresh_high;
-    linkaxes([axpix, axvelo], 'x')
-    
-    % create some buttons and menus
-    backsp = uicontrol('style', 'pushbutton', 'string', 'Previous', 'callback', @time_back, 'enable', 'off', 'position', [500 20 80 30]);
-    nextsp = uicontrol('style', 'pushbutton', 'string', 'Next', 'callback', {@time_forward, backsp}, 'position', [600 20 80 30], 'enable', 'off');
-    if size(data.sortdat,1) >1
-        set(nextsp, 'enable', 'on');
-    end
-    set(backsp, 'callback', {@time_back, nextsp});
-    dirbg = uibuttongroup('visible', 'off', 'units', 'pixels','position', [400 20 80 60 ]);
-    
-    dirseL = uicontrol('style', 'radiobutton', 'string', 'Left', 'position', ...
-        [5 5 70 25], 'parent', dirbg, 'handlevisibility', 'off');
-    dirseR = uicontrol('style', 'radiobutton', 'string', 'Right', 'position', ...
-        [5 30 70 25], 'parent', dirbg, 'handlevisibility', 'off');
-    
-    set(dirbg,'SelectionChangeFcn',@selcbk);
-    set(dirbg,'SelectedObject',[]);  % No selection
-    set(dirbg,'Visible','on');
-    
-    editsize = uicontrol('style', 'edit', 'string', 5, 'position', [300 20 80 30]);
-    sizest = uicontrol('style', 'text', 'string', 'Editing Size', 'position', [305 50 70 30]);
-    plusb = uicontrol('style', 'pushbutton', 'string', '+', 'position', [200 50 80 30], 'callback', @addsub_low);
-    plusplusb = uicontrol('style', 'pushbutton', 'string', '+++', 'position', [200 20 80 30], 'callback', @addsub_low);
-    minusb = uicontrol('style', 'pushbutton', 'string', '-', 'position', [100 50 80 30], 'callback', @addsub_low);
-    minusminusb = uicontrol('style', 'pushbutton', 'string', '---', 'position', [100 20 80 30], 'callback', @addsub_low);
-    removeb = uicontrol('style', 'pushbutton', 'string', 'Remove', 'position', [20 20 80 60], 'callback', {@delete_sp, nextsp, backsp});
-    
-    set(plusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
-    set(minusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
-    set(plusplusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
-    set(minusminusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
-    
-    edit_menu_1_1 = uimenu('label', '&File', 'parent', editwin);
-    edit_menu_1_2 = uimenu('label', '&Save Changes', 'parent', edit_menu_1_1, 'callback', @SaveAndReturn);
-    
-    data.current_sp = 1;
-    
-    data.axis.xy = [st*(data.sortdat(data.current_sp, 1)-100), st*(data.sortdat(data.current_sp, 2)+100), data.ax2(3), data.ax2(4)];
-    subplot('position', data.xychartpos ./ data.editmainsize)
-    axis(data.axis.xy)
-    
-    data.axis.velo = [st*(data.sortdat(data.current_sp, 1)-100), st*(data.sortdat(data.current_sp, 2)+100), data.ax3(3), data.ax3(4)];
-    subplot('position', data.veloplotpos./data.editmainsize)
-    axis(data.axis.velo)
-    hilite
+editwin = figure('position', [900 350 700 625], 'numbertitle', 'off', 'name', 'Edit SP Epochs',  'color', [.7 .7 .7], ...
+    'menubar', 'none', 'toolbar', 'figure');
+data.editmainsize = [700 525 700 525];
+%      Plots
+data.xychartpos = [75 190 550 315];
+axpix = subplot('position', data.xychartpos ./ data.editmainsize);
+title('X & Y Positions')
+hold on
+plot(st*(1:length(x)), x, 'b')
+plot(st*(1:length(y)), y, 'r')
+xcirc = plot(st*find(xqual), x(find(xqual)), 'ko', 'markersize', 3);
+ycirc = plot(st*find(yqual), y(find(yqual)), 'ko', 'markersize', 3);
+plot(st*(1:length(x)), x, 'b')
+plot(st*(1:length(y)), y, 'r')
+legend('Pix_X', 'Pix_Y')
+data.ax2 = axis;
+
+
+data.veloplotpos = [75, 90, 550, 75];
+axvelo = subplot('position', data.veloplotpos./data.editmainsize);
+plot(st*(1:length(x)), velo, 'k');
+hold on
+vcirc = plot(st*find(xqual), velo(find(xqual)), 'ko', 'markersize', 3);
+plot(st*(1:length(x)), velo, 'k');
+data.ax3 = axis;
+data.ax3(3) = 0; data.ax3(4) = mthresh_high;
+linkaxes([axpix, axvelo], 'x')
+
+% create some buttons and menus
+backsp = uicontrol('style', 'pushbutton', 'string', 'Previous', 'callback', @time_back, 'enable', 'off', 'position', [500 20 80 30]);
+nextsp = uicontrol('style', 'pushbutton', 'string', 'Next', 'callback', {@time_forward, backsp}, 'position', [600 20 80 30], 'enable', 'off');
+if size(data.sortdat,1) >1
+    set(nextsp, 'enable', 'on');
 end
+set(backsp, 'callback', {@time_back, nextsp});
+dirbg = uibuttongroup('visible', 'off', 'units', 'pixels','position', [400 20 80 60 ]);
+
+dirseL = uicontrol('style', 'radiobutton', 'string', 'Left', 'position', ...
+    [5 5 70 25], 'parent', dirbg, 'handlevisibility', 'off');
+dirseR = uicontrol('style', 'radiobutton', 'string', 'Right', 'position', ...
+    [5 30 70 25], 'parent', dirbg, 'handlevisibility', 'off');
+
+set(dirbg,'SelectionChangeFcn',@selcbk);
+set(dirbg,'SelectedObject',[]);  % No selection
+set(dirbg,'Visible','on');
+
+editsize = uicontrol('style', 'edit', 'string', 5, 'position', [300 20 80 30]);
+sizest = uicontrol('style', 'text', 'string', 'Editing Size', 'position', [305 50 70 30]);
+plusb = uicontrol('style', 'pushbutton', 'string', '+', 'position', [200 50 80 30], 'callback', @addsub_low);
+plusplusb = uicontrol('style', 'pushbutton', 'string', '+++', 'position', [200 20 80 30], 'callback', @addsub_low);
+minusb = uicontrol('style', 'pushbutton', 'string', '-', 'position', [100 50 80 30], 'callback', @addsub_low);
+minusminusb = uicontrol('style', 'pushbutton', 'string', '---', 'position', [100 20 80 30], 'callback', @addsub_low);
+removeb = uicontrol('style', 'pushbutton', 'string', 'Remove', 'position', [20 20 80 60], 'callback', {@delete_sp, nextsp, backsp});
+
+set(plusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
+set(minusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
+set(plusplusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
+set(minusminusb, 'callback', {@addsub_low, plusb, plusplusb, minusb, minusminusb, editsize});
+
+edit_menu_1_1 = uimenu('label', '&File', 'parent', editwin);
+edit_menu_1_2 = uimenu('label', '&Save Changes', 'parent', edit_menu_1_1, 'callback', @SaveAndReturn);
+
+data.current_sp = 1;
+
+data.axis.xy = [st*(data.sortdat(data.current_sp, 1)-100), st*(data.sortdat(data.current_sp, 2)+100), data.ax2(3), data.ax2(4)];
+subplot('position', data.xychartpos ./ data.editmainsize)
+axis(data.axis.xy)
+
+data.axis.velo = [st*(data.sortdat(data.current_sp, 1)-100), st*(data.sortdat(data.current_sp, 2)+100), data.ax3(3), data.ax3(4)];
+subplot('position', data.veloplotpos./data.editmainsize)
+axis(data.axis.velo)
+hilite
+
 uiwait
 
 

@@ -493,7 +493,7 @@ else
     %     keyboard
     switch includesp
         case 1
-            [sp_keep] = sp_tagv2(x, y, d, dsfinal, sr, vthresh, pix_to_angle_const, new_indices(fix_keep), new_indices(sac_keep),whatson);
+            [sp_keep] = sp_tagv2_1(x, y, d, dsfinal, sr, vthresh, pix_to_angle_const, new_indices(fix_keep), new_indices(sac_keep),whatson);
             classified_final(sp_keep) = 3; %smooth
         case 0
             sp_keep = [];
