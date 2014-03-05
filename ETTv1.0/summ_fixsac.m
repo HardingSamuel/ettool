@@ -1,11 +1,11 @@
 function [nitems,outmat] = summ_fixsac(classifications)
 if ~isempty(classifications.saccades)
     fn = fieldnames(classifications);
-    outmat = nan(0,12);
+    outmat = nan(0,13);
     for fni = 1:length(fn)
         nitems = classifications.(char(fn(fni))).count;
         if ~isempty(nitems)
-            loopmat = nan(nitems,12);
+            loopmat = nan(nitems,13);
             loopmat(:,1) = nitems;
             loopmat(:,2) = fni;
             loopmat(:,3) = 1:nitems';
@@ -21,6 +21,9 @@ if ~isempty(classifications.saccades)
             end
             if strcmp('saccades', char(fn(fni)))
                 loopmat(:,12) = classifications.(char(fn(fni))).velocities(3,:)';
+            end
+            if strcmp('smoothpursuit', char(fn(fni)))
+                loopmat(:,13) = classifications.(char(fn(fni))).displacement(1,:)';
             end
             outmat = [outmat; loopmat];
         end

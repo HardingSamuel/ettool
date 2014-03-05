@@ -44,8 +44,8 @@ end
 fn = fieldnames(procdata.sub(1).Trial(1));
 ft = gettypes(procdata.sub(1).Trial(1));
 writeme = [{'Subject'}, {'TrialNum'}, {'SampleRate'}, fn(~cellfun(@(x) strcmp(x, 'struct'), ft) & ~cellfun(@(x) strcmp(x, 'Time'), fn) & ~cellfun(@(x) strcmp(x, 'usecustom'), fn))'];
-writefixsac = [{'Subject'},{'TrialNum'},{'Count'},{'Type'},{'Number'},{'OnsetInd'},{'OnsetTime'},{'DurationPts'},{'DurationTime'},{'OffsetInd'},{'OffsetTime'},{'CentroidX'},{'CentroidY'},{'SaccadePeakVelo'}];
-subfixsac = nan(0,14);
+writefixsac = [{'Subject'},{'TrialNum'},{'Count'},{'Type'},{'Number'},{'OnsetInd'},{'OnsetTime'},{'DurationPts'},{'DurationTime'},{'OffsetInd'},{'OffsetTime'},{'CentroidX'},{'CentroidY'},{'SaccadePeakVelo'},{'SmoothPutsuitDisplacement'}];
+subfixsac = nan(0,15);
 subfixt = single(zeros(0,3));
 
 
