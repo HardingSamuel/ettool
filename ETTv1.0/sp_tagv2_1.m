@@ -246,7 +246,7 @@ end
 
 
 PhaseFig(1,1,whatson)
-keyboard
+% keyboard
 uiwait
 
 %% Functions
