@@ -1,4 +1,4 @@
-function [proportions,goodprops] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
+function [proportions,goodprops,buffproportions,buffgoodprops] = aoi_calcV1_0(x,y,t,wo,stimcode,aoimat,sr,vfr)
 
 %%  AOI_Calc
 %   Calculate the percentage of gaze points that land within various
@@ -33,14 +33,28 @@ fvec = fvec- fvec(1);
 tfvec = cell2mat(arrayfun(@(x) find(x >= fvec, 1, 'last'), t, 'uni', 0));
 
 aoimat.data(find(aoimat.data==0)) = NaN;
+aoimat.adjusteddata(find(aoimat.adjusteddata==0)) = NaN;
+
+% AOIMAT(1) = XY; 
+% AOIMAT(2) = FRAME;
+% AOIMAT(3) = AOIS;
+% AOIMAT(4) = VIDEOTYPE;
 
 % calculate logicals for in_aoi?
 xlog = (repmat(x, [1 1 size(aoimat.data, 3)]) >= aoimat.data(1,tfvec,:,stimcode)) & (repmat(x, [1 1 size(aoimat.data, 3)]) <= aoimat.data(3,tfvec,:,stimcode));
 ylog = (repmat(y, [1 1 size(aoimat.data, 3)]) >= aoimat.data(2,tfvec,:,stimcode)) & (repmat(y, [1 1 size(aoimat.data, 3)]) <= aoimat.data(4,tfvec,:,stimcode));
 
+xlogbuff = (repmat(x, [1 1 size(aoimat.adjusteddata, 3)]) >= aoimat.adjusteddata(1,tfvec,:,stimcode)) & (repmat(x, [1 1 size(aoimat.adjusteddata, 3)]) <= aoimat.adjusteddata(3,tfvec,:,stimcode));
+ylogbuff = (repmat(y, [1 1 size(aoimat.adjusteddata, 3)]) >= aoimat.adjusteddata(2,tfvec,:,stimcode)) & (repmat(y, [1 1 size(aoimat.adjusteddata, 3)]) <= aoimat.adjusteddata(4,tfvec,:,stimcode));
+
 goodxlog = xlog(:,~isnan(x),:); goodylog = ylog(:,~isnan(y),:);
+goodxlogbuff = xlogbuff(:,~isnan(x),:); goodylogbuff = ylogbuff(:,~isnan(y),:);
+
 proportions = squeeze(mean((xlog & ylog), 2));
+buffproportions = squeeze(mean((xlogbuff & ylogbuff), 2));
+
 goodprops = squeeze(mean((goodxlog & goodylog),2));
+buffgoodprops = squeeze(mean((goodxlogbuff & goodylogbuff),2));
 
 % keyboard
 

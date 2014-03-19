@@ -54,7 +54,7 @@ if ~isempty(D)
 end
 
 ChangedSubs = 0;
-
+aoimat = [];
 
 phasedata.PhaseKeep = {[]};
 phasedata.PhaseIndx = {[]};
@@ -186,8 +186,9 @@ for subn = subslist
             end
             
             if analyoutput(3)
-                
-                [aoimat] = AOI_definelocations(Direct);
+                if isempty(aoimat)
+                    [aoimat] = AOI_definelocations(Direct);
+                end
                 %                 [studydata] = ActionTracking(fn);
                 % stimcode = index for reference within the aoimat
                 % structure.  When we make it (in AOI_definelocations), we
@@ -201,7 +202,9 @@ for subn = subslist
                 
                 vfr = 30;
                 [procdata.sub(subn).Trial(trinum).proportions, ...
-                    procdata.sub(subn).Trial(trinum).proportions_gooddata] = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
+                    procdata.sub(subn).Trial(trinum).proportions_gooddata, ...
+                    procdata.sub(subn).Trial(trinum).buffed_proportions, ...
+                    procdata.sub(subn).Trial(trinum).buff_proportions_gooddata] = aoi_calcV1_0(x,y,t(2,:),wo,stimcode,aoimat,sr,vfr);
                 
             end
             
