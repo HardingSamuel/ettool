@@ -8,7 +8,7 @@ function an_ettgfconvert(DIRECT,SUBJECT,TRIALS,mode,procdata)
 
 %% Checks and Initial errors
 if isempty(DIRECT) || ~exist([DIRECT, '\MATLAB\INPUT\PROCDATA\'],'dir')
-    error('Please specify a valid ETTool Directory')
+    DIRECT = uigetdir(cd,'Select an ETT directory');
 end
 startdir = pwd;
 
