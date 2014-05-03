@@ -1,0 +1,31 @@
+function [] = ett_DrawMain(ETT,ETTFig)
+% 
+% ett_DrawMain
+% Redraws the main window with updated information, useful after running
+% any type of process that affects the ETT structure.  This provides useful
+% information in the main window for the user.
+% 
+% INPUTS:
+% ETT
+% 
+% OUTPUTS:
+% 
+% 
+%% Change Log
+%   [SH] - 05/02/14:    v1 - Creation 
+
+%%
+figure(ETTFig)
+
+text_box = [{'Project Name: '};{'Creation Date: '};{'Attached Subjects'};{'Project Columns:'}];
+if isempty(ETT)
+    col_box = [.6 .6 .6];
+else
+    col_box = [0 0 0];
+    stat_colload = ~isempty(ETT.ImportColumns); text_col = 'Not Loaded';
+    if stat_colload
+    textbox = cat(2,[{ETT.ProjectName};{ETT.CreationDate};{ETT.nSubjects};{
+        end
+LeftText = uicontrol('Style','Text','BackgroundColor',[.7 .8 .7],'FontSize',12,'Position',[25 25 360 300],'HorizontalAlignment','Left',...
+    'String',text_box);
+end
