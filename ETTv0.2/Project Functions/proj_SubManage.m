@@ -53,7 +53,8 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 50
         if ETT.nSubjects <= 0
             set(butt_rem, 'Enable', 'Off');
             set(butt_det, 'Enable', 'Off');
-            ETT.ImportColumns = [];
+            ETT.Config.Import = [];
+            ETT.Config.PreProcess = [];
         else
             set(butt_rem, 'Enable', 'On');
             set(butt_det, 'Enable', 'On');

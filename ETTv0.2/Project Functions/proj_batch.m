@@ -17,11 +17,13 @@ function [ETT] = proj_batch(ETT,selected,mode)
 switch mode
     case 1
         text_mode = 'Import';
+    case 2
+        text_mode = 'PreProcess';
 end
 
 batch_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, selected,'uni',0));
 
-BatchFig = figure('Name', ['Batch Process:  ' text_mode], 'Unit', 'Pixels', 'Position', [460 570 400 330], 'NumberTitle','Off','MenuBar','None',...
+BatchFig = figure('Name', ['Batch Process:  ' text_mode], 'Unit', 'Pixels', 'Position', [40 542.5 400 330], 'NumberTitle','Off','MenuBar','None',...
     'Color', [.65 .75 .65]);
 uipanel('Title', 'Batch List', 'Units', 'Pixels', 'Position', [20 70 170 250], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 Batchlist = uicontrol('Style','Text','Position',[25 75 140 220],'Parent',BatchFig,'BackgroundColor',[.7 .8 .7],...
@@ -57,12 +59,22 @@ set(DoneButton,'Enable','On')
         switch mode
             case 1
                 [status,statustext,usedcustom] = data_import(ETT,selected(batchi));
+                importdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(selected(batchi)).Name,'\SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
+                ETT.Subjects(selected(batchi)).Data.Import = importdatafname;
                 addtext = '';
                 if usedcustom
                     addtext = ' [C]';
                 end
-                ETT.Subjects(selected(batchi)).Import = [datestr(now), addtext];
-                
+                ETT.Subjects(selected(batchi)).Status.Import = [datestr(now), addtext];
+            case 2
+                [status,statustext,usedcustom] = data_preprocess(ETT,selected(batchi));
+                procdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(selected(batchi)).Name,'\SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
+                ETT.Subjects(selected(batchi)).Data.PreProcess = procdatafname;
+                addtext = '';
+                if usedcustom
+                    addtext = ' [C]';
+                end
+                ETT.Subjects(selected(batchi)).Status.PreProcess = [datestr(now), addtext];                
         end
     end
 

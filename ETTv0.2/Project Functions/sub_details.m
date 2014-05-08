@@ -33,13 +33,13 @@ switch mode
         title_addedit = 'Edit Subject';
         
         temp_subn = ETT.Subjects(selected).Name;
-        temp_dataloc = ETT.Subjects(selected).Data;
+        temp_dataloc = ETT.Subjects(selected).Data.Raw;
         temp_dob = ETT.Subjects(selected).DOB;
         temp_testd = ETT.Subjects(selected).TestD;
         
         text_data = 'Data File Loaded';
-        text_import = ETT.Subjects(selected).Import;
-        text_process = ETT.Subjects(selected).Process;
+        text_import = ETT.Subjects(selected).Status.Import;
+        text_process = ETT.Subjects(selected).Status.PreProcess;
 end
 
 col_dataloc = [1 0 0];
@@ -94,7 +94,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
                 temp_dataloc = [filepath,filename];
             case 1
                 
-                sub_currdir = ETT.Subjects(selected).Data; sla = strfind(sub_currdir,'\');
+                sub_currdir = ETT.Subjects(selected).Data.Raw; sla = strfind(sub_currdir,'\');
                 if length(sla)>0
                     sub_currfile = sub_currdir(sla(end)+1:end); sub_currdir = sub_currdir(1:sla(end));
                 else
@@ -123,16 +123,18 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
                 if ~strcmp(temp_subn,'')
                     edit_sub = ETT.nSubjects + 1;
                     ETT.nSubjects = ETT.nSubjects + 1;
-                    ETT.Subjects(edit_sub).Import = 'Not      Imported  ';
-                    ETT.Subjects(edit_sub).CustomColumns = [];
-                    ETT.Subjects(edit_sub).Process = 'Not Processed';
+                    ETT.Subjects(edit_sub).Status.Import = 'Not      Imported  ';
+                    ETT.Subjects(edit_sub).Status.PreProcess = 'Not Processed';
+                    ETT.Subjects(edit_sub).Config.Import = [];                    
+                    ETT.Subjects(edit_sub).Config.PreProcess = [];
+                    ETT.Subjects(edit_sub).Config.FixDetect = [];
                 end
             case 1
                 edit_sub = selected;
         end
         if ~isempty(temp_subn) && ~strcmp(temp_subn,'')
             ETT.Subjects(edit_sub).Name = temp_subn;
-            ETT.Subjects(edit_sub).Data = temp_dataloc;
+            ETT.Subjects(edit_sub).Data.Raw = temp_dataloc;
             ETT.Subjects(edit_sub).DOB = temp_dob;
             ETT.Subjects(edit_sub).TestD = temp_testd;
         end

@@ -14,7 +14,7 @@ function [ETT] = proj_Settings(ETT)
 
 %%
 
-SettingFig = figure('Name', 'Project Settings', 'pos', [40 580 400 320], 'NumberTitle', 'Off', 'MenuBar', 'None',...
+SettingFig = figure('Name', 'Project Settings', 'pos', [40 570 400 330], 'NumberTitle', 'Off', 'MenuBar', 'None',...
     'Color', [.65 .75 .65]);
 
 uipanel('Title', 'Screen Size', 'Units', 'Pixels', 'Position', [20 237.5 360 70], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
@@ -47,7 +47,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 20 360 50
     end
 
     function defaultdir(~,~)
-        ETT.DefaultDirectory = uigetdir(ETT.PathName,'Select a Default Directory');
+        ETT.DefaultDirectory = strcat(uigetdir(ETT.PathName,'Select a Default Directory'),'\');
     end
 
 waitfor(SettingFig)

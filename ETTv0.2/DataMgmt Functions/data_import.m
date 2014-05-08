@@ -14,19 +14,19 @@ function [status,stattext,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 05/01/14:    v1 - Creation
 
 %%
-cols = ETT.ImportColumns; usedcustom = 0;
-if ~isempty(ETT.Subjects(Subject).CustomColumns)
-    cols = ETT.Subjects(Subject).CustomColumns;
+cols = ETT.Config.Import; usedcustom = 0;
+if ~isempty(ETT.Subjects(Subject).Config.Import)
+    cols = ETT.Subjects(Subject).Config.Import;
     usedcustom = 1;
 end
 
 dataformat = strcat(['%*f %*f %*f %*f %*f %*f %*f %*f %f %f %f %*f '...
     '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
-rawdatafname = [ETT.DefaultDirectory,'RAWDATA\',ETT.Subjects(Subject).Name,'\RAWDATA_',ETT.Subjects(Subject).Name,'.mat'];
+rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'\SubjectData_',ETT.Subjects(Subject).Name,'.mat'];
 
 %% Retrieve the Data
-datafid = fopen(ETT.Subjects(Subject).Data);
+datafid = fopen(ETT.Subjects(Subject).Data.Raw);
 fgets(datafid);
 [datacell] = textscan(...
     datafid,dataformat,'delimiter','\t','treatasempty',{'-1.#INF','1.#INF','-1.#IND','1.#IND'},'emptyvalue',-1);
@@ -51,8 +51,14 @@ trilist = 1:length(begindices);
 if ~isempty(trilist)
     tlens = (1 + endices - begindices);
     maxlength = max(tlens);
-    emptymat = nan(size(trilist,1),maxlength);
-    tmicro = emptymat; Leye = repmat(emptymat,[1,1,5]); Reye = Leye;
+    emptymat = nan(length(trilist),maxlength);
+    tmicro = emptymat; 
+    
+    Leye.GazeX = emptymat; Reye.GazeX = emptymat;
+    Leye.GazeY = emptymat; Reye.GazeY = emptymat;
+    Leye.Pupil = emptymat; Reye.Pupil = emptymat;
+    Leye.Distance = emptymat; Reye.Distance = emptymat;
+    Leye.Validity = emptymat; Reye.Validity = emptymat;
     
     nadditionalentries = find(cat(2,cols{2,:})==0);
     for nae = nadditionalentries        
@@ -62,17 +68,17 @@ if ~isempty(trilist)
     for torg = 1:length(trilist)
         torg = trilist(torg);
         tmicro(torg,1:tlens(torg)) = datacell{1}(begindices(torg):endices(torg))';
-        Leye(torg,1:tlens(torg),1) = datacell{2}(begindices(torg):endices(torg))';
-        Leye(torg,1:tlens(torg),2) = datacell{3}(begindices(torg):endices(torg))';
-        Leye(torg,1:tlens(torg),3) = datacell{4}(begindices(torg):endices(torg))';
-        Leye(torg,1:tlens(torg),4) = datacell{5}(begindices(torg):endices(torg))';
-        Leye(torg,1:tlens(torg),5) = datacell{6}(begindices(torg):endices(torg))';
+        Leye.GazeX(torg,1:tlens(torg)) = datacell{2}(begindices(torg):endices(torg))';
+        Leye.GazeY(torg,1:tlens(torg)) = datacell{3}(begindices(torg):endices(torg))';
+        Leye.Pupil(torg,1:tlens(torg)) = datacell{4}(begindices(torg):endices(torg))';
+        Leye.Distance(torg,1:tlens(torg)) = datacell{5}(begindices(torg):endices(torg))';
+        Leye.Validity(torg,1:tlens(torg)) = datacell{6}(begindices(torg):endices(torg))';
         
-        Reye(torg,1:tlens(torg),1) = datacell{7}(begindices(torg):endices(torg))';
-        Reye(torg,1:tlens(torg),2) = datacell{8}(begindices(torg):endices(torg))';
-        Reye(torg,1:tlens(torg),3) = datacell{9}(begindices(torg):endices(torg))';
-        Reye(torg,1:tlens(torg),4) = datacell{10}(begindices(torg):endices(torg))';
-        Reye(torg,1:tlens(torg),5) = datacell{11}(begindices(torg):endices(torg))';
+        Reye.GazeX(torg,1:tlens(torg)) = datacell{7}(begindices(torg):endices(torg))';
+        Reye.GazeY(torg,1:tlens(torg)) = datacell{8}(begindices(torg):endices(torg))';
+        Reye.Pupil(torg,1:tlens(torg)) = datacell{9}(begindices(torg):endices(torg))';
+        Reye.Distance(torg,1:tlens(torg)) = datacell{10}(begindices(torg):endices(torg))';
+        Reye.Validity(torg,1:tlens(torg)) = datacell{11}(begindices(torg):endices(torg))';
         
         TBegin(torg,1:2) = [begindices(torg),endices(torg)];
         
@@ -102,24 +108,32 @@ if ~isempty(trilist)
     subdata.Name = ETT.Subjects(Subject).Name;
     subdata.DOB = ETT.Subjects(Subject).DOB;
     subdata.TestD = ETT.Subjects(Subject).TestD;
-    subdata.Import = datestr(now);
+    
+    SRmat = [60 120 180 240 300];
+    SR = SRmat(find(min(SRmat)-1000/((tmicro(1,2) - tmicro(1,1))/1000)));
+    
+    subdata.SampleRate = SR;
+    
+    subdata.Status.Import = datestr(now);
     subdata.LeftEye = Leye;
     subdata.RightEye = Reye;
     subdata.TMicroSeconds = tmicro;
     subdata.TrialOnOff = TBegin;
+    subdata.TrialLengths = tlens;
+    
     
     subdata.WhatsOn.Names = wonames';
     subdata.WhatsOn.Begindices = wobegin';
     subdata.WhatsOn.Endices = woends';
     
-    if ~exist([ETT.DefaultDirectory,'RAWDATA\'],'dir')
-        mkdir(ETT.DefaultDirectory,'RAWDATA')
+    if ~exist([ETT.DefaultDirectory,'ProjectData\'],'dir')
+        mkdir(ETT.DefaultDirectory,'ProjectData')
     end
-    if ~exist([ETT.DefaultDirectory,'RAWDATA\',ETT.Subjects(Subject).Name],'dir')
-        mkdir([ETT.DefaultDirectory,'RAWDATA\'],ETT.Subjects(Subject).Name)
+    if ~exist([ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name],'dir')
+        mkdir([ETT.DefaultDirectory,'ProjectData\'],ETT.Subjects(Subject).Name)
     end
-    
-    save(rawdatafname,'subdata');
+        
+    save(rawdatafname,'subdata');    
     status = 1; stattext = '';
     
     

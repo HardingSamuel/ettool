@@ -38,7 +38,10 @@ function savepass(obj,~)
     ETT.PathName = '';    
     [ETT,SaveStatus] = ett_SaveProject(ETT,2);
     ETT.DefaultDirectory = ETT.PathName;
-    ETT.ImportColumns = [];
+    ETT.Config.Import = [];
+    ETT.Config.PreProcess = [];
+    ETT.Config.FixDetect = [];
+    ETT.Subjects = [];
     
     if SaveStatus
         Status = 1;
