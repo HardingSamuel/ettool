@@ -110,7 +110,8 @@ if ~isempty(trilist)
     subdata.TestD = ETT.Subjects(Subject).TestD;
     
     SRmat = [60 120 180 240 300];
-    SR = SRmat(find(min(SRmat)-1000/((tmicro(1,2) - tmicro(1,1))/1000)));
+    SR = SRmat(find(min(abs(SRmat-1000/((tmicro(1,2) - tmicro(1,1))/1000)))==...
+        abs(SRmat-1000/((tmicro(1,2) - tmicro(1,1))/1000))));
     
     subdata.SampleRate = SR;
     

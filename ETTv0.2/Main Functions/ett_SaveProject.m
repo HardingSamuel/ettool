@@ -21,6 +21,7 @@ function [ETT,Status] = ett_SaveProject(ETT,mode)
 switch mode
     case 1
         try
+            ETT.LastSaved = datestr(now);
             save([ETT.PathName,ETT.FileName],'ETT')
             Status = 1;
         catch
@@ -33,6 +34,7 @@ switch mode
         
         if ischar(newfile) && ischar(newpath)
             save([newpath,newfile],'ETT')
+            ETT.LastSaved = datestr(now);
             ETT.PathName = newpath; ETT.FileName = newfile;
             Status = 1;
         else

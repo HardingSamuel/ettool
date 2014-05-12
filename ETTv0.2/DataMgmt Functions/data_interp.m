@@ -23,6 +23,8 @@ gapstart = arrayfun(@(X) find(diff(subdata.Combined.GoodEyes(X,:),1,2)==-1)+1,1:
 gapend = arrayfun(@(X) find(diff(subdata.Combined.GoodEyes(X,:),1,2)==1),1:size(subdata.Combined.GoodEyes,1),'uni',0);
 point1 = [subdata.Combined.GoodEyes(:,1)==0,subdata.Combined.GoodEyes(:,end)==0];
 
+InterpX = subdata.Combined.CombX; InterpY = subdata.Combined.CombY; InterpD = subdata.Combined.CombD; InterpP = subdata.Combined.CombP;
+
 for trinum = 1:size(gapstart,2)
     
     if ismember(trinum,find(point1(:,1)))
@@ -38,9 +40,11 @@ for trinum = 1:size(gapstart,2)
     gapdata{trinum}(:,gapdata{trinum}(1,:) == 1) = [];
     gapdata{trinum}(:,gapdata{trinum}(2,:) == subdata.TrialLengths(trinum)) = [];
     interps = find(gapdata{trinum}(4,:) == 0);
-    interpstart{trinum} = gapdata{trinum}(1,interps); interpend{trinum} = gapdata{trinum}(2,interps);
-    InterpX = subdata.Combined.CombX; InterpY = subdata.Combined.CombY; InterpD = subdata.Combined.CombD; InterpP = subdata.Combined.CombP;
+    interpstart{trinum} = gapdata{trinum}(1,interps)-1; interpend{trinum} = gapdata{trinum}(2,interps)+1;    
+    blinks = find(gapdata{trinum}(4,:) == 1);
+    blinkstart{trinum} = gapdata{trinum}(1,blinks)-1; blinkend{trinum} = gapdata{trinum}(2,blinks)+1;
     for interp_iter = interps
+        
         InterpX(trinum,gapdata{trinum}(1,interp_iter)-1:gapdata{trinum}(2,interp_iter)+1) = ...
             linspace(subdata.Combined.CombX(trinum,gapdata{trinum}(1,interp_iter)-1),subdata.Combined.CombX(trinum,gapdata{trinum}(2,interp_iter)+1),...
             gapdata{trinum}(3,interp_iter)+2);
@@ -61,6 +65,7 @@ subdata.Interpolation.InterpY = InterpY;
 subdata.Interpolation.InterpD = InterpD;
 subdata.Interpolation.InterpP = InterpP;
 subdata.Interpolation.Indices = [interpstart;interpend]';
+subdata.Interpolation.Blinks = [blinkstart;blinkend]';
 
 subdata.GoodData.Interpolation = cell2mat(arrayfun(@(X) length(find(~isnan(InterpX(X,1:subdata.TrialLengths(X)))))/subdata.TrialLengths(X),1:size(InterpX,1),'uni',0))';
 

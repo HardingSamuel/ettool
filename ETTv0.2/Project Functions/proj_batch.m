@@ -37,7 +37,7 @@ stat_y = 275;
 pause(1)
 for batchi = 1:length(selected)
     BatchText = uicontrol('Style','Text','Position',[215 stat_y 140 20],'Parent',BatchFig,'BackgroundColor',[.7 .8 .7],...
-        'HorizontalAlignment','Left','FontSize',12,'String',ETT.Subjects(batchi).Name,'ForeGroundColor',[.9 .9 0]);
+        'HorizontalAlignment','Left','FontSize',12,'String',ETT.Subjects(selected(batchi)).Name,'ForeGroundColor',[.9 .9 0]);
     batch_text(1) = [];
     set(Batchlist,'String',batch_text)
     stat_y = stat_y - 20;

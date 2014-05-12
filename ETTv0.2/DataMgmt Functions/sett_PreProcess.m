@@ -28,8 +28,8 @@ val_mil = 80; val_blk = 500; val_sett1 = 15; val_sett2 = 2;filtsett = [15,2];
 if ~isempty(existsettings)
     Settings = existsettings;
     curr_fil = existsettings(1);
-    val_mil = existsettings(2); 
-    val_blk = existsettings(3); 
+    val_mil = existsettings(2);
+    val_blk = existsettings(3);
     val_sett1 = existsettings(4);
     val_sett2 = existsettings(5);
 end
@@ -67,11 +67,11 @@ FiltOption4 = uicontrol('Style','RadioButton','String','Low-Pass Filter','Enable
 
 FiltSettings = uicontrol('Style','PushButton','String','Filter Settings','BackGroundColor',[.8 .8 .8],...
     'Parent',FiltButtonGroup,'Position',[5 5 227.5 25],'FontSize',10,'Callback',@filt_edit);
-    
+
 uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],...
     'Parent',PPFig,'Position',[10 10 240 35],'FontSize',12,'Callback',@donerefresh)
 
-    
+
     function filt_select(~,eventdata)
         curr_fil = get(eventdata.NewValue,'UserData');
     end
@@ -86,7 +86,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         switch curr_fil
             case 1
                 sett1txt = uicontrol('Style','Text','String','Window Length (must be odd):  ','Parent',FiltButtonGroup,...
-                    'Position',[5 90 180 20],'FontSize',10,'BackGroundColor',[.7 .8 .7],'HorizontalAlignment','Left');                
+                    'Position',[5 90 180 20],'FontSize',10,'BackGroundColor',[.7 .8 .7],'HorizontalAlignment','Left');
                 sett1 = uicontrol('Style','Edit','String',text_sett1,'Parent',FiltButtonGroup,'Position',[190 90 45 20],...
                     'FontSize',10,'BackGroundColor',[1 1 1]);
                 sett2txt = uicontrol('Style','Text','String',['Filter Order:  ' text_sett2],'Parent',FiltButtonGroup,...
@@ -95,7 +95,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
                     'Parent',FiltButtonGroup,'Position',[5 40 227.5 20],'Callback',@slide_text);
             case 3
                 sett1txt = uicontrol('Style','Text','String','Window Length (must be odd):  ','Parent',FiltButtonGroup,...
-                    'Position',[5 90 180 20],'FontSize',10,'BackGroundColor',[.7 .8 .7],'HorizontalAlignment','Left');                
+                    'Position',[5 90 180 20],'FontSize',10,'BackGroundColor',[.7 .8 .7],'HorizontalAlignment','Left');
                 sett1 = uicontrol('Style','Edit','String','15','Parent',FiltButtonGroup,'Position',[190 90 45 20],...
                     'FontSize',10,'BackGroundColor',[1 1 1]);
         end
@@ -104,23 +104,23 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
             text_ex = '';
             if get(sett2,'Value')==2
                 text_ex = ' (Default)';
-            end               
+            end
             set(sett2txt,'String',['Filter Order:  ' num2str(get(sett2,'Value')) text_ex])
         end
         
         function sett_return(~,~)
             set(sett1,'Visible','Off')
-            set(sett1txt,'Visible','Off')            
+            set(sett1txt,'Visible','Off')
             try
-            set(sett2txt,'Visible','Off')
-            set(sett2,'Visible','Off')
-            val_sett2 = get(sett2,'Value');
+                set(sett2txt,'Visible','Off')
+                set(sett2,'Visible','Off')
+                val_sett2 = get(sett2,'Value');
             end
             set(FiltOption1,'Visible','on')
             set(FiltOption2,'Visible','on')
             set(FiltOption3,'Visible','on')
             set(FiltOption4,'Visible','on')
-            set(FiltSettings,'String','Return','Callback',@filt_edit) 
+            set(FiltSettings,'String','Return','Callback',@filt_edit)
             filtsett = [str2num(get(sett1,'String')),val_sett2];
         end
     end
@@ -129,12 +129,11 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         interpval = str2num(get(MaxIntrpLat,'String'));
         blinkval = str2num(get(MaxBlinkLat,'String'));
         Settings = [curr_fil,interpval,blinkval,filtsett];
-        switch mode
-            case 0
-                close(PPFig)
-        end
+        uiresume(PPFig)
     end
 
-waitfor(PPFig)
-
+uiwait(PPFig)
+try
+close(PPFig)
+end
 end

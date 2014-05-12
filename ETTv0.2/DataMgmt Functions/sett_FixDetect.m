@@ -13,7 +13,7 @@ function [Settings] = sett_FixDetect(ETT,mode,existsettings)
 %   [SH] - 05/08/14:    v1 - Creation 
 
 %%
-Settings = [];
+Settings = cell(1,5);
 switch mode
     case 0
         text_done = 'Finished';
@@ -23,18 +23,18 @@ switch mode
         FixFigPos = [460 197.5 260 330];
 end
 val_velo = 40; val_fixdur = 100; val_bins = 5; val_trm = [.1 .45 .45; 0 .95 .05; 0 .05 .95];
-curr_est = 1;
+curr_est = 1; text_trm = '[.1 .45 .45;     0 .95 .05;     0 .05 .95]';
 if ~isempty(existsettings)
-    val_velo = existsettings(1);
-    val_fixdur = existsettings(2);
-%     val_trm = existsettings(3);
-    val_bins = existsettings(3);
-    curr_est = existsettings(4);
+    val_velo = existsettings{1};
+    val_fixdur = existsettings{2};
+    val_trm = existsettings(3);
+    text_trm = strcat('[', num2str(val_trm{1}(1,:)), ';     ', num2str(val_trm{1}(2,:)), ';     ', num2str(val_trm{1}(3,:)), ']');
+    text_trm = strrep(text_trm,'        ', ' ');
+    val_bins = existsettings{4};
+    curr_est = existsettings{5};
 end
 
-text_velo = num2str(val_velo); text_fixdur = num2str(val_fixdur); text_bins = num2str(val_trm);
-text_bins = num2str(val_bins); 
-text_trm = '[.1 .45 .45;     0 .95 .05;     0 .05 .95]';
+text_velo = num2str(val_velo); text_fixdur = num2str(val_fixdur); text_bins = num2str(val_bins);
 
 FixSacFig = figure('Position',FixFigPos,'Menubar','None','NumberTitle','Off','Color',[.65 .75 .65],...
     'Name','Fixation/Saccade Settings');
@@ -79,9 +79,15 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         val_velo = str2num(get(VeloThresh,'String'));
         val_fixdur = str2num(get(MinFixDur,'String'));
         val_bins = str2num(get(VeloBinBy,'String'));
-        Settings = [val_velo,val_fixdur,val_bins,curr_est];
-        close(FixSacFig)
+        val_trm = str2num(strrep(get(HMMTR,'String'), '[];,', ''));
+        Settings = [val_velo,val_fixdur,{val_trm},val_bins,curr_est];
+        uiresume(FixSacFig)
     end
 
-waitfor(FixSacFig)
+
+uiwait(FixSacFig)
+try
+close(FixSacFig)
+end
+
 end
