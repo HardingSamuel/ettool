@@ -107,7 +107,7 @@ if ~isempty(trilist)
     %% Save the Data, update the ETT
     subdata.Name = ETT.Subjects(Subject).Name;
     subdata.DOB = ETT.Subjects(Subject).DOB;
-    subdata.TestD = ETT.Subjects(Subject).TestD;
+    subdata.TestDate = ETT.Subjects(Subject).TestDate;
     
     SRmat = [60 120 180 240 300];
     SR = SRmat(find(min(abs(SRmat-1000/((tmicro(1,2) - tmicro(1,1))/1000)))==...

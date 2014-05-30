@@ -19,6 +19,8 @@ switch mode
         text_mode = 'Import';
     case 2
         text_mode = 'PreProcess';
+    case 3
+        text_mode = 'Additional Analysis';
 end
 
 batch_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, selected,'uni',0));
@@ -74,7 +76,22 @@ set(DoneButton,'Enable','On')
                 if usedcustom
                     addtext = ' [C]';
                 end
-                ETT.Subjects(selected(batchi)).Status.PreProcess = [datestr(now), addtext];                
+                ETT.Subjects(selected(batchi)).Status.PreProcess = [datestr(now), addtext];  
+            case 3
+                startdir = pwd;
+                for AddAna = 1:size(ETT.Config.AdditionalAnalyses,2)
+                    cd(ETT.Config.AdditionalAnalyses{1,AddAna})
+                    try     
+                        scrname = ETT.Config.AdditionalAnalyses{2,AddAna};
+                        eval(['ETT = ' scrname(1:end-2) '(ETT,' num2str(selected(batchi)) ');'])
+                        status = 1;
+                    catch
+                        status = 0;
+                        disp(['Error for Subject ' num2str(selected(batchi)) ' when running custom script:']);
+                        disp(scrname);                        
+                    end
+                end
+                cd(startdir)
         end
     end
 

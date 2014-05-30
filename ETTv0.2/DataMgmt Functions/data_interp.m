@@ -39,10 +39,14 @@ for trinum = 1:size(gapstart,2)
         (gapend{trinum}-gapstart{trinum}+1>max_interp) + (gapend{trinum}-gapstart{trinum}+1>max_blink)];
     gapdata{trinum}(:,gapdata{trinum}(1,:) == 1) = [];
     gapdata{trinum}(:,gapdata{trinum}(2,:) == subdata.TrialLengths(trinum)) = [];
+    
     interps = find(gapdata{trinum}(4,:) == 0);
     interpstart{trinum} = gapdata{trinum}(1,interps)-1; interpend{trinum} = gapdata{trinum}(2,interps)+1;    
     blinks = find(gapdata{trinum}(4,:) == 1);
     blinkstart{trinum} = gapdata{trinum}(1,blinks)-1; blinkend{trinum} = gapdata{trinum}(2,blinks)+1;
+    missings = find(gapdata{trinum}(4,:) == 2);
+    missingstart{trinum} = gapdata{trinum}(1,missings)-1; missingend{trinum} = gapdata{trinum}(2,missings)+1;
+    
     for interp_iter = interps
         
         InterpX(trinum,gapdata{trinum}(1,interp_iter)-1:gapdata{trinum}(2,interp_iter)+1) = ...
@@ -66,6 +70,7 @@ subdata.Interpolation.InterpD = InterpD;
 subdata.Interpolation.InterpP = InterpP;
 subdata.Interpolation.Indices = [interpstart;interpend]';
 subdata.Interpolation.Blinks = [blinkstart;blinkend]';
+subdata.Interpolation.MissingData = [missingstart;missingend]';
 
 subdata.GoodData.Interpolation = cell2mat(arrayfun(@(X) length(find(~isnan(InterpX(X,1:subdata.TrialLengths(X)))))/subdata.TrialLengths(X),1:size(InterpX,1),'uni',0))';
 

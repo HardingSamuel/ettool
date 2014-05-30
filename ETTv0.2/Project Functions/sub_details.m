@@ -24,7 +24,7 @@ switch mode
         temp_subn = '';
         temp_dataloc = '';
         temp_dob = '';
-        temp_testd = '';
+        temp_TestDate = '';
         
         text_data = 'Data File Not Found';
         text_import = 'Not      Imported  ';
@@ -35,7 +35,7 @@ switch mode
         temp_subn = ETT.Subjects(selected).Name;
         temp_dataloc = ETT.Subjects(selected).Data.Raw;
         temp_dob = ETT.Subjects(selected).DOB;
-        temp_testd = ETT.Subjects(selected).TestD;
+        temp_TestDate = ETT.Subjects(selected).TestDate;
         
         text_data = 'Data File Loaded';
         text_import = ETT.Subjects(selected).Status.Import;
@@ -63,7 +63,7 @@ SubN = uicontrol('Style','Edit','String',temp_subn,'Position',[25 177.5 215 27.5
 uipanel('Title', 'Date of Birth', 'Units', 'Pixels', 'Position', [20 110 225 55], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 DOB = uicontrol('Style','Edit','String',temp_dob,'Position',[25 117.5 215 27.5],'Backgroundcolor',[1 1 1],'FontSize',10);
 uipanel('Title', 'Date Tested', 'Units', 'Pixels', 'Position', [20 50 225 55], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
-TestD = uicontrol('Style','Edit','String',temp_testd,'Position',[25 57.5 215 27.5],'Backgroundcolor',[1 1 1],'FontSize',10);
+TestDate = uicontrol('Style','Edit','String',temp_TestDate,'Position',[25 57.5 215 27.5],'Backgroundcolor',[1 1 1],'FontSize',10);
 
 uipanel('Title', 'Status', 'Units', 'Pixels', 'Position', [265 50 115 175], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 DatafileText = uicontrol('Style','Text','Position',[270 157.5 105 45],'Backgroundcolor',[.7 .8 .7],'FontSize',13,'ForegroundColor',col_dataloc,'HorizontalAlignment','Left',...
@@ -117,7 +117,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
     function done_adddetail(~,~,mode)
         temp_subn = get(SubN,'String');
         temp_dob = get(DOB,'String');
-        temp_testd = get(TestD,'String');
+        temp_TestDate = get(TestDate,'String');
         switch mode
             case 0
                 if ~strcmp(temp_subn,'')
@@ -128,6 +128,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
                     ETT.Subjects(edit_sub).Config.Import = [];                    
                     ETT.Subjects(edit_sub).Config.PreProcess = [];
                     ETT.Subjects(edit_sub).Config.FixDetect = [];
+                    ETT.Subjects(edit_sub).Config.AdditionalAnalyses = [];
                 end
             case 1
                 edit_sub = selected;
@@ -136,7 +137,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
             ETT.Subjects(edit_sub).Name = temp_subn;
             ETT.Subjects(edit_sub).Data.Raw = temp_dataloc;
             ETT.Subjects(edit_sub).DOB = temp_dob;
-            ETT.Subjects(edit_sub).TestD = temp_testd;
+            ETT.Subjects(edit_sub).TestDate = temp_TestDate;
         end
         close(AddSubjectFig)
     end

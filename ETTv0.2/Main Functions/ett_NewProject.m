@@ -35,13 +35,15 @@ function savepass(obj,~)
     ETT.nSubjects = 0;
     ETT.CreationDate = datestr(now);
     ETT.FileName = '';
-    ETT.PathName = '';    
-    [ETT,SaveStatus] = ett_SaveProject(ETT,2);
+    ETT.PathName = '';        
     ETT.DefaultDirectory = ETT.PathName;
     ETT.Config.Import = [];
     ETT.Config.PreProcess = [];
     ETT.Config.FixDetect = [];
+    ETT.Config.AdditionalAnalyses = [];
     ETT.Subjects = [];
+    
+    [ETT,SaveStatus] = ett_SaveProject(ETT,2);
     
     if SaveStatus
         Status = 1;
@@ -49,7 +51,7 @@ function savepass(obj,~)
     else
         Status = 0; 
         delete(obj)
-        uicontrol('Style','Pushbutton','String','Unable to Save File (Click to return)','pos',[30 25 340 35],'BackgroundColor',[1 1 1],...
+        uicontrol('Style','Pushbutton','String','Unable to Save File (Click to return)','pos',[30 25 340 35],'BackgroundColor',[.8 .8 .8],...
             'ForeGroundColor',[1 0 0],'Callback','close(gcf); clear ETT','FontSize',12);
     end
 end

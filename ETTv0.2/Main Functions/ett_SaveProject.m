@@ -17,6 +17,9 @@ function [ETT,Status] = ett_SaveProject(ETT,mode)
 %   [SH] - 04/28/14:   v1 - Creation
 
 %%
+if isempty(ETT.PathName)
+    mode = 2;
+end
 
 switch mode
     case 1

@@ -36,8 +36,10 @@ else
     if cust_anyproc
         text_Pcust = '[C] ';
     end
-    stat_preproc = all(ETT.Config.PreProcess == [1 80 500 15 2]);
-    text_pre = 'Default';
+    text_pre = 'Default'; stat_preproc = 1;
+    if length(ETT.Config.PreProcess) == 4
+        stat_preproc = all(ETT.Config.PreProcess == [1 80 500 15 2]);
+    end            
     if ~stat_preproc
         text_pre = 'User Defined';
     end

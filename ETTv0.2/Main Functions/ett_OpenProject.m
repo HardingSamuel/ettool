@@ -13,13 +13,16 @@ function ETT = ett_OpenProject
 %   [SH] - 04/28/14:   v1 - Creation
 
 %%
+ETT = [];
 
 [filename,pathname] = uigetfile(...
     {'*.etp', 'ETT Project FIles (*.etp)'},...
     'Select a File to Load');
 
-if ~isempty(filename) && ~isempty(pathname)
+if ischar(filename) && ischar(pathname)
     load([pathname,filename],'-mat')
+else
+    
 end
 
 end

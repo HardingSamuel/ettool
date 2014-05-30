@@ -13,8 +13,6 @@ function ETT = proj_Info(ETT)
 %   [SH] - 04/29/14:   v1 - Creation
 
 %%
-InfoSize = [40 570 400 330];
-
 if ~isfield(ETT, 'ProjectTitle')
     ETT.ProjectTitle = '';
     ETT.ProjectDescription = '';
@@ -23,7 +21,7 @@ end
 title_text = ETT.ProjectName;
 desc_text = ETT.ProjectDescription;
 
-InfoFig = figure('Name', 'Project Information', 'pos', InfoSize, 'NumberTitle', 'Off', 'MenuBar', 'None',...
+InfoFig = figure('Name', 'Project Information', 'pos', [40 570 400 330], 'NumberTitle', 'Off', 'MenuBar', 'None',...
     'Color', [.65 .75 .65]);
 
 uipanel('Title', 'Project Name', 'Units', 'Pixels', 'Position', [20 255 360 70], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
