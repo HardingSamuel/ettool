@@ -122,6 +122,7 @@ if ~isempty(trilist)
     subdata.TrialOnOff = TBegin;
     subdata.TrialLengths = tlens;
     
+    subdata.GoodData.Raw = arrayfun(@(tri) 1-(length(find(subdata.LeftEye.GazeX(tri,:)==-1))/length(find(~isnan(subdata.LeftEye.GazeX(tri,:))))), 1:length(tlens));
     
     subdata.WhatsOn.Names = wonames';
     subdata.WhatsOn.Begindices = wobegin';
