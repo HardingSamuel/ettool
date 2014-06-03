@@ -12,6 +12,7 @@ function [status,stattext,usedcustom] = data_import(ETT,Subject)
 %
 %% Change Log
 %   [SH] - 05/01/14:    v1 - Creation
+%   [SH] - 06/03/14:   Added GoodData.Raw calculation
 
 %%
 cols = ETT.Config.Import; usedcustom = 0;
