@@ -17,7 +17,7 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
-seg_vis = 1; seg_sizeT = 3000; seg_sizeP = []; fixdetset = ETT.Config.FixDetect; preprocset = ETT.Config.PreProcess;
+seg_vis = 1; seg_sizeP = []; fixdetset = ETT.Config.FixDetect; preprocset = ETT.Config.PreProcess;
 
 xplot = []; yplot = []; vplot = []; vtext = []; vthresh = [];
 plot_interp = []; plot_blink = []; plot_missing = []; text_phase = cell(2,0); hlx = []; hly = [];
@@ -116,7 +116,7 @@ EB_Split = uicontrol('Style','Pushbutton','String','Split Fixations','Background
     'Position',[322.5 542 77.5 38],'Enable','Off');
 
 
-fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
+set(brush,'ActionPostCallback',@fix_brush)
 
     function fix_x(~,~)
         xticks = get(GazeAxes,'xtick');
@@ -126,7 +126,7 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
 
     function slide_sub(~,~)
         text_sub = num2str(subslist(fix(get(Slide_Sub,'Value'))));
-        val_sub = str2num(text_sub);
+        val_sub = str2double(text_sub);
         set(Sel_Sub,'Title',['Subject: ' text_sub])
     end
 
@@ -136,7 +136,7 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
         if seg_sizeP == length(find(~isnan(subdata.Filtered.FiltX(val_tri,:))))
             maxnext = 1;
         end
-        val_tri = str2num(text_tri);
+        val_tri = str2double(text_tri);
         seg_sizeP = fix(3000 / (1000/subdata.SampleRate));
         set(WinSize,'String','3000')
         if maxnext
@@ -156,14 +156,14 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
         
         set(WinSize,'Enable','On')
         set(Slide_Tri,'Value',1);
-        set(Sel_Tri,'Title', ['Trial: 1']);
+        set(Sel_Tri,'Title', 'Trial: 1');
         subdata = load(ETT.Subjects(val_sub).Data.Import);
         subdata = subdata.subdata;
         
         set(Slide_Tri','Enable','On')
         val_maxtri = size(subdata.TrialLengths,1);
         val_tri = 1;
-        seg_sizeP = fix(str2num(get(WinSize,'String'))/(1000/subdata.SampleRate));
+        seg_sizeP = fix(str2double(get(WinSize,'String'))/(1000/subdata.SampleRate));
         set(Slide_Tri,'Max',val_maxtri,'SliderStep',...
             [1/(val_maxtri-1), 1/(val_maxtri-1)])
         trilist = 1:val_maxtri;
@@ -197,8 +197,8 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
     end
 
     function disp_trial_gui(~,~)
-        seg_sizeP = fix(min(str2num(get(WinSize,'String')),length(find(~isnan(subdata.Filtered.FiltX(val_tri,:))))*(1000/subdata.SampleRate))/(1000/subdata.SampleRate));
-        set(WinSize,'String',num2str(fix(min(str2num(get(WinSize,'String')),size(subdata.Filtered.FiltX,2)*(1000/subdata.SampleRate)))))
+        seg_sizeP = fix(min(str2double(get(WinSize,'String')),length(find(~isnan(subdata.Filtered.FiltX(val_tri,:))))*(1000/subdata.SampleRate))/(1000/subdata.SampleRate));
+        set(WinSize,'String',num2str(fix(min(str2double(get(WinSize,'String')),size(subdata.Filtered.FiltX,2)*(1000/subdata.SampleRate)))))
         disp_trial
     end
 
@@ -213,7 +213,7 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
         tri_segs = cell(0,0);
         if trilen > seg_sizeP
             for trispl = 1:ceil(trilen/(seg_sizeP))
-                tri_segs{trispl} = fix([.75*seg_sizeP*(trispl-1)+1:.75*seg_sizeP*(trispl-1)+seg_sizeP+1]);
+                tri_segs{trispl} = fix(.75*seg_sizeP*(trispl-1)+1:.75*seg_sizeP*(trispl-1)+seg_sizeP+1);
             end
             set(Scroll_Right,'Enable','On');
         else
@@ -437,6 +437,7 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
     end
 
     function orgdata = organize_fixations
+        orgdata = cell(1,length(subslist));
         for tri_n = 1:val_maxtri
             orgdata{val_sub==subslist}{tri_n}.fixbegin = find(fixinfo.hmmclean.fixbegin(tri_n,:));
             orgdata{val_sub==subslist}{tri_n}.fixend = find(fixinfo.hmmclean.fixend(tri_n,:));
@@ -487,15 +488,6 @@ fixbrush = brush(FixDetWin); set(brush,'ActionPostCallback',@fix_brush)
 %% Manual fixation editing
 
     function fix_brush(~,~)
-%         Handle = findobj(FixDetWin,'-property','BrushData');
-%         for i = 1:length(Handle)
-%             CH = get(Handle(i));            
-%             if strcmp(CH.DisplayName,'X-Gaze') || strcmp(CH.DisplayName,'Y-Gaze') || strcmp(CH.DisplayName,'Velocity (scaled)')
-%                 if ~all(CH.BrushData == 0)
-%                     break
-%                 end
-%             end
-%         end
         
         brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         wasbrushed = 0;

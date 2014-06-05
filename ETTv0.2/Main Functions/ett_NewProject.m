@@ -49,8 +49,8 @@ uicontrol('Style','Edit','Position',[30 25 340 35],'Parent',NewProjectFig,'Backg
         ETT.ScreenDim.Height = 287.75;
         ETT.ScreenDim.PixX = 1920;
         ETT.ScreenDim.PixY = 1080;
-        ETT.ScreenDim.StimX = str2num(get(xextent,'String'));
-        ETT.ScreenDim.StimY = str2num(get(yextent,'String'));
+        ETT.ScreenDim.StimX = [0 1920];
+        ETT.ScreenDim.StimY = [0 1080];
         
         
         
