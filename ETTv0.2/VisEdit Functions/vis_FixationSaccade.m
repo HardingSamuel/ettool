@@ -50,13 +50,17 @@ Sel_Seg = uipanel('Title', ['Trial Segment: ' num2str(seg_vis), '/1'], 'Units', 
 uipanel('Title', 'Length(ms):', 'Units', 'Pixels', 'Position', [825 535 105 50],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 
-Slide_Sub = uicontrol('Style','Slider','Min',1,'Max',length(subslist),...
-    'Value',1,'SliderStep',[1/(length(subslist)-1), 1/(length(subslist)-1)],...
-    'Position',[650 652.5 210 20],'Callback',@slide_sub);
+
+if length(subslist)>1
+    Slide_Sub = uicontrol('Style','Slider','Min',1,'Max',length(subslist),...
+        'Value',1,'SliderStep',[1/(length(subslist)-1), 1/(length(subslist)-1)],...
+        'Position',[650 652.5 210 20],'Callback',@slide_sub);
+end
+
 uicontrol('Style','PushButton','String','Load','Position',[870 650 50 27.5],...
     'BackgroundColor',[.8 .8 .8],'Callback',@loadsub);
 Slide_Tri = uicontrol('Style','Slider','Min',1,'Max',99,...
-    'Value',1,'SliderStep',[1/(length(subslist)-1), 1/(length(subslist)-1)],...
+    'Value',1,'SliderStep',[1 1],...
     'Position',[650 597.5 270 20],'Callback',@slide_tri,'Enable','Off');
 
 GazeAxes = axes('Parent',FixDetWin,'Units','Pixels','Position',[60 50 870 440],...
@@ -345,7 +349,7 @@ set(brush,'ActionPostCallback',@fix_brush)
             ETT.Subjects(val_sub).Config.PreProcess = preprocset;
             
             pre_text
-            calc_velo            
+            calc_velo
             list_fix
             disp_trial
         end
@@ -496,12 +500,12 @@ set(brush,'ActionPostCallback',@fix_brush)
             if ~all(get(brushothers(brushes),'BrushData') == 0)
                 CH = get(brushothers(brushes));
                 for fill = otherbrushes
-                    set(brushothers(fill),'BrushData', get(brushothers(brushes),'BrushData')); 
+                    set(brushothers(fill),'BrushData', get(brushothers(brushes),'BrushData'));
                 end
                 wasbrushed = 1;
             end
         end
-                
+        
         if wasbrushed
             brushed.indices = CH.XData(CH.BrushData==1);
             brushed.begin = brushed.indices(1);
@@ -527,27 +531,29 @@ set(brush,'ActionPostCallback',@fix_brush)
         if ~isempty(brushed)
             issaved = 0;
             newfixnum = find(tempdata{val_sub==subslist}{val_tri}.fixbegin < brushed.begin,1,'last')+1;
+            nextfixbegin = inf;
             if isempty(newfixnum)
                 newfixnum = 1;
                 lastfixend = 0;
             else
                 lastfixend = tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum-1);
-            end
-            
-            if brushed.begin > lastfixend && brushed.end < tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum)
-                if newfixnum < length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
-                    restoffixes = [tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum:end);tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum:end)];
-                    tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum) = brushed.begin;
-                    tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum) = brushed.end;
+                if newfixnum <= length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
+                    nextfixbegin = tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum);
+                end
+            end            
+            if brushed.begin > lastfixend && brushed.end < nextfixbegin
+                restoffixes = [tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum:end);tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum:end)];
+                tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum) = brushed.begin;
+                tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum) = brushed.end;
+                if ~isempty(restoffixes)
                     tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum+1:length(tempdata{val_sub==subslist}{val_tri}.fixbegin)+1) = restoffixes(1,:);
                     tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum+1:length(tempdata{val_sub==subslist}{val_tri}.fixend)+1) = restoffixes(2,:);
-                    tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
-                    list_fix
-                    plot_fixations([])
                 end
+                tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
             end
-            brushed = [];
         end
+        list_fix
+        plot_fixations([])
     end
 
     function delete_fix(~,~)
@@ -560,7 +566,6 @@ set(brush,'ActionPostCallback',@fix_brush)
                 tempdata{val_sub==subslist}{val_tri}.fixdurations(fixselected) = [];
                 list_fix
                 plot_fixations([])
-                brushed = [];
             end
         end
     end
@@ -576,7 +581,6 @@ set(brush,'ActionPostCallback',@fix_brush)
             tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
             list_fix
             plot_fixations([])
-            brushed = [];
         end
     end
     function split_fix(~,~)
@@ -588,13 +592,14 @@ set(brush,'ActionPostCallback',@fix_brush)
                 tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected+1) = brushed.end;
                 tempdata{val_sub==subslist}{val_tri}.fixend(fixselected+1) = tempdata{val_sub==subslist}{val_tri}.fixend(fixselected);
                 tempdata{val_sub==subslist}{val_tri}.fixend(fixselected) = brushed.begin;
-                tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixbegin)+1) = restoffixes(1,:);
-                tempdata{val_sub==subslist}{val_tri}.fixend(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixend)+1) = restoffixes(2,:);
+                if ~isempty(restoffixes)
+                    tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixbegin)+1) = restoffixes(1,:);
+                    tempdata{val_sub==subslist}{val_tri}.fixend(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixend)+1) = restoffixes(2,:);
+                end
                 tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
                 list_fix
                 plot_fixations([])
             end
-            brushed = [];
         end
     end
 
