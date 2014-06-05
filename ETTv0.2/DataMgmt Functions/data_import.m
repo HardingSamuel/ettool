@@ -1,4 +1,4 @@
-function [Status,StatusText,usedcustom] = data_import(ETT,Subject)
+function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %
 % data_import
 % Imports the raw eye tracking data and returns a status and updates the
@@ -15,6 +15,9 @@ function [Status,StatusText,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 06/03/14:   Added GoodData.Raw calculation
 
 %%
+
+Status = 0; ErrorOutput = [];
+
 cols = ETT.Config.Import; usedcustom = 0;
 if ~isempty(ETT.Subjects(Subject).Config.Import)
     cols = ETT.Subjects(Subject).Config.Import;
@@ -139,17 +142,19 @@ try
         end
         
         save(rawdatafname,'subdata');
-        Status = 1; StatusText = '';
+        Status = 1;
         
         
     else
         Status = 0;
-        StatusText = (['Unable to parse trial counter column.  Check your column settings and try again, or consider changing this column in your data to'...
-            ' only numbers']);
+%         ErrorOutput = (['Unable to parse trial counter column.  Check your column settings and try again, or consider changing this column in your data to'...
+%             ' only numbers']);
     end
     
 catch err
     Status = 0;
-    StatusText = err.message;
+    ErrorOutput = err;
+    disp(['Error during PreProcess for Subject ' ETT.Subjects(Subject).Name ' with error message'])
+    disp(ErrorOutput.message)
 end
 end

@@ -1,4 +1,4 @@
-function [ETT] = proj_batch(ETT,selected,mode)
+function [ETT,ERRORS] = proj_batch(ETT,selected,mode)
 %
 % proj_batch
 % Process multiple entries of ETT (subjects, trials, etc. . .) with visual
@@ -60,7 +60,7 @@ set(DoneButton,'Enable','On')
     function status = batch_proc(batchi,mode)
         switch mode
             case 1
-                [status,statustext,usedcustom] = data_import(ETT,selected(batchi));
+                [status,ERRORS,usedcustom] = data_import(ETT,selected(batchi));
                 importdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(selected(batchi)).Name,'\SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
                 ETT.Subjects(selected(batchi)).Data.Import = importdatafname;
                 addtext = '';
@@ -69,7 +69,7 @@ set(DoneButton,'Enable','On')
                 end
                 ETT.Subjects(selected(batchi)).Status.Import = [datestr(now), addtext];
             case 2
-                [status,statustext,usedcustom] = data_preprocess(ETT,selected(batchi));
+                [status,ERRORS,usedcustom] = data_preprocess(ETT,selected(batchi));
                 procdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(selected(batchi)).Name,'\SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
                 ETT.Subjects(selected(batchi)).Data.PreProcess = procdatafname;
                 addtext = '';

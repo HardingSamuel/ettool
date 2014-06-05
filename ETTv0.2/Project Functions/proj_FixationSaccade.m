@@ -21,6 +21,11 @@ if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
     init_enable = 'off';
     init_style = 'Text';
     init_colenable = 'Off';
+elseif all(strcmp(cat(1,arrayfun(@(X) ETT.Subjects(X).Status.PreProcess, 1:length(ETT.Subjects),'uni',0)),'Not Processed'))
+    sub_text = '-- No Subjects PreProcessed -- Please PreProcess subjects using ''PreProcess Data'' first';
+    init_enable = 'off';
+    init_style = 'Text';
+    init_colenable = 'Off';
 else
     sub_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, 1:length(ETT.Subjects),'uni',0));
     if ~isempty(ETT.Subjects(1).Config.FixDetect)

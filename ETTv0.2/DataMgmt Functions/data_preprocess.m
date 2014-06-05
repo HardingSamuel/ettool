@@ -1,4 +1,4 @@
-function [Status,StatusText,usedcustom] = data_preprocess(ETT,Subject)
+function [Status,ErrorOutput,usedcustom] = data_preprocess(ETT,Subject)
 %
 % data_preprocess
 % Interpolates and filters the raw data, resaves the data
@@ -18,7 +18,7 @@ function [Status,StatusText,usedcustom] = data_preprocess(ETT,Subject)
 
 %%
 
-Status = 0; StatusText = '';
+Status = 0; ErrorOutput = [];
 
 procsettings = ETT.Config.PreProcess; usedcustom = 0;
 if ~isempty(ETT.Subjects(Subject).Config.PreProcess)
@@ -73,7 +73,9 @@ save(importfname,'subdata')
 Status = 1;
 catch err
     status = 0;
-   statustext = err.message;
+    ErrorOutput = err;
+    disp(['Error during PreProcess for Subject ' ETT.Subjects(Subject).Name ' with error message'])
+    disp(ErrorOutput.message)
 end
 
 end

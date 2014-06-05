@@ -1,4 +1,4 @@
-function [ETT] = proj_PreProcess(ETT)
+function [ETT,ERRORS] = proj_PreProcess(ETT)
 %
 % proj_PreProcess
 % To be run after importing, will do basics such as interpolation and
@@ -14,11 +14,18 @@ function [ETT] = proj_PreProcess(ETT)
 %   [SH] - 05/05/14:    v1 - Creation
 
 %%
+ERRORS = [];
 init_enable = 'On'; imp_enable = 'On'; init_colenable = 'On';
 init_style = 'Listbox'; col_subbut = [0 0 0];
 
+
 if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
-    sub_text = '--No Subjects Found -- Please add subjects using ''Manage Subjects'' first.';
+    sub_text = '-- No Subjects Found -- Please add subjects using ''Manage Subjects'' first';
+    init_enable = 'off';
+    init_style = 'Text';
+    init_colenable = 'Off';
+elseif all(strcmp(cat(1,arrayfun(@(X) ETT.Subjects(X).Status.Import, 1:length(ETT.Subjects),'uni',0)),'Not      Imported  '))
+    sub_text = '-- No Subjects Imported -- Please Import subjects using ''Import Data'' first';
     init_enable = 'off';
     init_style = 'Text';
     init_colenable = 'Off';
@@ -62,7 +69,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
 
     function sub_process(~,~)
         selected = get(Subslist,'Value');
-        [ETT] = proj_batch(ETT,selected,2);
+        [ETT,ERRORS] = proj_batch(ETT,selected,2);
         figure(ProcessFig)
     end
 

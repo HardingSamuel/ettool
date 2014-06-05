@@ -37,8 +37,8 @@ Project_Settings = uimenu('Label','Project &Settings','Parent',ProjectMenu,'Posi
 % -----------------------------------
 Project_ManageSubjects = uimenu('Label','&Manage Subjects','Parent',ProjectMenu,'Separator','On','Position',3,'Callback','ETT = proj_SubManage(ETT);ett_DrawMain(ETT,ETTFig);');
 % -----------------------------------
-Project_ImportData = uimenu('Label','&Import Data','Parent',ProjectMenu,'Separator','On','Position',4,'Callback','ETT = proj_Import(ETT);ett_DrawMain(ETT,ETTFig);');
-Project_PreProcess = uimenu('Label','&Pre-Process Data','Parent',ProjectMenu,'Position',5,'Callback','ETT = proj_PreProcess(ETT);ett_DrawMain(ETT,ETTFig);');
+Project_ImportData = uimenu('Label','&Import Data','Parent',ProjectMenu,'Separator','On','Position',4,'Callback','[ETT,ERRORS] = proj_Import(ETT);ett_DrawMain(ETT,ETTFig);');
+Project_PreProcess = uimenu('Label','&Pre-Process Data','Parent',ProjectMenu,'Position',5,'Callback','[ETT,ERRORS] = proj_PreProcess(ETT);ett_DrawMain(ETT,ETTFig);');
 Project_FixationSaccade = uimenu('Label','&Fixation Detection','Parent',ProjectMenu,'Position',6,'Callback','ETT = proj_FixationSaccade(ETT);ett_DrawMain(ETT,ETTFig);');
 Project_Summarize = uimenu('Label','Summarize &Data','Parent',ProjectMenu,'Position',7,'Callback','proj_Summarize','Enable','Off');
 

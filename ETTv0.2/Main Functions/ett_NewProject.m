@@ -52,8 +52,6 @@ uicontrol('Style','Edit','Position',[30 25 340 35],'Parent',NewProjectFig,'Backg
         ETT.ScreenDim.StimX = [0 1920];
         ETT.ScreenDim.StimY = [0 1080];
         
-        
-        
         if SaveStatus
             Status = 1;
             close(gcf)

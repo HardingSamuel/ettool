@@ -1,4 +1,4 @@
-function [ETT] = proj_Import(ETT)
+function [ETT,ERRORS] = proj_Import(ETT)
 %
 % proj_Import
 % Import raw eye-tracking data for a subject and link it to the project
@@ -16,14 +16,14 @@ function [ETT] = proj_Import(ETT)
 %   [SH] - 04/30/14:    v1 - Creation
 
 %%
-
+ERRORS = [];
 datafid = []; col_arrange = []; redraw = 0;
 init_enable = 'On'; imp_enable = 'On'; init_colenable = 'On';
 init_style = 'Listbox'; 
 
 col_subbut = [0 0 0];
 if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
-    sub_text = '--No Subjects Found -- Please add subjects using ''Manage Subjects'' first.';
+    sub_text = '-- No Subjects Found -- Please add subjects using ''Manage Subjects'' first';
     init_enable = 'off';
     init_style = 'Text';
     init_colenable = 'Off';
@@ -103,7 +103,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
 
     function sub_import(~,~)
         selected = get(Subslist,'Value');
-        [ETT] = proj_batch(ETT,selected,1);
+        [ETT,ERRORS] = proj_batch(ETT,selected,1);
         figure(ImportFig)
     end
 
