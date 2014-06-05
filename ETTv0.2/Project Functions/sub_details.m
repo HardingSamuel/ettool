@@ -92,8 +92,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
                     ['Select a Data file for Subject ' subn]);
                 set(DatafileText,'ForegroundColor',[.2 .75 .2],'String','Data File Loaded')
                 temp_dataloc = [filepath,filename];
-            case 1
-                
+            case 1                
                 sub_currdir = ETT.Subjects(selected).Data.Raw; sla = strfind(sub_currdir,'\');
                 if length(sla)>0
                     sub_currfile = sub_currdir(sla(end)+1:end); sub_currdir = sub_currdir(1:sla(end));
@@ -114,7 +113,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
         cd(opdir);
     end
 
-    function done_adddetail(~,~,mode)
+    function done_adddetail(~,~,mode)        
         temp_subn = get(SubN,'String');
         temp_dob = get(DOB,'String');
         temp_TestDate = get(TestDate,'String');

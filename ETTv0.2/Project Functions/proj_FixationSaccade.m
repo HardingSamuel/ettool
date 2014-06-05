@@ -62,7 +62,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
 
     function sub_Fixation(~,~)
         selected = get(Subslist,'Value');
-        [ETT] = vis_FixationSaccade(ETT,selected);
+        [ETT] = vis_FixationSaccade(ETT,selected);        
         figure(FixationFig)
     end
 
@@ -81,7 +81,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
         end            
         [NewSettings] = sett_FixDetect(ETT,0,Settings);
         if mode
-            if all(NewSettings == ETT.Config.FixDetect);
+            if all(arrayfun(@(set) NewSettings{set}==ETT.Config.FixDetect{set},[1,2,4,5])) && all(all(NewSettings{3} == ETT.Config.FixDetect{3}));
                 NewSettings = [];
             end
             ETT.Subjects(selected).Config.FixDetect = NewSettings;

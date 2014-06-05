@@ -102,10 +102,12 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         
         function slide_text(~,~)
             text_ex = '';
-            if get(sett2,'Value')==2
+            slidval = fix(get(sett2,'Value'));
+            if slidval ==2
                 text_ex = ' (Default)';
             end
-            set(sett2txt,'String',['Filter Order:  ' num2str(get(sett2,'Value')) text_ex])
+            set(sett2txt,'String',['Filter Order:  ' num2str(slidval) text_ex])
+            set(sett2,'Value',slidval)
         end
         
         function sett_return(~,~)
@@ -126,6 +128,11 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
     end
 
     function donerefresh(~,~)
+        if  filtsett(2) >= filtsett(1)
+            filtsett(1) = 5 + 2 * filtsett(2);
+            errordlg(['Error while filtering:  SGOlay Filter Order must be less than the window length.' char(10) 'Adjusting Window to length:' char(10) num2str(filtsett(1))  '   (5 + 2 * Filter Order)']);
+        end
+        
         interpval = str2num(get(MaxIntrpLat,'String'));
         blinkval = str2num(get(MaxBlinkLat,'String'));
         Settings = [curr_fil,interpval,blinkval,filtsett];

@@ -14,6 +14,7 @@ function [Status,StatusText,usedcustom] = data_preprocess(ETT,Subject)
 %
 %% Change Log
 %   [SH] - 05/06/14:    v1 - Creation
+%   [SH] - 06/03/14:   Changed GoodData.Initial to GoodData.PreProcess
 
 %%
 
@@ -26,6 +27,8 @@ if ~isempty(ETT.Subjects(Subject).Config.PreProcess)
 end
 
 %% Load the existing data (Imported)
+
+try
 importfname = ETT.Subjects(Subject).Data.Import;
 load(importfname)
 
@@ -56,7 +59,7 @@ subdata.Combined.CombD = CombD;
 subdata.Combined.CombP = CombP;
 subdata.Combined.GoodEyes = vec_combvalid;
 
-GoodData.Initial = cell2mat(arrayfun(@(X) mean(vec_combvalid(X,1:subdata.TrialLengths(X))),1:size(vec_combvalid,1),'uni',0))';
+GoodData.PreProcess = cell2mat(arrayfun(@(X) mean(vec_combvalid(X,1:subdata.TrialLengths(X))),1:size(vec_combvalid,1),'uni',0))';
 
 %% Interpolating
 [subdata] = data_interp(subdata,procsettings);
@@ -68,5 +71,9 @@ GoodData.Initial = cell2mat(arrayfun(@(X) mean(vec_combvalid(X,1:subdata.TrialLe
 subdata.Status.PreProcess = datestr(now);
 save(importfname,'subdata')
 Status = 1;
+catch err
+    status = 0;
+   statustext = err.message;
+end
 
 end

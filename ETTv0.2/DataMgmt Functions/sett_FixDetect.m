@@ -1,19 +1,19 @@
 function [Settings] = sett_FixDetect(ETT,mode,existsettings)
-% 
+%
 % sett_FixDetect
 % Interface to edit settings when performing fixation/saccade detection
-% 
+%
 % INPUTS:
 % ETT
-% 
+%
 % OUTPUTS:
 % ETT
-% 
+%
 %% Change Log
-%   [SH] - 05/08/14:    v1 - Creation 
+%   [SH] - 05/08/14:    v1 - Creation
 
 %%
-Settings = cell(1,5);
+Settings = existsettings;
 switch mode
     case 0
         text_done = 'Finished';
@@ -80,6 +80,10 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         val_fixdur = str2num(get(MinFixDur,'String'));
         val_bins = str2num(get(VeloBinBy,'String'));
         val_trm = str2num(strrep(get(HMMTR,'String'), '[];,', ''));
+        if any(sum(val_trm,2) ~= repmat(1,3,1))
+            errordlg(['Error in Transition Matrix:  each row much sum to 1' char(10) 'Resetting to Default'])
+            val_trm = [.1 .45 .45; 0 .95 .05; 0 .05 .95];
+        end
         Settings = [val_velo,val_fixdur,{val_trm},val_bins,curr_est];
         uiresume(FixSacFig)
     end
@@ -87,7 +91,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
 
 uiwait(FixSacFig)
 try
-close(FixSacFig)
+    close(FixSacFig)
 end
 
 end

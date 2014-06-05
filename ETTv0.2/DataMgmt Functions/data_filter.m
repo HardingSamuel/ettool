@@ -18,7 +18,7 @@ function [subdata] = data_filter(subdata,procsettings)
 filt_type = procsettings(1);
 switch filt_type
     case 1 %SG Olay
-        filt_order = procsettings(5); filt_wind = procsettings(4); filt_wind = 5 + 2*(subdata.SampleRate/60);
+        filt_order = procsettings(5); filt_wind = procsettings(4);        
         FiltX = nan(size(subdata.Interpolation.InterpX)); FiltY = nan(size(subdata.Interpolation.InterpY)); FiltD = nan(size(subdata.Interpolation.InterpD)); FiltP = nan(size(subdata.Interpolation.InterpP));
         for trinum = 1:size(subdata.Interpolation.InterpX,1)
             notnans = find(~isnan(subdata.Interpolation.InterpX(trinum,:)));

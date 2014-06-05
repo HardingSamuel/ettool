@@ -31,14 +31,22 @@ for trinum = 1:size(states,1)
     fixons = find(fixinfo_sub.fixbegin(trinum,:)); fixoffs = find(fixinfo_sub.fixend(trinum,:)); fixdur = fixoffs - fixons + 1; fixrej = find(fixdur<minduration);
     rejecdices = arrayfun(@(rej) fixons(rej):fixoffs(rej),fixrej,'uni',0); rejecdices = cat(2,rejecdices{:});
     states(trinum,rejecdices) = newvalue;
-end       
+end  
 
+try
 fixinfo_subout.isfix = zeros(size(states)); fixinfo_subout.fixbegin = zeros(size(states)); fixinfo_subout.fixend = zeros(size(states)); fixinfo_subout.fixdurations = zeros(size(states));
 fixinfo_subout.isfix(states==2) = 1;
 fixinfo_subout.fixbegin(find(diff(states,1,2)==-1 | diff(states,1,2)==-997)+size(states,1)) = 1;
 fixinfo_subout.fixend(find(diff(states,1,2)==1 | diff(states,1,2)==997)) = 1;
-fixinfo_subout.fixbegin(sub2ind([size(states,1),size(states,2)],1:size(states,1),arrayfun(@(tri) find(states(tri,:)==2,1,'first'),1:size(fixinfo_subout.isfix)))) = 1;
-fixinfo_subout.fixend(sub2ind([size(states,1),size(states,2)],1:size(states,1),arrayfun(@(tri) find(states(tri,:)==2,1,'last'),1:size(fixinfo_subout.isfix)))) = 1;
+firstfix = arrayfun(@(tri) find(states(tri,:)==2,1,'first'),1:size(fixinfo_subout.isfix),'uni',0);
+fixinfo_subout.fixbegin(sub2ind([size(states,1),size(states,2)],find(arrayfun(@(tri) ~isempty(firstfix{tri}),1:length(firstfix))),...
+    cell2mat(firstfix))) = 1;
+lastfix = arrayfun(@(tri) find(states(tri,:)==2,1,'last'),1:size(fixinfo_subout.isfix),'uni',0);
+fixinfo_subout.fixend(sub2ind([size(states,1),size(states,2)],find(arrayfun(@(tri) ~isempty(lastfix{tri}),1:length(lastfix))),...
+    cell2mat(lastfix))) = 1;
 fixinfo_subout.states = states;
+catch
+    keyboard
+end
 
 end
