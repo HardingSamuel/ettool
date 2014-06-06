@@ -26,12 +26,15 @@ else
     states = fixinfo_sub.states;
     newvalue = 3;
 end
-
+try
 for trinum = 1:size(states,1)
     fixons = find(fixinfo_sub.fixbegin(trinum,:)); fixoffs = find(fixinfo_sub.fixend(trinum,:)); fixdur = fixoffs - fixons + 1; fixrej = find(fixdur<minduration);
     rejecdices = arrayfun(@(rej) fixons(rej):fixoffs(rej),fixrej,'uni',0); rejecdices = cat(2,rejecdices{:});
     states(trinum,rejecdices) = newvalue;
-end  
+end
+catch
+    keyboard
+end
 
 try
 fixinfo_subout.isfix = zeros(size(states)); fixinfo_subout.fixbegin = zeros(size(states)); fixinfo_subout.fixend = zeros(size(states)); fixinfo_subout.fixdurations = zeros(size(states));

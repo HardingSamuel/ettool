@@ -22,8 +22,8 @@ switch mode
         text_done = 'Refresh';
         FixFigPos = [460 197.5 260 330];
 end
-val_velo = 40; val_fixdur = 100; val_bins = 5; val_trm = [.1 .45 .45; 0 .95 .05; 0 .05 .95];
-curr_est = 1; text_trm = '[.1 .45 .45;     0 .95 .05;     0 .05 .95]';
+val_velo = 40; val_fixdur = 100; val_bins = 5; val_trm = [.1 .45 .45; .01 .94 .05; .01 .05 .94];
+curr_est = 1; text_trm = '[.1 .45 .45;     .01 .94 .05;     .01 .05 .94]';
 if ~isempty(existsettings)
     val_velo = existsettings{1};
     val_fixdur = existsettings{2};
@@ -82,7 +82,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         val_trm = str2num(strrep(get(HMMTR,'String'), '[];,', ''));
         if any(sum(val_trm,2) ~= repmat(1,3,1))
             errordlg(['Error in Transition Matrix:  each row much sum to 1' char(10) 'Resetting to Default'])
-            val_trm = [.1 .45 .45; 0 .95 .05; 0 .05 .95];
+            val_trm = [.1 .45 .45; .01 .94 .05; .01 .05 .94];
         end
         Settings = [val_velo,val_fixdur,{val_trm},val_bins,curr_est];
         uiresume(FixSacFig)

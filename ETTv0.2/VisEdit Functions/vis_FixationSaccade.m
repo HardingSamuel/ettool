@@ -32,7 +32,7 @@ tempdata = cell(1,length(subslist)); issaved = 1;
 FixDetWin = figure('Position',[740 197.5 1120 702.5],'Menubar','none','Toolbar','Figure','NumberTitle','Off','Color',[.65 .75 .65],...
     'Name','Fixation Detection');
 
-FileMenu = uimenu('Label','&Fixations','Parent',FixDetWin,'Position',1);
+FileMenu = uimenu('Label','&Fixations','Parent',FixDetWin,'Position',1,'Enable','Off');
 
 uimenu('Label','&Save Fixations','Parent',FileMenu,'Position',1,...
     'Callback',@pop_save);
@@ -161,6 +161,7 @@ set(brush,'ActionPostCallback',@fix_brush)
         set(WinSize,'Enable','On')
         set(Slide_Tri,'Value',1);
         set(Sel_Tri,'Title', 'Trial: 1');
+        set(FileMenu,'Enable','On')
         subdata = load(ETT.Subjects(val_sub).Data.Import);
         subdata = subdata.subdata;
         
@@ -436,7 +437,7 @@ set(brush,'ActionPostCallback',@fix_brush)
     function estim_fixations
         [fixinfo] = fix_ivt(velo,fixdetset{1});
         [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(1000/subdata.SampleRate)));
-        [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states,subdata.SampleRate);
+        [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);        
         [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
     end
 
