@@ -21,17 +21,23 @@ vthresh = fixdetset{1};
 trmat = fixdetset{3};
 binsize = fixdetset{4};
 mode = fixdetset{5};
-veloest = ceil(velo/binsize);
+veloest = max(1,ceil(velo/binsize));
 % keyboard
 switch mode
     case 1
-        counts = arrayfun(@(state) histc(velo(states==state),0:binsize:binsize*ceil(max(max(velo))/binsize)),1:3,'uni',0);
+        counts = arrayfun(@(state) hist(velo(states==state),0:binsize:max(max(velo))),1:3,'uni',0);
         velodist = arrayfun(@(state) cell2mat(counts(state))/sum(cell2mat(counts(state))),1:3,'uni',0);
-        velodist = cat(2,velodist{:})';
-        veloest(isnan(velo)) = length(velodist);        
-        for trinum = 1:size(states,1)
-            [estim_states(trinum,:)] = hmmviterbi(ceil(veloest(trinum,:)/binsize),trmat,velodist);
-        end
+        velodist = cat(1,velodist{:}); velodist(velodist==0) = .00001; velodist = arrayfun(@(state) velodist(state,:)/sum(velodist(state,:),2),1:size(velodist,1),'uni',0);
+        velodist = cat(1,velodist{:});
+        veloest(isnan(velo)) = length(velodist); 
+        try
+            for trinum = 1:size(states,1)
+                [estim_states(trinum,:)] = hmmviterbi(veloest(trinum,:),trmat,velodist);
+            end
+        catch err
+            disp(['Error on Trial ' num2str(trinum)])
+            keyboard
+        end            
 %         [estTR,estE] = hmmestimate(veloest,estim_states);
 %         figure
 %         estE(end) = nan;
