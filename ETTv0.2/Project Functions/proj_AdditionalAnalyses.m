@@ -1,6 +1,6 @@
 function [ETT] = proj_AdditionalAnalyses(ETT)
 % 
-% add_MainWin
+% proj_AdditionalAnalyses
 % Manage which subjects and additinal analyses to run in additional
 % analyses besides those included by default.
 % 

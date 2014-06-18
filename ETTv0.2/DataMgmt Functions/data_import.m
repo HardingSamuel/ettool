@@ -33,8 +33,8 @@ rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'
 try
     datafid = fopen(ETT.Subjects(Subject).Data.Raw);
     fgets(datafid);
-    [datacell] = textscan(...
-        datafid,dataformat,'delimiter','\t','treatasempty',{'-1.#INF','1.#INF','-1.#IND','1.#IND'},'emptyvalue',-1);
+    [datacell,position] = textscan(...
+        datafid,dataformat,'delimiter','\t','treatAsEmpty',{'-1.#INF','1.#INF','-1.#IND','1.#IND','-1.#QNAN','1.#QNAN','NF','ND'},'emptyvalue',-1,'CommentStyle','#');
     if ~feof(datafid)
         keyboard
     end
@@ -87,7 +87,6 @@ try
             Reye.Validity(torg,1:tlens(torg)) = datacell{11}(begindices(torg):endices(torg))';
             
             TBegin(torg,1:2) = [begindices(torg),endices(torg)];
-            
             for nae = nadditionalentries
                 add_vec = aerow{nae==nadditionalentries}(begindices(torg):endices(torg));
                 if length(unique(add_vec,'stable')) == 1

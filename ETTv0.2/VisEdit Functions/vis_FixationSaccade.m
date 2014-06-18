@@ -14,6 +14,10 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   [SH] - 05/08/14:    v1 - Creation
 
 %%
+
+try
+    close(gcf)
+end
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
@@ -437,8 +441,9 @@ set(brush,'ActionPostCallback',@fix_brush)
     function estim_fixations
         [fixinfo] = fix_ivt(velo,fixdetset{1});
         [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(1000/subdata.SampleRate)));
-        [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);        
-        [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
+        [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);
+        fixinfo.hmmclean = fixinfo.hmm
+%         [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
     end
 
     function orgdata = organize_fixations
@@ -493,21 +498,24 @@ set(brush,'ActionPostCallback',@fix_brush)
 %% Manual fixation editing
 
     function fix_brush(~,~)
-        
         brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         wasbrushed = 0;
+        minbrush = nan(1,3); maxbrush = nan(1,3);
         for brushes = 1:3
-            otherbrushes = 1:3; otherbrushes(brushes) = [];
-            if ~all(get(brushothers(brushes),'BrushData') == 0)
-                CH = get(brushothers(brushes));
-                for fill = otherbrushes
-                    set(brushothers(fill),'BrushData', get(brushothers(brushes),'BrushData'));
-                end
+            bd = get(brushothers(brushes),'BrushData');
+            if ~isempty(find(bd))
                 wasbrushed = 1;
+                minbrush(brushes) = find(bd,1,'first'); maxbrush(brushes) = find(bd,1,'last');
             end
         end
         
         if wasbrushed
+            for brushes = 1:3
+                newbd = zeros(1,length(get(brushothers(brushes),'BrushData')));
+                newbd(min(minbrush):max(maxbrush)) = ones(1,max(maxbrush)-min(minbrush)+1);
+                set(brushothers(brushes),'BrushData',newbd)
+            end
+            CH = get(brushothers(1));
             brushed.indices = CH.XData(CH.BrushData==1);
             brushed.begin = brushed.indices(1);
             brushed.end = brushed.indices(end);
@@ -541,7 +549,7 @@ set(brush,'ActionPostCallback',@fix_brush)
                 if newfixnum <= length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
                     nextfixbegin = tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum);
                 end
-            end            
+            end
             if brushed.begin > lastfixend && brushed.end < nextfixbegin
                 restoffixes = [tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum:end);tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum:end)];
                 tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum) = brushed.begin;

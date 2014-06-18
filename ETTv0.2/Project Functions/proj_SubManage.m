@@ -14,6 +14,7 @@ function [ETT] = proj_SubManage(ETT)
 %   [SH] - 04/29/14:    v1 - Creation
 
 %%
+subwinpos = [460 670 400 230];
 
 init_enable = 'on';
 if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
@@ -63,7 +64,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 50
 
     function sub_adddetail(~,~,mode)
         selected = get(Subslist,'Value');
-        [ETT] = sub_details(ETT,selected,mode);
+        [ETT,subwinpos] = sub_details(ETT,selected,mode,subwinpos);
         sub_text = '';
         if isfield(ETT,'Subjects')
             sub_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, 1:length(ETT.Subjects),'uni',0));

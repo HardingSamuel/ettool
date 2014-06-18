@@ -48,6 +48,11 @@ if ~isempty(existingcolumns) && ~all(cat(2,existingcolumns{2,:})==0)
     arranged_columns = existingcolumns;
 end
 
+if ~isempty(find(cat(2,existingcolumns{2,:})==-1))
+    ignore_col = 1;
+    text_ignore = existingcolumns{1,find(cat(2,existingcolumns{2,:})==-1)};
+end
+
 
 
 ColConfigFig = figure('Name', 'Arrange Columns', 'Unit', 'Pixels', 'Position', [460 600 400 300], 'NumberTitle','Off','MenuBar','None',...

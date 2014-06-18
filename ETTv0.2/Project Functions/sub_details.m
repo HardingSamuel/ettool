@@ -1,4 +1,4 @@
-function [ETT] = sub_details(ETT,selected,mode)
+function [ETT,subwinpos] = sub_details(ETT,selected,mode,subwinpos)
 %
 % sub_details
 % Get additional details about a subject from Manage Subjects, Import, or
@@ -56,7 +56,7 @@ if ~strcmp(text_process,'Not Processed')
     col_process = [.2 .75 .2];
 end
 
-AddSubjectFig = figure('Name', title_addedit, 'Unit', 'Pixels', 'Position', [460 670 400 230], 'NumberTitle','Off','MenuBar','None',...
+AddSubjectFig = figure('Name', title_addedit, 'Unit', 'Pixels', 'Position', subwinpos, 'NumberTitle','Off','MenuBar','None',...
     'Color', [.65 .75 .65]);
 uipanel('Title', 'Subject Number', 'Units', 'Pixels', 'Position', [20 170 225 55], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 SubN = uicontrol('Style','Edit','String',temp_subn,'Position',[25 177.5 215 27.5],'Backgroundcolor',[1 1 1],'FontSize',10);
@@ -138,6 +138,7 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
             ETT.Subjects(edit_sub).DOB = temp_dob;
             ETT.Subjects(edit_sub).TestDate = temp_TestDate;
         end
+        subwinpos = get(AddSubjectFig,'Position');
         close(AddSubjectFig)
     end
 
