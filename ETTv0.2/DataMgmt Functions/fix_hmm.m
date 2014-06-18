@@ -13,7 +13,12 @@ function [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,states)
 %
 %
 %% Change Log
-%   [SH] - 05/13/14:    v1 - Creation
+%   [SH] - 05/13/14:   v1 - Creation
+%   [SH] - 06/18/14:   v1.1 - Hmm debugging.  Bins should properly group
+%   the observed velocities.  In addition, average observed data with
+%   normal distrbution of mean = max(observed) at each state and sd =
+%   2*max.  Allows emission probabilites to be >0 at ranges beyond the
+%   observed values.
 
 %%
 

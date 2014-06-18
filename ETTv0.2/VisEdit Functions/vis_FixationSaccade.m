@@ -11,7 +11,9 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %
 %
 %% Change Log
-%   [SH] - 05/08/14:    v1 - Creation
+%   [SH] - 05/08/14:   v1 - Creation
+%   [SH] - 06/18/14:   v1.1 - Several changes since creation.  Corrected
+%   merging of fixations incorrectly determining which had been brushed.
 
 %%
 
