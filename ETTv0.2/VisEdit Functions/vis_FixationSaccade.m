@@ -16,7 +16,7 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %%
 
 try
-    close(gcf)
+    close all
 end
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
@@ -442,8 +442,8 @@ set(brush,'ActionPostCallback',@fix_brush)
         [fixinfo] = fix_ivt(velo,fixdetset{1});
         [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(1000/subdata.SampleRate)));
         [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);
-        fixinfo.hmmclean = fixinfo.hmm
-%         [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
+%         fixinfo.hmmclean = fixinfo.hmm
+        [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
     end
 
     function orgdata = organize_fixations
@@ -582,7 +582,7 @@ set(brush,'ActionPostCallback',@fix_brush)
     function merge_fix(~,~)
         if ~isempty(brushed)
             issaved = 0;
-            fixselected = find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.begin,1,'last'):find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.end,1,'first');
+            fixselected = intersect(find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.begin),find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.end));
             newend = tempdata{val_sub==subslist}{val_tri}.fixend(fixselected(end));
             tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected(2:end)) = [];
             tempdata{val_sub==subslist}{val_tri}.fixend(fixselected(2:end)) = [];

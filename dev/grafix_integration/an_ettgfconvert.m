@@ -66,7 +66,7 @@ seg_count = 0;
 lastlen = 0;
 
 for trinum = TRIALS
-    % Check rial integrity
+    % Check trial integrity
     try
         rawthistrial = [procdata.sub(SUBJECT).Trial(trinum).Time(1,:)',...
             zeros(length(procdata.sub(SUBJECT).Trial(trinum).Time(1,:)),1),...

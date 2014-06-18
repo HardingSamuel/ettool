@@ -21,42 +21,41 @@ vthresh = fixdetset{1};
 trmat = fixdetset{3};
 binsize = fixdetset{4};
 mode = fixdetset{5};
-velo(velo==0) = 1e-5;
-veloest = max(1,ceil(velo/binsize));
-% keyboard
+
+veloest = ceil(velo/binsize); veloest(isnan(velo)) = [];
+stateest = states; stateest(isnan(velo)) = [];
+
+
 switch mode
     case 1
-        [counts] = arrayfun(@(state) histc(velo(states==state),0:binsize:max(max(velo))),1:3,'uni',0);
+        [counts] = arrayfun(@(state) histc(veloest(stateest==state),1:max(max(veloest))),1:3,'uni',0);
         velodist = arrayfun(@(state) cell2mat(counts(state))/sum(cell2mat(counts(state))),1:3,'uni',0);
-        velodist = cat(2,velodist{:})'; velodist(velodist==0) = .00001; velodist = arrayfun(@(state) velodist(state,:)/sum(velodist(state,:),2),1:size(velodist,1),'uni',0);
+        velodist = cat(1,velodist{:}); velodist(velodist==0) = .00001; velodist = arrayfun(@(state) velodist(state,:)/sum(velodist(state,:),2),1:size(velodist,1),'uni',0);
         velodist = cat(1,velodist{:});
-        veloest(isnan(velo)) = length(velodist); 
-        try
-            for i = 1:2
-                i
-            for trinum = 1:size(states,1)
-                [estim_states(trinum,:)] = hmmviterbi(veloest(trinum,:),trmat,velodist);
-            end
-            [trmat,velodist] = hmmtrain(veloest,trmat,velodist,'maxiterations',100);
-            end
-            trmat            
-        catch err
-            disp(['Error on Trial ' num2str(trinum)])
-            keyboard
-        end            
-
-%         figure(2)
-%         subplot(211)
-%         plot(velodist')
-%         set(gca,'xlim',[0 100])
-%         subplot(212)
-%         [estTR,estE] = hmmestimate(veloest,estim_states);
-%         disp([num2str(estTR)])
-%         estE(end) = nan;
-%         plot(estE')
-%         set(gca,'xlim',[0 100])
-% %         keyboard
+                
+%         [ESTTR, ESTEMIT] = hmmtrain(veloest,trmat,velodist,'verbose','true','tolerance',1e-2);
+        distcent = arrayfun(@(sta) find(max(velodist(sta,:))==(velodist(sta,:))),1:3);  
+        ESTEMIT = [velodist(1,:);...
+            pdf('normal',1:length(velodist),distcent(2),2*distcent(2));
+            pdf('normal',1:length(velodist),distcent(3),2*distcent(3))];
+        velodist = mean(cat(3,ESTEMIT,velodist),3);
+        figure
+        hold on
+        plot(velodist(2,:))
+        plot(velodist(3,:))
         
+        for trinum = 1:size(states,1)
+            try
+                trivec = ceil(velo(trinum,:)/binsize); nandex = find(isnan(trivec));
+                
+                [stateout] = hmmviterbi(trivec(~isnan(trivec)),trmat,velodist);
+                nanrow = nan(1,length(trivec)); nanrow(~isnan(trivec)) = stateout;
+                estim_states(trinum,:) = nanrow;
+            catch err
+                disp(['Error on Trial ' num2str(trinum)])
+                keyboard
+            end
+        end                
     case 2
         for trinum = 1:size(states,1)
             counts{trinum} = arrayfun(@(state) histc(velo(states(trinum,:)==state),0:binsize:binsize*ceil(max(max(velo))/binsize)),1:3,'uni',0);
