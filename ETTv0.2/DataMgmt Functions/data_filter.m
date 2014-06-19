@@ -13,6 +13,7 @@ function [subdata] = data_filter(subdata,procsettings)
 %
 %% Change Log
 %   [SH] - 05/08/14:    v1 - Creation
+%   [SH] - 06/19/14:   v1.1 - Added GoodData.Filtered calculation
 
 %%
 filt_type = procsettings(1);
@@ -55,4 +56,6 @@ subdata.Filtered.FiltD = FiltD;
 subdata.Filtered.FiltP = FiltP;
 
 subdata.Filtered.Indices = [filtbegin;filtend]';
+
+subdata.GoodData.Filtered = cell2mat(arrayfun(@(X) length(find(~isnan(FiltX(X,:))))/subdata.TrialLengths(X),1:size(FiltX,1),'uni',0))';
 end

@@ -13,6 +13,7 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %% Change Log
 %   [SH] - 05/01/14:    v1 - Creation
 %   [SH] - 06/03/14:   Added GoodData.Raw calculation
+%   [SH] - 06/19/14:   Flipped orientation of GoodData.Raw
 
 %%
 
@@ -127,7 +128,7 @@ try
         subdata.TrialOnOff = TBegin;
         subdata.TrialLengths = tlens;
         
-        subdata.GoodData.Raw = arrayfun(@(tri) 1-(length(find(subdata.LeftEye.GazeX(tri,:)==-1))/length(find(~isnan(subdata.LeftEye.GazeX(tri,:))))), 1:length(tlens));
+        subdata.GoodData.Raw = arrayfun(@(tri) 1-(length(find(subdata.LeftEye.GazeX(tri,:)==-1))/length(find(~isnan(subdata.LeftEye.GazeX(tri,:))))), 1:length(tlens))';
         
         subdata.WhatsOn.Names = wonames';
         subdata.WhatsOn.Begindices = wobegin';

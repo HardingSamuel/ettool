@@ -59,7 +59,7 @@ subdata.Combined.CombD = CombD;
 subdata.Combined.CombP = CombP;
 subdata.Combined.GoodEyes = vec_combvalid;
 
-GoodData.PreProcess = cell2mat(arrayfun(@(X) mean(vec_combvalid(X,1:subdata.TrialLengths(X))),1:size(vec_combvalid,1),'uni',0))';
+subdata.GoodData.PreProcess = cell2mat(arrayfun(@(X) mean(vec_combvalid(X,1:subdata.TrialLengths(X))),1:size(vec_combvalid,1),'uni',0))';
 
 %% Interpolating
 [subdata] = data_interp(subdata,procsettings);

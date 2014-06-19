@@ -13,7 +13,8 @@ function [subdata] = data_interp(subdata,procsettings)
 % Interpolation - structure containing the interpolated data.
 % 
 %% Change Log
-%   [SH] - 05/08/14:    v1 - Creation 
+%   [SH] - 05/08/14:   v1 - Creation 
+%   [SH] - 06/19/14:   v1.1 - Added GoodData.Interpolation calculation
 
 %%
 max_interp = floor(procsettings(2)/(1000/subdata.SampleRate));
