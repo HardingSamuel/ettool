@@ -19,6 +19,8 @@ function [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,states)
 %   normal distrbution of mean = max(observed) at each state and sd =
 %   2*max.  Allows emission probabilites to be >0 at ranges beyond the
 %   observed values.
+%   [SH] - 06/20/14:   v1.2 - Bounded values of veloest, and trivec to be
+%   greater than 1. (Was previously in there, but removed at some point!)
 
 %%
 
@@ -27,7 +29,7 @@ trmat = fixdetset{3};
 binsize = fixdetset{4};
 mode = fixdetset{5};
 
-veloest = ceil(velo/binsize); veloest(isnan(velo)) = [];
+veloest = max(ceil(velo/binsize),1); veloest(isnan(velo)) = [];
 stateest = states; stateest(isnan(velo)) = [];
 
 
@@ -51,9 +53,9 @@ switch mode
         
         for trinum = 1:size(states,1)
             try
-                trivec = ceil(velo(trinum,:)/binsize); nandex = find(isnan(trivec));
+                trivec = max(ceil(velo(trinum,:)/binsize),1); nonnandex = find(~isnan(velo(trinum,:)));
                 
-                [stateout] = hmmviterbi(trivec(~isnan(trivec)),trmat,velodist);
+                [stateout] = hmmviterbi(trivec(nonnandex),trmat,velodist);
                 nanrow = nan(1,length(trivec)); nanrow(~isnan(trivec)) = stateout;
                 estim_states(trinum,:) = nanrow;
             catch err
