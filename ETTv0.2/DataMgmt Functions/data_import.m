@@ -14,6 +14,9 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 05/01/14:    v1 - Creation
 %   [SH] - 06/03/14:   Added GoodData.Raw calculation
 %   [SH] - 06/19/14:   Flipped orientation of GoodData.Raw
+%   [SH] - 06/23/14:   Corrected miscalculation of GoodData.Raw. Was only
+%   counting instances of -1, however bad dad can also include values < -1
+%   or >1.
 
 %%
 
@@ -128,7 +131,8 @@ try
         subdata.TrialOnOff = TBegin;
         subdata.TrialLengths = tlens;
         
-        subdata.GoodData.Raw = arrayfun(@(tri) 1-(length(find(subdata.LeftEye.GazeX(tri,:)==-1))/length(find(~isnan(subdata.LeftEye.GazeX(tri,:))))), 1:length(tlens))';
+        subdata.GoodData.Raw = arrayfun(@(tri) (length(find(subdata.LeftEye.Validity(tri,1:subdata.TrialLengths(tri))>=2)))/...
+            subdata.TrialLengths(tri), 1:length(tlens))';
         
         subdata.WhatsOn.Names = wonames';
         subdata.WhatsOn.Begindices = wobegin';
