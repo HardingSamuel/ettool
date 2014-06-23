@@ -131,8 +131,9 @@ try
         subdata.TrialOnOff = TBegin;
         subdata.TrialLengths = tlens;
         
-        subdata.GoodData.Raw = arrayfun(@(tri) (length(find(subdata.LeftEye.Validity(tri,1:subdata.TrialLengths(tri))>=2)))/...
-            subdata.TrialLengths(tri), 1:length(tlens))';
+        subdata.GoodData.Raw = arrayfun(@(tri) 1-(length(find(subdata.LeftEye.Validity(tri,1:subdata.TrialLengths(tri))>=2 &...
+            subdata.RightEye.Validity(tri,1:subdata.TrialLengths(tri))>=2))/...
+            subdata.TrialLengths(tri)), 1:length(tlens))';
         
         subdata.WhatsOn.Names = wonames';
         subdata.WhatsOn.Begindices = wobegin';
