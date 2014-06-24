@@ -1,16 +1,16 @@
 function [ETT] = proj_FixationSaccade(ETT)
-% 
+%
 % proj_FixationSaccade
 % Automatic and manual fixation detection through visualization
-% 
+%
 % INPUTS:
 % ETT
-% 
+%
 % OUTPUTS:
 % ETT
-% 
+%
 %% Change Log
-%   [SH] - 05/08/14:    v1 - Creation 
+%   [SH] - 05/08/14:    v1 - Creation
 
 %%
 init_enable = 'On'; imp_enable = 'On'; init_colenable = 'On';
@@ -67,7 +67,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
 
     function sub_Fixation(~,~)
         selected = get(Subslist,'Value');
-        [ETT] = vis_FixationSaccade(ETT,selected);        
+        [ETT] = vis_FixationSaccade(ETT,selected);
         figure(FixationFig)
     end
 
@@ -83,20 +83,24 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
         Settings = ETT.Config.FixDetect;
         if mode
             Settings = ETT.Subjects(selected).Config.FixDetect;
-        end            
+        end
+        NewSettings = Settings;
+        % so if you quit early it doesn't error.
         [NewSettings] = sett_FixDetect(ETT,0,Settings);
         if mode
-            if all(arrayfun(@(set) NewSettings{set}==ETT.Config.FixDetect{set},[1,2,4,5])) && all(all(NewSettings{3} == ETT.Config.FixDetect{3}));
-                NewSettings = [];
+            if ~isempty(NewSettings)
+                if all(arrayfun(@(set) NewSettings{set}==ETT.Config.FixDetect{set},[1,2,4,5])) && all(all(NewSettings{3} == ETT.Config.FixDetect{3}));
+                    NewSettings = [];
+                end
             end
             ETT.Subjects(selected).Config.FixDetect = NewSettings;
         else
             ETT.Config.FixDetect = NewSettings;
-        end     
+        end
         if ~isempty(NewSettings)
             set(FixDetButton,'Enable','On')
         end
-        @updatecolors;        
+        @updatecolors;
     end
 
     function updatecolors(~,~)

@@ -63,7 +63,7 @@ if length(subslist)>1
         'Position',[650 652.5 210 20],'Callback',@slide_sub);
 end
 
-uicontrol('Style','PushButton','String','Load','Position',[870 650 50 27.5],...
+Load_SubButton = uicontrol('Style','PushButton','String','Load','Position',[870 650 50 27.5],...
     'BackgroundColor',[.8 .8 .8],'Callback',@loadsub);
 Slide_Tri = uicontrol('Style','Slider','Min',1,'Max',99,...
     'Value',1,'SliderStep',[1 1],...
@@ -164,6 +164,7 @@ set(brush,'ActionPostCallback',@fix_brush)
         hlx = []; hly = [];
         fixinfo = []; plot_fix = []; text_fix = []; velo = []; pix_deg = [];  plot_fix_high = []; text_fix_high = [];
         
+        set(Load_SubButton,'Enable','Off')
         set(WinSize,'Enable','On')
         set(Slide_Tri,'Value',1);
         set(Sel_Tri,'Title', 'Trial: 1');
@@ -444,7 +445,6 @@ set(brush,'ActionPostCallback',@fix_brush)
         [fixinfo] = fix_ivt(velo,fixdetset{1});
         [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(1000/subdata.SampleRate)));
         [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);
-%         fixinfo.hmmclean = fixinfo.hmm
         [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
     end
 
@@ -495,6 +495,7 @@ set(brush,'ActionPostCallback',@fix_brush)
                 - tempdata{val_sub==subslist}{val_tri}.fixbegin(selectedfix))/2,repmat(.2,1,length(tempdata{val_sub==subslist}{val_tri}.fixbegin(selectedfix))),...
                 cellstr(num2str((selectedfix)')),'HorizontalAlignment','Center','Color',[0 0 0]);
         end
+        set(Load_SubButton,'Enable','On')
     end
 
 %% Manual fixation editing

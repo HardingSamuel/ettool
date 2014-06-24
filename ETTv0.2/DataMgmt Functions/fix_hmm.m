@@ -46,17 +46,17 @@ switch mode
             pdf('normal',1:length(velodist),distcent(2),2*distcent(2));
             pdf('normal',1:length(velodist),distcent(3),2*distcent(3))];
         velodist = mean(cat(3,ESTEMIT,velodist),3);
-        figure
-        hold on
-        plot(velodist(2,:))
-        plot(velodist(3,:))
+%         figure
+%         hold on
+%         plot(velodist(2,:))
+%         plot(velodist(3,:))
         
         for trinum = 1:size(states,1)
             try
                 trivec = max(ceil(velo(trinum,:)/binsize),1); nonnandex = find(~isnan(velo(trinum,:)));
                 
                 [stateout] = hmmviterbi(trivec(nonnandex),trmat,velodist);
-                nanrow = nan(1,length(trivec)); nanrow(~isnan(trivec)) = stateout;
+                nanrow = nan(1,length(trivec)); nanrow(~isnan(velo(trinum,:))) = stateout;
                 estim_states(trinum,:) = nanrow;
             catch err
                 disp(['Error on Trial ' num2str(trinum)])
@@ -76,8 +76,9 @@ fixinfo.hmm.isfix = zeros(size(velo)); fixinfo.hmm.fixbegin = zeros(size(velo));
 fixinfo.hmm.isfix(estim_states==2) = 1;
 fixinfo.hmm.fixbegin(find(diff(estim_states,1,2)==-1 | diff(estim_states,1,2)==-997)+size(estim_states,1)) = 1;
 fixinfo.hmm.fixend(find(diff(estim_states,1,2)==1 | diff(estim_states,1,2)==997)) = 1;
-fixinfo.hmm.fixbegin(sub2ind([size(estim_states,1),size(estim_states,2)],1:size(estim_states,1),arrayfun(@(tri) find(estim_states(tri,:)==2,1,'first'),1:size(fixinfo.hmm.isfix)))) = 1;
-fixinfo.hmm.fixend(sub2ind([size(estim_states,1),size(estim_states,2)],1:size(estim_states,1),arrayfun(@(tri) find(estim_states(tri,:)==2,1,'last'),1:size(fixinfo.hmm.isfix)))) = 1;
+trialswithfix = find(arrayfun(@(tri) any(fixinfo.hmm.isfix(tri,:)==1),1:size(fixinfo.hmm.isfix)));
+fixinfo.hmm.fixbegin(sub2ind([size(estim_states,1),size(estim_states,2)],trialswithfix,arrayfun(@(tri) find(estim_states(tri,:)==2,1,'first'),trialswithfix))) = 1;
+fixinfo.hmm.fixend(sub2ind([size(estim_states,1),size(estim_states,2)],trialswithfix,arrayfun(@(tri) find(estim_states(tri,:)==2,1,'last'),trialswithfix))) = 1;
 fixinfo.hmm.states = estim_states;
 
 end
