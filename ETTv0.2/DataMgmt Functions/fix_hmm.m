@@ -21,6 +21,8 @@ function [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,states)
 %   observed values.
 %   [SH] - 06/20/14:   v1.2 - Bounded values of veloest, and trivec to be
 %   greater than 1. (Was previously in there, but removed at some point!)
+%   [SH] - 06/24/14:   v1.2.1 - Disabled 'Load' button while still drawing
+%   to prevent error from trying to load too soon.
 
 %%
 
