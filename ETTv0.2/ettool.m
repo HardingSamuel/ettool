@@ -46,7 +46,8 @@ Project_Summarize = uimenu('Label','Summarize &Data','Parent',ProjectMenu,'Posit
 ToolsVisualize = uimenu('Label','&Visualize Data','Parent',ToolsMenu,'Position',1,'Callback','','Enable','Off');
 Tools_VisScan = uimenu('Label','&Scan Paths','Parent',ToolsVisualize,'Position',1,'Callback','');
 Tools_VisHeat = uimenu('Label','&Heat Maps','Parent',ToolsVisualize,'Position',2,'Callback','');
-ToolsFixations = uimenu('Label','&Additional Analyses','Parent',ToolsMenu,'Position',2,'Callback','ETT = proj_AdditionalAnalyses(ETT);ett_DrawMain(ETT,ETTFig);');
+ToolsAdditional = uimenu('Label','&Additional Analyses','Parent',ToolsMenu,'Position',2,'Callback','ETT = proj_AdditionalAnalyses(ETT);ett_DrawMain(ETT,ETTFig);');
+ToolsGrafix = uimenu('Label','Export to &Grafix','Parent',ToolsMenu,'Position',3,'Separator','On','Callback','[ETT,ERRORS] = proj_GrafixExport(ETT);ett_DrawMain(ETT,ETTFig);');
 
 %AboutMenu Config
 HelpAbout = uimenu('Label','&About','Parent',HelpMenu,'Position',1,'Callback','ett_About');
