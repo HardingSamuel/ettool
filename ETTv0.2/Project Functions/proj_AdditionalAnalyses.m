@@ -11,16 +11,20 @@ function [ETT] = proj_AdditionalAnalyses(ETT)
 % 
 % 
 %% Change Log
-%   [SH] - 05/19/14:    v1 - Creation 
+%   [SH] - 05/19/14:   v1 - Creation 
+%   [SH] - 06/25/14:   v1.1 - Renamed variables for consistency, check
+%   project at beginning to ensure existence of required fields.
 
 %%
-ana_enable = 'On'; init_aalistenable = 'On';
+
+[ETT] = proj_CheckUpdate(ETT);
+
+ana_enable = 'On';
 init_style = 'Listbox'; 
 
 if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
     sub_text = '--No Subjects Found -- Please add subjects using ''Manage Subjects'' first.';
-    init_style = 'Text';
-    init_aalistenable = 'Off';
+    init_style = 'Text';    
 else
     sub_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, 1:length(ETT.Subjects),'uni',0));
     if ~isempty(ETT.Subjects(1).Config.AdditionalAnalyses)

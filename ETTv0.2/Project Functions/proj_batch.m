@@ -21,6 +21,8 @@ switch mode
         text_mode = 'PreProcess';
     case 3
         text_mode = 'Additional Analysis';
+    case 4
+        text_mode = 'Grafix Export';
 end
 
 batch_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, selected,'uni',0));
@@ -92,6 +94,8 @@ set(DoneButton,'Enable','On')
                     end
                 end
                 cd(startdir)
+            case 4
+                [status,ERRORS] = data_grafix(ETT,selected(batchi));
         end
     end
 

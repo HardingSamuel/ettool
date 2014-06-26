@@ -43,7 +43,13 @@ switch mode
         velodist = cat(1,velodist{:});
                 
 %         [ESTTR, ESTEMIT] = hmmtrain(veloest,trmat,velodist,'verbose','true','tolerance',1e-2);
-        distcent = arrayfun(@(sta) find(max(velodist(sta,:))==(velodist(sta,:))),1:3);  
+        distcent = nan(1,3);
+        for sta = 1:3
+            if ~all(velodist(sta,:)==0)
+                distcent(sta) = find(max(velodist(sta,:))==(velodist(sta,:)));
+            end
+        end
+%         distcent = arrayfun(@(sta) find(max(velodist(sta,:))==(velodist(sta,:))),1:3);  
         ESTEMIT = [velodist(1,:);...
             pdf('normal',1:length(velodist),distcent(2),2*distcent(2));
             pdf('normal',1:length(velodist),distcent(3),2*distcent(3))];

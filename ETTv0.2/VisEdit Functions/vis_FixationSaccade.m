@@ -14,18 +14,17 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   [SH] - 05/08/14:   v1 - Creation
 %   [SH] - 06/18/14:   v1.1 - Several changes since creation.  Corrected
 %   merging of fixations incorrectly determining which had been brushed.
+%   [SH] - 06/24/14:   v1.2 - Addition of raw data samples (reduced alpha)
+%   and validity shading for each eye.
 
 %%
-
-try
-    close all
-end
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
 seg_vis = 1; seg_sizeP = []; fixdetset = ETT.Config.FixDetect; preprocset = ETT.Config.PreProcess;
 
 xplot = []; yplot = []; vplot = []; vtext = []; vthresh = [];
+xplotraw = []; yplotraw = [];
 plot_interp = []; plot_blink = []; plot_missing = []; text_phase = cell(2,0); hlx = []; hly = [];
 fixinfo = []; plot_fix = []; text_fix = []; plot_fix_high = []; text_fix_high = []; velo = []; pix_deg = []; tempdata{val_sub==subslist} = [];
 
@@ -160,6 +159,7 @@ set(brush,'ActionPostCallback',@fix_brush)
     function loadsub(~,~)
         cla(GazeAxes); cla(TagAxes);
         xplot = []; yplot = []; vplot = []; vtext = []; vthresh = [];
+        xplotraw = []; yplotraw = [];
         plot_interp = []; plot_blink = []; plot_missing = []; text_phase = cell(2,0);
         hlx = []; hly = [];
         fixinfo = []; plot_fix = []; text_fix = []; velo = []; pix_deg = [];  plot_fix_high = []; text_fix_high = [];
@@ -217,6 +217,7 @@ set(brush,'ActionPostCallback',@fix_brush)
     function disp_trial
         cla(GazeAxes); cla(TagAxes);
         xplot = []; yplot = []; vplot = []; vtext = []; vthresh = [];
+        xplotraw = []; yplotraw = [];
         plot_interp = []; plot_blink = []; plot_missing = []; text_phase = cell(2,0);
         hlx = []; hly = []; plot_fix = []; text_fix = []; plot_fix_high = []; text_fix_high = [];
         
@@ -268,18 +269,52 @@ set(brush,'ActionPostCallback',@fix_brush)
 
     function scroll_trial
         delete(xplot);delete(yplot);
+        delete(xplotraw); delete(yplotraw);
         
-        data.plotX = subdata.Filtered.FiltX(val_tri,:); data.plotY = subdata.Filtered.FiltY(val_tri,:);
+        data.PlotX = subdata.Filtered.FiltX(val_tri,:); data.PlotY = subdata.Filtered.FiltY(val_tri,:);
         data.plotV = velo(val_tri,:);
         
-        if max(tri_segs{end}) > length(data.plotX)
-            data.plotX(end+1:end+max(tri_segs{end}) - length(data.plotX)) = nan(1,max(tri_segs{end}) - length(data.plotX));
-            data.plotY(end+1:end+max(tri_segs{end}) - length(data.plotY)) = nan(1,max(tri_segs{end}) - length(data.plotY));
+        data.RawPlotX = subdata.Combined.CombX(val_tri,:); data.RawPlotY = 1 - subdata.Combined.CombY(val_tri,:);
+        
+        data.ShadeTop = subdata.LeftEye.Validity(val_tri,:); data.ShadeBottom = subdata.RightEye.Validity(val_tri,:);
+        
+        if max(tri_segs{end}) > length(data.PlotX)
+            data.PlotX(end+1:end+max(tri_segs{end}) - length(data.PlotX)) = nan(1,max(tri_segs{end}) - length(data.PlotX));
+            data.PlotY(end+1:end+max(tri_segs{end}) - length(data.PlotY)) = nan(1,max(tri_segs{end}) - length(data.PlotY));
             data.plotV(end+1:end+max(tri_segs{end}) - length(data.plotV)) = nan(1,max(tri_segs{end}) - length(data.plotV));
         end
         
-        xplot = plot(GazeAxes,tri_segs{seg_vis},data.plotX(tri_segs{seg_vis}),'k');
-        yplot = plot(GazeAxes,tri_segs{seg_vis},1-data.plotY(tri_segs{seg_vis}),'r');
+        if max(tri_segs{end}) > length(data.RawPlotX)
+            data.RawPlotX(end+1:end+max(tri_segs{end}) - length(data.RawPlotX)) = nan(1,max(tri_segs{end}) - length(data.RawPlotX));
+            data.RawPlotY(end+1:end+max(tri_segs{end}) - length(data.RawPlotY)) = nan(1,max(tri_segs{end}) - length(data.RawPlotY));
+        end
+        
+        if max(tri_segs{end}) > length(data.ShadeTop)
+            data.ShadeTop(end+1:end+max(tri_segs{end}) - length(data.ShadeTop)) = nan(1,max(tri_segs{end}) - length(data.ShadeTop));
+            data.ShadeBottom(end+1:end+max(tri_segs{end}) - length(data.ShadeBottom)) = nan(1,max(tri_segs{end}) - length(data.ShadeBottom));
+        end
+        
+        axes(GazeAxes)
+        
+        [rectlist] = make_rectangles(data.ShadeTop,data.ShadeBottom);
+        for eye = [{'top'},{'bottom'}]
+            offset = double(strcmp(char(eye),'top')) / 2;
+            for shader = 1:4
+                thisrect = rectlist.(char(eye)).(['rect' num2str(shader)]);
+                if ~isempty(thisrect)
+                    for nboxes = 1:size(thisrect,2)
+                        rectangle('Position',[thisrect(1,nboxes) offset thisrect(2,nboxes) - thisrect(1,nboxes) + 1, .5],...
+                            'FaceColor',repmat(1-.1*shader,1,3),'EdgeColor',repmat(1-.1*shader,1,3))
+                    end
+                end
+            end
+        end
+        
+        xplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotX(tri_segs{seg_vis}),'--o','Color',[.7 .7 .7],'MarkerSize',2);
+        yplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotY(tri_segs{seg_vis}),'--o','Color',[.9 .6 .6],'MarkerSize',2);
+        
+        xplot = plot(GazeAxes,tri_segs{seg_vis},data.PlotX(tri_segs{seg_vis}),'k','LineWidth',2);
+        yplot = plot(GazeAxes,tri_segs{seg_vis},1-data.PlotY(tri_segs{seg_vis}),'r','LineWidth',2);
         
         plot_velo(data.plotV)
         legend([xplot,yplot,vplot],'X-Gaze','Y-Gaze','Velocity (scaled)','location','northeast');
@@ -289,6 +324,36 @@ set(brush,'ActionPostCallback',@fix_brush)
         xticks = get(GazeAxes,'xtick');
         set(GazeAxes,'xticklabel',(1000/subdata.SampleRate)*xticks)
         tag_pre
+    end
+
+    function rectlist = make_rectangles(top,bottom)
+        thiseye = [];
+        for eye = [{'top'},{'bottom'}];
+            eval(['thiseye = ' char(eye) ';'])
+            for validity = 1:4
+                vallist = find(thiseye==validity);
+                if ~isempty(vallist)
+                    valend = [vallist(find(diff(vallist)>1)),vallist(end)];
+                end
+                notvallist = find(thiseye~=validity);
+                valbegin = notvallist(find(diff(notvallist)>1))+1;
+                if thiseye(subdata.TrialLengths(val_tri)) == validity
+                    valend = cat(2,valend,subdata.TrialLengths(val_tri));
+                end
+                if thiseye(1) == validity
+                    valbegin = cat(2,1,valbegin);
+                end
+                if ~isempty(valbegin) & ~isempty(valend)
+                    valbegin = unique(valbegin); valend = unique(valend);
+                    try
+                    rectlist.(char(eye)).(['rect' num2str(validity)]) = [valbegin;valend];
+                    catch; keyboard
+                    end 
+                else
+                    rectlist.(char(eye)).(['rect' num2str(validity)]) = [];
+                end
+            end
+        end
     end
 
     function calc_velo

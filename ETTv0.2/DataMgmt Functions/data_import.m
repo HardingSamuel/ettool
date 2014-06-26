@@ -17,6 +17,9 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 06/23/14:   Corrected miscalculation of GoodData.Raw. Was only
 %   counting instances of -1, however bad dad can also include values < -1
 %   or >1.
+%   [SH] - 06/25/14:   v1.1 - Time column changed from "TimestampMicrosec"
+%   to "TETTime" during import.  Prevents overflows back to 0 for correct
+%   extended time stamping.
 
 %%
 
@@ -28,7 +31,7 @@ if ~isempty(ETT.Subjects(Subject).Config.Import)
     usedcustom = 1;
 end
 
-dataformat = strcat(['%*f %*f %*f %*f %*f %*f %*f %*f %f %f %f %*f '...
+dataformat = strcat(['%*f %*f %*f %f %*f %*f %*f %*f %*f %f %f %*f '...
     '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
 rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'\SubjectData_',ETT.Subjects(Subject).Name,'.mat'];

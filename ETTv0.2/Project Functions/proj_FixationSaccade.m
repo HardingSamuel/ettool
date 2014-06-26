@@ -10,26 +10,29 @@ function [ETT] = proj_FixationSaccade(ETT)
 % ETT
 %
 %% Change Log
-%   [SH] - 05/08/14:    v1 - Creation
+%   [SH] - 05/08/14:   v1 - Creation
+%   [SH] - 06/25/14:   v1.1 - Renamed variables for consistency, check
+%   project at beginning to ensure existence of required fields.
 
 %%
-init_enable = 'On'; imp_enable = 'On'; init_colenable = 'On';
+
+[ETT] = proj_CheckUpdate(ETT);
+
+init_enable = 'On'; fix_enable = 'On';
 init_style = 'Listbox'; fix_subbut = [0 0 0];
 
 if ~isfield(ETT, 'Subjects') || ETT.nSubjects == 0
     sub_text = '--No Subjects Found -- Please add subjects using ''Manage Subjects'' first.';
     init_enable = 'off';
     init_style = 'Text';
-    init_colenable = 'Off';
 elseif all(strcmp(cat(1,arrayfun(@(X) ETT.Subjects(X).Status.PreProcess, 1:length(ETT.Subjects),'uni',0)),'Not Processed'))
     sub_text = '-- No Subjects PreProcessed -- Please PreProcess subjects using ''PreProcess Data'' first';
     init_enable = 'off';
     init_style = 'Text';
-    init_colenable = 'Off';
 else
     sub_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, 1:length(ETT.Subjects),'uni',0));
     if ~isempty(ETT.Subjects(1).Config.FixDetect)
-        imp_enable = 'on';
+        fix_enable = 'on';
         fix_subbut = [.25 .7 .25];
     end
 end
@@ -37,7 +40,7 @@ end
 fix_projsett = [.25 .7 .25];
 
 if isempty(ETT.Config.FixDetect)
-    imp_enable = 'off';
+    fix_enable = 'off';
     fix_projsett = [0 0 0];
 end
 
@@ -51,7 +54,7 @@ Subslist = uicontrol('Style',init_style,'Position',[25 75 190 220],'Parent',Fixa
 uipanel('Title', 'Options', 'Units', 'Pixels', 'Position', [230 70 150 250], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 
 FixDetButton = uicontrol('Style', 'Pushbutton', 'String', 'FixDetect', 'Position', [240 248.75 130 46.25],'FontSize', 12,...
-    'BackgroundColor',[.8 .8 .8],'Callback',@sub_Fixation,'Enable',imp_enable);
+    'BackgroundColor',[.8 .8 .8],'Callback',@sub_Fixation,'Enable',fix_enable);
 SetProjBut = uicontrol('Style', 'Pushbutton', 'String', 'Settings (Project)', 'Position', [240 192.5 130 46.25],'FontSize', 10,...
     'BackgroundColor',[.8 .8 .8],'Callback',{@fixdet_manage,0},'ForeGroundColor',[0 0 0],'Enable',init_enable,...
     'ForegroundColor',fix_projsett);
@@ -60,7 +63,7 @@ SetSubBut = uicontrol('Style', 'Pushbutton', 'String', 'Settings (Selected)', 'P
     'ForegroundColor',fix_subbut);
 
 uicontrol('Style', 'Pushbutton', 'String', 'Details/Edit', 'Position', [240 80 130 46.25],'FontSize', 12,...
-    'BackgroundColor',[.8 .8 .8],'Callback',{@imp_detail,1},'Enable',init_enable);
+    'BackgroundColor',[.8 .8 .8],'Callback',{@fix_detail,1},'Enable',init_enable);
 uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46.25], 'ForegroundColor', [.1 .1 .1],...
     'BackgroundColor',[.8 .8 .8],'FontSize',12,'Callback',@doneall)
 
@@ -71,7 +74,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
         figure(FixationFig)
     end
 
-    function imp_detail(~,~,mode)
+    function fix_detail(~,~,mode)
         selected = get(Subslist,'Value');
         [ETT] = sub_details(ETT,selected,mode);
         sub_text = cat(1,arrayfun(@(X) ETT.Subjects(X).Name, 1:length(ETT.Subjects),'uni',0));

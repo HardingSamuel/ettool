@@ -13,7 +13,9 @@ function [ETT,ERRORS] = proj_Import(ETT)
 % status of the import process for each subject.
 %
 %% Change Log
-%   [SH] - 04/30/14:    v1 - Creation
+%   [SH] - 04/30/14:   v1 - Creation
+%   [SH] - 06/25/14:   v1.1 - Renamed variables for consistency, check
+%   project at beginning to ensure existence of required fields.
 
 %%
 ERRORS = [];
