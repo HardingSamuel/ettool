@@ -32,6 +32,8 @@ text_tint = []; text_tbli = []; text_tgap  = [];
 
 brushed = [];
 
+curr_edge = [];
+
 tempdata = cell(1,length(subslist)); issaved = 1;
 
 FixDetWin = figure('Position',[740 197.5 1120 702.5],'Menubar','none','Toolbar','Figure','NumberTitle','Off','Color',[.65 .75 .65],...
@@ -123,6 +125,15 @@ EB_Merge = uicontrol('Style','Pushbutton','String','Merge Fixations','Background
     'Position',[235 542 77.5 38],'Enable','Off');
 EB_Split = uicontrol('Style','Pushbutton','String','Split Fixations','BackgroundColor',[.8 .8 .8],...
     'Position',[322.5 542 77.5 38],'Enable','Off');
+
+SE_Edge = uibuttongroup('Visible','On','units','Pixels','Position',[410 542 77.5 38],'BackGroundColor',[.7 .8 .7],...
+    'Title','Edit Edge:','TitlePosition','lefttop','FontSize',12,'SelectionChangefcn',@edge_select);
+uicontrol('Style','RadioButton','String','Raw','Enable','On','Value',1,...
+    'Position',[2.5 25 120 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
+    'Value',curr_edge==1,'UserData',1);
+uicontrol('Style','RadioButton','String','PreProcessed','Enable','On','Value',0,...
+    'Position',[2.5 5 120 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
+    'Value',curr_edge==2,'UserData',2);
 
 
 set(brush,'ActionPostCallback',@fix_brush)
@@ -678,6 +689,10 @@ set(brush,'ActionPostCallback',@fix_brush)
                 plot_fixations([])
             end
         end
+    end
+
+    function edge_select(~,eventdata)
+        curr_edge = get(eventdata.NewValue,'UserData');
     end
 
 
