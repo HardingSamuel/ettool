@@ -18,6 +18,7 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   and validity shading for each eye.
 
 %%
+
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
@@ -32,7 +33,7 @@ text_tint = []; text_tbli = []; text_tgap  = [];
 
 brushed = [];
 
-curr_edge = [];
+curr_edge = 1; curr_len = 5;
 
 tempdata = cell(1,length(subslist)); issaved = 1;
 
@@ -48,27 +49,27 @@ uimenu('Label','&Quit Fixation Detection','Parent',FileMenu,'Position',3,...
 uimenu('Label','&Reset Fixations','Parent',FileMenu,'Position',2,...
     'Callback',@pop_reset);
 
-Sel_Sub = uipanel('Title', ['Subject: ' text_sub], 'Units', 'Pixels', 'Position', [640 645 290 50],...
+Sel_Sub = uipanel('Title', ['Subject: ' text_sub], 'Units', 'Pixels', 'Position', [640 652 290 50],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
-Sel_Tri = uipanel('Title', ['Trial: ' text_tri], 'Units', 'Pixels', 'Position', [640 590 290 50],...
+Sel_Tri = uipanel('Title', ['Trial: ' text_tri], 'Units', 'Pixels', 'Position', [640 597 290 50],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
-Sel_Seg = uipanel('Title', ['Trial Segment: ' num2str(seg_vis), '/1'], 'Units', 'Pixels', 'Position', [640 535 180 50],...
+Sel_Seg = uipanel('Title', ['Trial Segment: ' num2str(seg_vis), '/1'], 'Units', 'Pixels', 'Position', [640 542 180 50],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
-uipanel('Title', 'Length(ms):', 'Units', 'Pixels', 'Position', [825 535 105 50],...
+uipanel('Title', 'Length(ms):', 'Units', 'Pixels', 'Position', [825 542 105 50],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 
 
 if length(subslist)>1
     Slide_Sub = uicontrol('Style','Slider','Min',1,'Max',length(subslist),...
         'Value',1,'SliderStep',[1/(length(subslist)-1), 1/(length(subslist)-1)],...
-        'Position',[650 652.5 210 20],'Callback',@slide_sub);
+        'Position',[650 659.5 210 20],'Callback',@slide_sub);
 end
 
-Load_SubButton = uicontrol('Style','PushButton','String','Load','Position',[870 650 50 27.5],...
+Load_SubButton = uicontrol('Style','PushButton','String','Load','Position',[870 657 50 27.5],...
     'BackgroundColor',[.8 .8 .8],'Callback',@loadsub);
 Slide_Tri = uicontrol('Style','Slider','Min',1,'Max',99,...
     'Value',1,'SliderStep',[1 1],...
-    'Position',[650 597.5 270 20],'Callback',@slide_tri,'Enable','Off');
+    'Position',[650 604.5 270 20],'Callback',@slide_tri,'Enable','Off');
 
 GazeAxes = axes('Parent',FixDetWin,'Units','Pixels','Position',[60 50 870 440],...
     'ylim',[0 1],'xlim',[0 1000],'NextPlot','Add');
@@ -86,14 +87,15 @@ set(zoom(GazeAxes),'ActionPostCallback',@fix_x); set(zoom(TagAxes),'ActionPostCa
 set(pan(FixDetWin),'ActionPostCallback',@fix_x)
 
 Scroll_Right = uicontrol('Style','PushButton','String','>>>','Parent',FixDetWin,...
-    'Position',[735 540 75 25],'Backgroundcolor',[.8 .8 .8],'Enable','Off',...
+    'Position',[735 547 75 25],'Backgroundcolor',[.8 .8 .8],'Enable','Off',...
     'Callback',@scroll_right);
 Scroll_Left = uicontrol('Style','PushButton','String','<<<','Parent',FixDetWin,...
-    'Position',[650 540 75 25],'Backgroundcolor',[.8 .8 .8],'Enable','Off',...
+    'Position',[650 547 75 25],'Backgroundcolor',[.8 .8 .8],'Enable','Off',...
     'Callback',@scroll_left);
 WinSize = uicontrol('Style','Edit','Enable','Off','String','3000',...
-    'Position',[835 540 85 25],'FontSize',12,'Callback',@disp_trial_gui);
+    'Position',[835 547 85 25],'FontSize',12,'Callback',@disp_trial_gui);
 
+%% Settings Summary and Editing
 PreSumm = uicontrol('Style','Text','Parent',FixDetWin,'Position',[110 645 290 40],'String',...
     '','CreateFcn',@pre_text,'BackgroundColor',[.7 .8 .7]);
 PreEdit = uicontrol('Style','PushButton','String','Edit','Parent',FixDetWin,...
@@ -103,6 +105,7 @@ FixSumm = uicontrol('Style','Text','Parent',FixDetWin,'Position',[110 590 290 40
 FixEdit = uicontrol('Style','PushButton','String','Edit','Parent',FixDetWin,...
     'Position',[60 590 40 40],'BackgroundColor',[.8 .8 .8],'Callback',@fix_edit,'Enable','Off');
 
+%% Fixation Summary List
 FixSumPan = uipanel('Title', 'Fixation Summary:', 'Units', 'Pixels', 'Position', [940 50 175 645],...
     'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 
@@ -117,6 +120,7 @@ FixSumList_End = uicontrol('Style','Text','Parent',FixSumPan,'Position',[85 5 35
 FixSumList_Dur = uicontrol('Style','Text','Parent',FixSumPan,'Position',[125 5 35 595],'String','',...
     'FontSize',8,'BackgroundColor',[.7 .8 .7],'HorizontalAlignment','Left','FontWeight','Normal');
 
+%% Gross Fixation Auditing
 EB_New = uicontrol('Style','Pushbutton','String','New Fixation','BackgroundColor',[.8 .8 .8],...
     'Position',[60 542 77.5 38],'Enable','Off');
 EB_Delete = uicontrol('Style','Pushbutton','String','Delete Fixation','BackgroundColor',[.8 .8 .8],...
@@ -126,17 +130,36 @@ EB_Merge = uicontrol('Style','Pushbutton','String','Merge Fixations','Background
 EB_Split = uicontrol('Style','Pushbutton','String','Split Fixations','BackgroundColor',[.8 .8 .8],...
     'Position',[322.5 542 77.5 38],'Enable','Off');
 
-SE_Edge = uibuttongroup('Visible','On','units','Pixels','Position',[410 542 77.5 38],'BackGroundColor',[.7 .8 .7],...
-    'Title','Edit Edge:','TitlePosition','lefttop','FontSize',12,'SelectionChangefcn',@edge_select);
-uicontrol('Style','RadioButton','String','Raw','Enable','On','Value',1,...
-    'Position',[2.5 25 120 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
+%% Fine Editing buttons
+SE_Edge = uibuttongroup('Visible','On','units','Pixels','Position',[410 542 220 96],'BackGroundColor',[.7 .8 .7],...
+    'Title','Refine Edges:','TitlePosition','LeftTop','FontSize',10,'SelectionChangefcn',@edge_select);
+uicontrol('Style','RadioButton','String','Left','Enable','On','Value',1,...
+    'Position',[12.5 50 60 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
     'Value',curr_edge==1,'UserData',1);
-uicontrol('Style','RadioButton','String','PreProcessed','Enable','On','Value',0,...
-    'Position',[2.5 5 120 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
-    'Value',curr_edge==2,'UserData',2);
+uicontrol('Style','RadioButton','String','Right','Enable','On','Value',0,...
+    'Position',[62.5 50 60 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
+    'Value',curr_edge==-1,'UserData',-1);
+uicontrol('Style','Text','String','Size:','Parent',SE_Edge,'Position',[135 47.5 45 25],'FontSize',10,...
+    'BackgroundColor',[.7 .8 .7])
+uicontrol('Style','Edit','String','5','Parent',SE_Edge','Position',[180 50 30 25],'FontSize',10,...
+    'Callback',@edge_size)
+uipanel('Units', 'Pixels', 'Position', [540 590 2 39],...
+    'BackgroundColor', [.7 .8 .7], 'ForegroundColor', [.1 .1 .1]);
+uipanel('Units', 'Pixels', 'Position', [410 587.5 220 2],...
+    'BackgroundColor', [.7 .8 .7], 'ForegroundColor', [.1 .1 .1]);
+
+FineMMM = uicontrol('Style','PushButton','String','---','Parent',SE_Edge,'Position',[5 5 48.75 35],...
+    'BackgroundColor',[.8 .8 .8],'FontSize',12,'Enable','Off','Callback',[]);
+FineM = uicontrol('Style','PushButton','String','-','Parent',SE_Edge,'Position',[58.75 5 48.75 35],...
+    'BackgroundColor',[.8 .8 .8],'FontSize',12,'Enable','Off','Callback',[]);
+FineP = uicontrol('Style','PushButton','String','+','Parent',SE_Edge,'Position',[111.5 5 48.75 35],...
+    'BackgroundColor',[.8 .8 .8],'FontSize',12,'Enable','Off','Callback',[]);
+FinePPP = uicontrol('Style','PushButton','String','+++','Parent',SE_Edge,'Position',[164.25 5 48.75 35],...
+    'BackgroundColor',[.8 .8 .8],'FontSize',12,'Enable','Off','Callback',[]);
 
 
-set(brush,'ActionPostCallback',@fix_brush)
+fixbrush = brush(FixDetWin);
+set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 
     function fix_x(~,~)
         xticks = get(GazeAxes,'xtick');
@@ -577,42 +600,59 @@ set(brush,'ActionPostCallback',@fix_brush)
 %% Manual fixation editing
 
     function fix_brush(~,~)
-        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
+        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');        
         wasbrushed = 0;
         minbrush = nan(1,3); maxbrush = nan(1,3);
         for brushes = 1:3
             bd = get(brushothers(brushes),'BrushData');
-            if ~isempty(find(bd))
+            if ~isempty(find(bd, 1))
                 wasbrushed = 1;
                 minbrush(brushes) = find(bd,1,'first'); maxbrush(brushes) = find(bd,1,'last');
             end
         end
         
         if wasbrushed
-            for brushes = 1:3
-                newbd = zeros(1,length(get(brushothers(brushes),'BrushData')));
-                newbd(min(minbrush):max(maxbrush)) = ones(1,max(maxbrush)-min(minbrush)+1);
-                set(brushothers(brushes),'BrushData',newbd)
-            end
-            CH = get(brushothers(1));
-            brushed.indices = CH.XData(CH.BrushData==1);
-            brushed.begin = brushed.indices(1);
-            brushed.end = brushed.indices(end);
+            indices = min(minbrush):max(maxbrush);
+            brushes_update(indices)
+            
             set(EB_New,'Enable','On','Callback',@new_fix);
             set(EB_Delete,'Enable','On','Callback',@delete_fix);
             set(EB_Merge,'Enable','On','Callback',@merge_fix);
-            set(EB_Split,'Enable','On','Callback',@split_fix);
-            fixselected = intersect(find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.begin),find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.end));
+            set(EB_Split,'Enable','On','Callback',@split_fix);            
+            fixselected = intersect(find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.begin),find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.end));            
             plot_fixations(fixselected)
+            if length(fixselected)==1
+                set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
+                set(FineMMM,'Callback',{@edge_edit,0,fixselected}); set(FineM,'Callback',{@edge_edit,1,fixselected});
+                set(FineP,'Callback',{@edge_edit,2,fixselected}); set(FinePPP,'Callback',{@edge_edit,3,fixselected});
+            else
+                set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+            end
         else
             brushed = [];
             set(EB_New,'Enable','On','Callback',[]);
             set(EB_Delete,'Enable','On','Callback',[]);
             set(EB_Merge,'Enable','On','Callback',[]);
             set(EB_Split,'Enable','On','Callback',[]);
+            set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+            set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
             plot_fixations([])
         end
         
+    end
+
+    function brushes_update(indices)
+        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
+        newbd = zeros(1,length(get(brushothers(1),'BrushData')));
+        newbd(indices) = 1;        
+        for brushes = 1:3            
+            set(brushothers(brushes),'BrushData',newbd)
+        end        
+        xdata = get(brushothers(1),'XData');
+        brushed.indices = xdata(indices);
+        brushed.begin = brushed.indices(1);
+        brushed.end = brushed.indices(end);
     end
 
     function new_fix(~,~)
@@ -640,6 +680,9 @@ set(brush,'ActionPostCallback',@fix_brush)
                 tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
             end
         end
+        set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
+        set(FineMMM,'Callback',{@edge_edit,0,newfixnum}); set(FineM,'Callback',{@edge_edit,1,newfixnum});
+        set(FineP,'Callback',{@edge_edit,2,newfixnum}); set(FinePPP,'Callback',{@edge_edit,3,newfixnum});
         list_fix
         plot_fixations([])
     end
@@ -691,8 +734,81 @@ set(brush,'ActionPostCallback',@fix_brush)
         end
     end
 
+%% Edge editing functions
     function edge_select(~,eventdata)
         curr_edge = get(eventdata.NewValue,'UserData');
+    end
+
+    function edge_size(source,~)
+        curr_len = str2double(get(source,'String'));
+    end
+
+    function edge_edit(~,~,sname,efix)
+        brushed.indices = tempdata{val_sub==subslist}{val_tri}.fixbegin(efix):tempdata{val_sub==subslist}{val_tri}.fixend(efix);
+        try
+        if sname == 1 || sname == 2
+            mult = 1;
+        else
+            mult = curr_len;
+        end        
+        el = mult * curr_edge * sign(2*curr_edge + 1) * -1 * sign(2*sname - 3);
+        erbx = [];
+        switch curr_edge
+            case 1
+                if efix > 1
+                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > tempdata{val_sub==subslist}{val_tri}.fixend(efix-1)
+                        tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
+                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+                    else
+                        erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
+                            'Cannot Edit Fixation');
+                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                    end
+                else
+                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > 1
+                        tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
+                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+                    else
+                        erbx = errordlg('Cannot extend this fixation beyond time 0',...
+                            'Cannot Edit Fixation');
+                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                    end
+                end     
+            case -1
+                el = -1* el;
+                if efix < length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
+                    if tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el < tempdata{val_sub==subslist}{val_tri}.fixbegin(efix+1)
+                        tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
+                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
+                    else
+                        erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
+                            'Cannot Edit Fixation');
+                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                    end
+                else
+                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el < length(data.PlotX)
+                        tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
+                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
+                    else
+                        erbx = errordlg('Cannot extend this fixation beyond end of trial',...
+                            'Cannot Edit Fixation');
+                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                    end
+                end
+        end
+        catch
+            keyboard
+        end
+        waitfor(erbx)           
+        list_fix
+        plot_fixations(efix)
+        indices = find(tri_segs{seg_vis}==tempdata{val_sub==subslist}{val_tri}.fixbegin(efix)):...
+            find(tri_segs{seg_vis}==tempdata{val_sub==subslist}{val_tri}.fixend(efix));        
+        brushes_update(indices)
     end
 
 
