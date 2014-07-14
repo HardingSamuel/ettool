@@ -19,6 +19,9 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 
 %%
 
+close all
+
+
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
@@ -38,8 +41,10 @@ curr_edge = 1; curr_len = 5;
 tempdata = cell(1,length(subslist)); issaved = 1;
 
 FixDetWin = figure('Position',[740 197.5 1120 702.5],'Menubar','none','Toolbar','Figure','NumberTitle','Off','Color',[.65 .75 .65],...
-    'Name','Fixation Detection');
-
+    'Name','Fixation Detection','KeyPressFcn',@key_switch);
+% jFig = handle(FixDetWin);
+% jFig = jFig.JavaFrame; jAxis = jFig.getAxisComponent;
+% set(jAxis,'FocusGainedCallback',@brush_end)
 FileMenu = uimenu('Label','&Fixations','Parent',FixDetWin,'Position',1,'Enable','Off');
 
 uimenu('Label','&Save Fixations','Parent',FileMenu,'Position',1,...
@@ -72,7 +77,7 @@ Slide_Tri = uicontrol('Style','Slider','Min',1,'Max',99,...
     'Position',[650 604.5 270 20],'Callback',@slide_tri,'Enable','Off');
 
 GazeAxes = axes('Parent',FixDetWin,'Units','Pixels','Position',[60 50 870 440],...
-    'ylim',[0 1],'xlim',[0 1000],'NextPlot','Add');
+    'ylim',[0 1],'xlim',[0 1000],'NextPlot','Add');%,'ButtonDownFcn',@key_switch);
 GazeText = text(400, .5, 'Load data from Subject to Continue');
 
 ylabel('Relative Gaze Position','BackgroundColor',[.7 .8 .7])
@@ -80,7 +85,7 @@ xlabel('Trial Time','BackgroundColor',[.7 .8 .7])
 
 TagAxes = axes('Parent',FixDetWin,'Units','Pixels','Position',[60 492 870 40],...
     'NextPlot','Add','xticklabel','','yticklabel','','xtick',[],'ytick',[],...
-    'ylim',[0 1]);
+    'ylim',[0 1]);%,'ButtonDownFcn',@key_switch);
 
 linkaxes([GazeAxes,TagAxes],'x')
 set(zoom(GazeAxes),'ActionPostCallback',@fix_x); set(zoom(TagAxes),'ActionPostCallback',@fix_x);
@@ -278,7 +283,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         end
         list_fix
         plot_fixations([])
-        brush on
+        %         brush on
     end
 
     function scroll_right(~,~)
@@ -380,9 +385,9 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
                 if ~isempty(valbegin) & ~isempty(valend)
                     valbegin = unique(valbegin); valend = unique(valend);
                     try
-                    rectlist.(char(eye)).(['rect' num2str(validity)]) = [valbegin;valend];
+                        rectlist.(char(eye)).(['rect' num2str(validity)]) = [valbegin;valend];
                     catch; keyboard
-                    end 
+                    end
                 else
                     rectlist.(char(eye)).(['rect' num2str(validity)]) = [];
                 end
@@ -600,7 +605,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 %% Manual fixation editing
 
     function fix_brush(~,~)
-        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');        
+        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         wasbrushed = 0;
         minbrush = nan(1,3); maxbrush = nan(1,3);
         for brushes = 1:3
@@ -618,8 +623,8 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             set(EB_New,'Enable','On','Callback',@new_fix);
             set(EB_Delete,'Enable','On','Callback',@delete_fix);
             set(EB_Merge,'Enable','On','Callback',@merge_fix);
-            set(EB_Split,'Enable','On','Callback',@split_fix);            
-            fixselected = intersect(find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.begin),find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.end));            
+            set(EB_Split,'Enable','On','Callback',@split_fix);
+            fixselected = intersect(find(tempdata{val_sub==subslist}{val_tri}.fixend >= brushed.begin),find(tempdata{val_sub==subslist}{val_tri}.fixbegin <= brushed.end));
             plot_fixations(fixselected)
             if length(fixselected)==1
                 set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
@@ -639,16 +644,23 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
             plot_fixations([])
         end
-        
+        hManager = uigetmodemanager(gcf);
+        set(hManager.WindowListenerHandles,'Enable','Off')
+        set(FixDetWin,'KeyPressFcn',@key_switch)
+    end
+
+    function brush_end(~,~)
+        disp('hi')
+        brush off
     end
 
     function brushes_update(indices)
         brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         newbd = zeros(1,length(get(brushothers(1),'BrushData')));
-        newbd(indices) = 1;        
-        for brushes = 1:3            
+        newbd(indices) = 1;
+        for brushes = 1:3
             set(brushothers(brushes),'BrushData',newbd)
-        end        
+        end
         xdata = get(brushothers(1),'XData');
         brushed.indices = xdata(indices);
         brushed.begin = brushed.indices(1);
@@ -746,68 +758,68 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     function edge_edit(~,~,sname,efix)
         brushed.indices = tempdata{val_sub==subslist}{val_tri}.fixbegin(efix):tempdata{val_sub==subslist}{val_tri}.fixend(efix);
         try
-        if sname == 1 || sname == 2
-            mult = 1;
-        else
-            mult = curr_len;
-        end        
-        el = mult * curr_edge * sign(2*curr_edge + 1) * -1 * sign(2*sname - 3);
-        erbx = [];
-        switch curr_edge
-            case 1
-                if efix > 1
-                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > tempdata{val_sub==subslist}{val_tri}.fixend(efix-1)
-                        tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
-                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+            if sname == 1 || sname == 2
+                mult = 1;
+            else
+                mult = curr_len;
+            end
+            el = mult * curr_edge * sign(2*curr_edge + 1) * -1 * sign(2*sname - 3);
+            erbx = [];
+            switch curr_edge
+                case 1
+                    if efix > 1
+                        if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > tempdata{val_sub==subslist}{val_tri}.fixend(efix-1)
+                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
+                                tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+                        else
+                            erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
+                                'Cannot Edit Fixation');
+                            set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                            set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        end
                     else
-                        erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
-                            'Cannot Edit Fixation');
-                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
-                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > 1
+                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
+                                tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+                        else
+                            erbx = errordlg('Cannot extend this fixation beyond time 0',...
+                                'Cannot Edit Fixation');
+                            set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                            set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        end
                     end
-                else
-                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el > 1
-                        tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) = ...
-                            tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el;
+                case -1
+                    el = -1* el;
+                    if efix < length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
+                        if tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el < tempdata{val_sub==subslist}{val_tri}.fixbegin(efix+1)
+                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
+                                tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
+                        else
+                            erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
+                                'Cannot Edit Fixation');
+                            set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                            set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        end
                     else
-                        erbx = errordlg('Cannot extend this fixation beyond time 0',...
-                            'Cannot Edit Fixation');
-                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
-                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el < length(data.PlotX)
+                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
+                                tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
+                        else
+                            erbx = errordlg('Cannot extend this fixation beyond end of trial',...
+                                'Cannot Edit Fixation');
+                            set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
+                            set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
+                        end
                     end
-                end     
-            case -1
-                el = -1* el;
-                if efix < length(tempdata{val_sub==subslist}{val_tri}.fixbegin)
-                    if tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el < tempdata{val_sub==subslist}{val_tri}.fixbegin(efix+1)
-                        tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
-                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
-                    else
-                        erbx = errordlg('Cannot extend this fixation into an existing fixation. Use ''Merge Fixations'' instead',...
-                            'Cannot Edit Fixation');
-                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
-                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
-                    end
-                else
-                    if tempdata{val_sub==subslist}{val_tri}.fixbegin(efix) + el < length(data.PlotX)
-                        tempdata{val_sub==subslist}{val_tri}.fixend(efix) = ...
-                            tempdata{val_sub==subslist}{val_tri}.fixend(efix) + el;
-                    else
-                        erbx = errordlg('Cannot extend this fixation beyond end of trial',...
-                            'Cannot Edit Fixation');
-                        set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
-                        set(FineMMM,'Callback',[]); set(FineM,'Callback',[]); set(FineP,'Callback',[]); set(FinePPP,'Callback',[]);
-                    end
-                end
-        end
+            end
         catch
             keyboard
         end
-        waitfor(erbx)           
+        waitfor(erbx)
         list_fix
         plot_fixations(efix)
         indices = find(tri_segs{seg_vis}==tempdata{val_sub==subslist}{val_tri}.fixbegin(efix)):...
-            find(tri_segs{seg_vis}==tempdata{val_sub==subslist}{val_tri}.fixend(efix));        
+            find(tri_segs{seg_vis}==tempdata{val_sub==subslist}{val_tri}.fixend(efix));
         brushes_update(indices)
     end
 
@@ -875,6 +887,26 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         close(FixDetWin)
     end
 
-waitfor(FixDetWin)
+%% Keyboard shortcuts
+    function key_switch(obj,data)
+        if ~isempty(data.Key)
+            ks = data.Key;
+            switch ks
+                case 'b'
+                    brush on
+                case 'n'
+                    new_fix
+                case 'm'
+                    merge_fix
+                case 'd'
+                    delete_fix
+                case 's'
+                    split_fix
+            end
+        end
+    end
+
+
+% waitfor(FixDetWin)
 
 end
