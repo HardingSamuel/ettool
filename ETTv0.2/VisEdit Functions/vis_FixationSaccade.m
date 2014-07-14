@@ -19,9 +19,6 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 
 %%
 
-close all
-
-
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
