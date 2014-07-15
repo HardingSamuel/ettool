@@ -14,6 +14,7 @@ function [ETT,ERRORS] = proj_GrafixExport(ETT)
 %   [SH] - 06/25/14:  v1 - Creation 
 %   [SH] - 06/25/14:   v1.1 - Renamed variables for consistency, check
 %   project at beginning to ensure existence of required fields.
+%   [SH] - 07/15/14:   fixing interface bugs
 
 %%
 

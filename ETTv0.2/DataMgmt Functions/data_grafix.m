@@ -51,8 +51,8 @@ if ~exist(ETT.Config.GrafixExport{2},'dir')
     mkdir(ETT.Config.GrafixExport{2})
 end
 
-if ~exist([ETT.Config.GrafixExport{2},ETT.Subjects(Subject).Name],'dir')
-    mkdir([ETT.Config.GrafixExport{2},ETT.Subjects(Subject).Name])
+if ~exist([ETT.Config.GrafixExport{2},'\',ETT.Subjects(Subject).Name],'dir')
+    mkdir([ETT.Config.GrafixExport{2},'\',ETT.Subjects(Subject).Name])
 end
 
 csvwrite([ETT.Config.GrafixExport{2},'\',ETT.Subjects(Subject).Name,'\GRAFIX_INPUT_DATA_' ETT.Subjects(Subject).Name '.csv'],datablock)
