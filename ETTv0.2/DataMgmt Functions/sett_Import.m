@@ -32,7 +32,7 @@ end
 
 arranged_columns = [colheadings;repmat({0},1,length(colheadings))];
 if ~isempty(existingcolumns) && ~all(cat(2,existingcolumns{2,:})==0)
-    text_trial = existingcolumns(1,cat(2,existingcolumns{2,:})==1);    
+    text_trial = existingcolumns(1,cat(2,existingcolumns{2,:})==1);
     phase_trial = existingcolumns(1,cat(2,existingcolumns{2,:})==2);
     if length(find(cat(2,existingcolumns{2,:})==1))==1
         col_trial = [.25 .7 .25];
@@ -43,17 +43,17 @@ if ~isempty(existingcolumns) && ~all(cat(2,existingcolumns{2,:})==0)
     if length(find(cat(2,existingcolumns{2,:})==-1))==1
         col_ignore = [.25 .7 .25];
     end
-    edited_cols = existingcolumns(1,cat(2,existingcolumns{2,:})==0);    
+    edited_cols = existingcolumns(1,cat(2,existingcolumns{2,:})==0);
     init_done = 'on'; phase_col = 1; trial_col = 1;
     arranged_columns = existingcolumns;
+    
+    
+    if ~isempty(find(cat(2,existingcolumns{2,:})==-1))
+        ignore_col = 1;
+        text_ignore = existingcolumns{1,find(cat(2,existingcolumns{2,:})==-1)};
+    end
+    
 end
-
-if ~isempty(find(cat(2,existingcolumns{2,:})==-1))
-    ignore_col = 1;
-    text_ignore = existingcolumns{1,find(cat(2,existingcolumns{2,:})==-1)};
-end
-
-
 
 ColConfigFig = figure('Name', 'Arrange Columns', 'Unit', 'Pixels', 'Position', [460 600 400 300], 'NumberTitle','Off','MenuBar','None',...
     'Color', [.65 .75 .65]);
@@ -171,7 +171,7 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
         for colcheck = 1:size(arranged_columns,2)
             arranged_columns{1,colcheck} = strread(arranged_columns{1,colcheck},'%c')';
         end
-        close(ColConfigFig)        
+        close(ColConfigFig)
     end
 
 
