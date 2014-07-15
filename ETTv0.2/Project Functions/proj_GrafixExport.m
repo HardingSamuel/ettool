@@ -87,7 +87,14 @@ DirectText = uicontrol('Style','Edit','Enable','On','String',curr_dir,'Position'
     end
 
     function select_outputdir(~,~)
-        curr_dir = uigetdir(curr_dir,'Select Grafix output directory location');        
+        try
+            curr_dir = uigetdir(curr_dir,'Select Grafix output directory location');
+        catch
+            curr_dir = uigetdir('Select Grafix output directory location');
+        end
+        if strcmp(curr_dir(end),'\')
+            curr_dir = curr_dir(1:end-1);
+        end
         set(DirectText,'String',curr_dir)
     end       
 
