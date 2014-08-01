@@ -20,6 +20,10 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 06/25/14:   v1.1 - Time column changed from "TimestampMicrosec"
 %   to "TETTime" during import.  Prevents overflows back to 0 for correct
 %   extended time stamping.
+%   [SH] - 08/01/14:   Fixed time column to be column 5, not 4 (which has
+%   all identical values).  Adjusted SR calculation to use mode of the time
+%   vector to match against expected differences, rather than data point 1,
+%   and 2.
 
 %%
 
@@ -31,7 +35,7 @@ if ~isempty(ETT.Subjects(Subject).Config.Import)
     usedcustom = 1;
 end
 
-dataformat = strcat(['%*f %*f %*f %f %*f %*f %*f %*f %*f %f %f %*f '...
+dataformat = strcat(['%*f %*f %*f %*f %f %*f %*f %*f %*f %f %f %*f '...
     '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
 rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'\SubjectData_',ETT.Subjects(Subject).Name,'.mat'];
@@ -122,8 +126,9 @@ try
         subdata.TestDate = ETT.Subjects(Subject).TestDate;
         
         SRmat = [60 120 180 240 300];
-        SR = SRmat(find(min(abs(SRmat-1000/((tmicro(1,2) - tmicro(1,1))/1000)))==...
-            abs(SRmat-1000/((tmicro(1,2) - tmicro(1,1))/1000))));
+        
+        SR = find(min(abs(SRmat-(1000/mode(diff(tmicro(1,:))))))==abs(SRmat-(1000/mode(diff(tmicro(1,:)))))) ...
+            * 60;
         
         subdata.SampleRate = SR;
         
