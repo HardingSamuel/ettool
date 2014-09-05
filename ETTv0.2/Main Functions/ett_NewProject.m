@@ -40,7 +40,7 @@ uicontrol('Style','Edit','Position',[30 25 340 35],'Parent',NewProjectFig,'Backg
         
         ETT.DefaultDirectory = ETT.PathName;
         ETT.Config.Import = [];
-        ETT.Config.PreProcess = [];
+        ETT.Config.PreProcess = [1 80 500 15 2];
         ETT.Config.FixDetect = [];
         ETT.Config.AdditionalAnalyses = [];
         ETT.Subjects = [];
