@@ -16,8 +16,7 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   merging of fixations incorrectly determining which had been brushed.
 %   [SH] - 06/24/14:   v1.2 - Addition of raw data samples (reduced alpha)
 %   and validity shading for each eye.
-%   [SH] - 09/02/14:   More keyboard shortcuts to facilitate easier editing
-%   of fixation edges.
+%   [SH] - 09/02/14:   
 
 %%
 
