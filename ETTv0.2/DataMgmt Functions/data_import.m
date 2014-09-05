@@ -24,9 +24,6 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   all identical values).  Adjusted SR calculation to use mode of the time
 %   vector to match against expected differences, rather than data point 1,
 %   and 2.
-%   [SH] - 09/05/14:   Returned t column to 4, rather than 5.  Not sure
-%   which situation the reported identical values were found, but it was
-%   not AT or FaceEyes.  Will continue looking for.  
 
 %%
 
@@ -38,7 +35,7 @@ if ~isempty(ETT.Subjects(Subject).Config.Import)
     usedcustom = 1;
 end
 
-dataformat = strcat(['%*f %*f %*f %f %*f %*f %*f %*f %*f %f %f %*f '...
+dataformat = strcat(['%*f %*f %*f %*f %f %*f %*f %*f %*f %f %f %*f '...
     '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
 rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'\SubjectData_',ETT.Subjects(Subject).Name,'.mat'];

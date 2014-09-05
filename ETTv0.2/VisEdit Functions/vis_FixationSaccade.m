@@ -16,8 +16,6 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   merging of fixations incorrectly determining which had been brushed.
 %   [SH] - 06/24/14:   v1.2 - Addition of raw data samples (reduced alpha)
 %   and validity shading for each eye.
-%   [SH] - 09/02/14:   More keyboard shortcuts to facilitate easier editing
-%   of fixation edges.
 
 %%
 
@@ -33,16 +31,17 @@ fixinfo = []; plot_fix = []; text_fix = []; plot_fix_high = []; text_fix_high = 
 
 text_tint = []; text_tbli = []; text_tgap  = [];
 
-brushed = []; fixselected = [];
+brushed = [];
 
-curr_edge = 1; curr_len = 5; data=[];
+curr_edge = 1; curr_len = 5;
 
 tempdata = cell(1,length(subslist)); issaved = 1;
 
-diagfig = [];
-
 FixDetWin = figure('Position',[740 197.5 1120 702.5],'Menubar','none','Toolbar','Figure','NumberTitle','Off','Color',[.65 .75 .65],...
-    'Name','Fixation Detection','WindowKeyPressFcn',@key_switch);
+    'Name','Fixation Detection','KeyPressFcn',@key_switch);
+% jFig = handle(FixDetWin);
+% jFig = jFig.JavaFrame; jAxis = jFig.getAxisComponent;
+% set(jAxis,'FocusGainedCallback',@brush_end)
 FileMenu = uimenu('Label','&Fixations','Parent',FixDetWin,'Position',1,'Enable','Off');
 
 uimenu('Label','&Save Fixations','Parent',FileMenu,'Position',1,...
@@ -135,11 +134,11 @@ EB_Split = uicontrol('Style','Pushbutton','String','Split Fixations','Background
 
 %% Fine Editing buttons
 SE_Edge = uibuttongroup('Visible','On','units','Pixels','Position',[410 542 220 96],'BackGroundColor',[.7 .8 .7],...
-    'Title','Refine Edges:','TitlePosition','LeftTop','FontSize',10,'SelectionChangefcn',@edge_select,'Parent',FixDetWin);
-edge_left = uicontrol('Style','RadioButton','String','Left','Enable','On','Value',1,...
+    'Title','Refine Edges:','TitlePosition','LeftTop','FontSize',10,'SelectionChangefcn',@edge_select);
+uicontrol('Style','RadioButton','String','Left','Enable','On','Value',1,...
     'Position',[12.5 50 60 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
     'Value',curr_edge==1,'UserData',1);
-edge_right = uicontrol('Style','RadioButton','String','Right','Enable','On','Value',0,...
+uicontrol('Style','RadioButton','String','Right','Enable','On','Value',0,...
     'Position',[62.5 50 60 25],'FontSize',10,'Parent',SE_Edge,'BackGroundColor',[.7 .8 .7],...
     'Value',curr_edge==-1,'UserData',-1);
 uicontrol('Style','Text','String','Size:','Parent',SE_Edge,'Position',[135 47.5 45 25],'FontSize',10,...
@@ -171,8 +170,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     end
 
     function slide_sub(~,~)
-%         text_sub = num2str(subslist(fix(get(Slide_Sub,'Value'))));
-        text_sub = ETT.Subjects(get(Slide_Sub,'Value')).Name;
+        text_sub = num2str(subslist(fix(get(Slide_Sub,'Value'))));
         val_sub = str2double(text_sub);
         set(Sel_Sub,'Title',['Subject: ' text_sub])
     end
@@ -202,16 +200,12 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         hlx = []; hly = [];
         fixinfo = []; plot_fix = []; text_fix = []; velo = []; pix_deg = [];  plot_fix_high = []; text_fix_high = [];
         
-        
-        
         set(Load_SubButton,'Enable','Off')
         set(WinSize,'Enable','On')
         set(Slide_Tri,'Value',1);
         set(Sel_Tri,'Title', 'Trial: 1');
         set(FileMenu,'Enable','On')
-        gen_diag(['Loading Subject ', ETT.Subjects(val_sub).Name])
         subdata = load(ETT.Subjects(val_sub).Data.Import);
-        delete(diagfig)
         subdata = subdata.subdata;
         
         set(Slide_Tri','Enable','On')
@@ -248,7 +242,6 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             tempdata{val_sub==subslist} = subdata.Fixations;
         end
         disp_trial
-        
     end
 
     function disp_trial_gui(~,~)
@@ -632,7 +625,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             plot_fixations(fixselected)
             if length(fixselected)==1
                 set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
-                set(FineMMM,'Callback',{@edge_edit,1,fixselected}); set(FineM,'Callback',{@edge_edit,0,fixselected});
+                set(FineMMM,'Callback',{@edge_edit,0,fixselected}); set(FineM,'Callback',{@edge_edit,1,fixselected});
                 set(FineP,'Callback',{@edge_edit,2,fixselected}); set(FinePPP,'Callback',{@edge_edit,3,fixselected});
             else
                 set(FineMMM,'Enable','Off'); set(FineM,'Enable','Off'); set(FineP,'Enable','Off'); set(FinePPP,'Enable','Off');
@@ -640,7 +633,6 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             end
         else
             brushed = [];
-            fixselected = [];
             set(EB_New,'Enable','On','Callback',[]);
             set(EB_Delete,'Enable','On','Callback',[]);
             set(EB_Merge,'Enable','On','Callback',[]);
@@ -651,7 +643,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         end
         hManager = uigetmodemanager(gcf);
         set(hManager.WindowListenerHandles,'Enable','Off')
-        set(FixDetWin,'WindowKeyPressFcn',@key_switch)
+        set(FixDetWin,'KeyPressFcn',@key_switch)
     end
 
     function brush_end(~,~)
@@ -698,7 +690,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             end
         end
         set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
-        set(FineMMM,'Callback',{@edge_edit,1,newfixnum}); set(FineM,'Callback',{@edge_edit,0,newfixnum});
+        set(FineMMM,'Callback',{@edge_edit,0,newfixnum}); set(FineM,'Callback',{@edge_edit,1,newfixnum});
         set(FineP,'Callback',{@edge_edit,2,newfixnum}); set(FinePPP,'Callback',{@edge_edit,3,newfixnum});
         list_fix
         plot_fixations([])
@@ -763,7 +755,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     function edge_edit(~,~,sname,efix)
         brushed.indices = tempdata{val_sub==subslist}{val_tri}.fixbegin(efix):tempdata{val_sub==subslist}{val_tri}.fixend(efix);
         try
-            if sname == 0 || sname == 2
+            if sname == 1 || sname == 2
                 mult = 1;
             else
                 mult = curr_len;
@@ -836,13 +828,10 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             'Only this Subject', 'All Subjects, All Trials', 'Cancel', 'Only this Subject');
         switch SaveFig
             case 'Only this Subject'
-                gen_diag('Saving Only this Subject, please wait')
                 subdata.Fixations = tempdata{val_sub==subslist};
                 save(ETT.Subjects(val_sub).Data.Import,'subdata')
                 issaved = 1;
-                delete(diagfig)
             case 'All Subjects, All Trials'
-                gen_diag('Saving All Subjects, please wait')
                 for subn = subslist
                     subdata = load(ETT.Subjects(subn).Data.Import);
                     subdata = subdata.subdata;
@@ -850,7 +839,6 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
                     save(ETT.Subjects(subn).Data.Import)
                     issaved = 1;
                 end
-                delete(diagfig)
             case 'Cancel'
                 issaved = 0;
         end
@@ -861,14 +849,12 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             'Reset Fixations',...
             'Only this Trial', 'Only this Subject', 'All Subjects, All Trials', 'Only this Trial');
         switch ResetFig
-            case 'Only this Trial'                
+            case 'Only this Trial'
                 estim_fixations
                 newdata = organize_fixations;
                 tempdata{val_sub==subslist}{val_tri} = newdata{val_sub==subslist}{val_tri};
             case 'Only this Subject'
-                gen_diag('Recalculating this Subject, please wait')
                 estim_fixations
-                delete(diagfig)
                 newdata = organize_fixations;
                 tempdata{val_sub==subslist} = newdata{val_sub==subslist};
             case 'All Subjects, All Trials'
@@ -877,9 +863,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
                     'No','Yes','No');
                 switch ConfirmDiag
                     case 'Yes'
-                        gen_diag('Recalculating All Subjects, please wait')
                         tempdata = cell(1,length(subslist));
-                        delete(diagfig)
                 end
         end
         list_fix
@@ -900,21 +884,10 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         close(FixDetWin)
     end
 
-    function gen_diag(in_str)
-        diagfig=dialog('Color',[.7 .8 .7], 'Name', 'Please Wait','Position',[1200 498.75 200 100],'CloseRequestFcn','','Visible','On');
-        uicontrol('Style','Text','Parent',diagfig,'String',in_str,'BackgroundColor',[.7 .8 .7],'FontSize',14,...
-            'Position',[5 10 190 80])       
-        pause(.1)
-    end
-        
-
 %% Keyboard shortcuts
     function key_switch(obj,data)
-%         disp('key')
         if ~isempty(data.Key)
-%             ks = data.Key
-            mood = data.Modifier;
-            ks = data.Character;
+            ks = data.Key;
             switch ks
                 case 'b'
                     brush on
@@ -926,28 +899,6 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
                     delete_fix
                 case 's'
                     split_fix
-                case 'q'
-                    curr_edge = 1;
-                    set(edge_right ,'Value',0)
-                    set(edge_left ,'Value',1)
-                case 'e'
-                    curr_edge = -1;
-                    set(edge_left ,'Value',0)
-                    set(edge_right ,'Value',1)
-                case {'-','+'}
-                    if strcmp(get(FineMMM,'Enable'),'on')
-                        if strcmp(ks,'+')
-                            editnum = 2;
-                        else
-                            editnum = 0;
-                        end
-                        if ~isempty(mood)
-                            editnum = editnum + 1;                                                       
-                        end
-%                         disp('now editing')
-                        edge_edit([],[],editnum,fixselected)
-                    end
-                    
             end
         end
     end
