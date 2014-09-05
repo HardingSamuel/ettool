@@ -14,6 +14,8 @@ function [subdata] = data_filter(subdata,procsettings)
 %% Change Log
 %   [SH] - 05/08/14:    v1 - Creation
 %   [SH] - 06/19/14:   v1.1 - Added GoodData.Filtered calculation
+%   [SH] - 09/05/14:   Added filtbegin in cases where trial is completely
+%   null
 
 %%
 filt_type = procsettings(1);
@@ -42,6 +44,7 @@ switch filt_type
                 end
                 filtbegin{trinum} = segstartfilt; filtend{trinum} = segendfilt;
             else
+                filtbegin{trinum} = nan; filtend{trinum} = nan;
                 FiltX(trinum,:) = nan(1,size(subdata.Interpolation.InterpX,2));
                 FiltY(trinum,:) = nan(1,size(subdata.Interpolation.InterpY,2));
                 FiltD(trinum,:) = nan(1,size(subdata.Interpolation.InterpD,2));
