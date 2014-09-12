@@ -16,6 +16,11 @@ function [ETT,Status] = ett_NewProject
 %
 %% Changelog
 %   [SH] - 04/28/14:   v1 - Creation
+%   [SH] - 09/12/14:   Changed order of operations such that Subjects,
+%   Default Directory, etc, appear before auto save.  Previously, the file
+%   was saved before these fields were added, so if the user forgot to
+%   save, the .etp became corrupted when searching for non-existent fields,
+%   because they were added after having been saved.
 
 %%
 
@@ -36,7 +41,6 @@ uicontrol('Style','Edit','Position',[30 25 340 35],'Parent',NewProjectFig,'Backg
         ETT.CreationDate = datestr(now);
         ETT.FileName = '';
         ETT.PathName = '';
-        [ETT,SaveStatus] = ett_SaveProject(ETT,2);
         
         ETT.DefaultDirectory = ETT.PathName;
         ETT.Config.Import = [];
@@ -51,6 +55,8 @@ uicontrol('Style','Edit','Position',[30 25 340 35],'Parent',NewProjectFig,'Backg
         ETT.ScreenDim.PixY = 1080;
         ETT.ScreenDim.StimX = [0 1920];
         ETT.ScreenDim.StimY = [0 1080];
+                
+        [ETT,SaveStatus] = ett_SaveProject(ETT,2);
         
         if SaveStatus
             Status = 1;

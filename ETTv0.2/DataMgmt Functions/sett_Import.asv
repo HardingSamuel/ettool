@@ -12,9 +12,8 @@ function [arranged_columns,remove_cust] = sett_Import(colheadings,existingcolumn
 % arranged_columns - columns with numerical identification
 %
 %% Change Log
-%   [SH] - 04/30/14:   v1 - Creation
-%   [SH] - 09/12/14:   Fixed bug in which empty columns were included at
-%   the end of the list with empty 1 or 2 character names. 
+%   [SH] - 04/30/14:    v1 - Creation
+%   [SH] - 09/12/14:   
 
 %%
 trial_col = 0; phase_col = 0; ignore_col = 0;

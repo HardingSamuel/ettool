@@ -27,6 +27,8 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   [SH] - 09/05/14:   Returned t column to 4, rather than 5.  Not sure
 %   which situation the reported identical values were found, but it was
 %   not AT or FaceEyes.  Will continue looking for.  
+%   [SH] - 09/12/14:   Simplified SR calculation significantly.  No longer
+%   assumes multiple of 60 Hz, included option for 50 Hz.
 
 %%
 
@@ -128,10 +130,12 @@ try
         subdata.DOB = ETT.Subjects(Subject).DOB;
         subdata.TestDate = ETT.Subjects(Subject).TestDate;
         
-        SRmat = [60 120 180 240 300];
+        SRmat = [50 60 120 180 240 300];
         
-        SR = find(min(abs(SRmat-(1000/mode(diff(tmicro(1,:))))))==abs(SRmat-(1000/mode(diff(tmicro(1,:)))))) ...
-            * 60;
+%         SR = find(min(abs(SRmat-(1000/mode(diff(tmicro(1,:))))))==abs(SRmat-(1000/mode(diff(tmicro(1,:)))))) ...
+%             * 60;
+        
+        SR = SRmat(find(min(abs(SRmat-1000/mode(diff(tmicro(1,:)))))==abs(SRmat-1000/mode(diff(tmicro(1,:))))))
         
         subdata.SampleRate = SR;
         
