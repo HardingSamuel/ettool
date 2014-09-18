@@ -2,6 +2,8 @@
 close all
 clear all
 
+%% Check version
+ett_versioncheck
 
 %%
 ETT = [];
