@@ -29,6 +29,11 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   not AT or FaceEyes.  Will continue looking for.  
 %   [SH] - 09/12/14:   Simplified SR calculation significantly.  No longer
 %   assumes multiple of 60 Hz, included option for 50 Hz.
+%   [SH] - 09/19/14:   Referring to previous change from t column from
+%   5->4, this apparently was incorrect.  Miscellaneous files with strange
+%   properties were configured to use col 4 instead of 5.  This change had
+%   caused problems with normal data format, so reverting.  Should fix SR
+%   calculations.
 
 %%
 
@@ -40,7 +45,7 @@ if ~isempty(ETT.Subjects(Subject).Config.Import)
     usedcustom = 1;
 end
 
-dataformat = strcat(['%*f %*f %*f %f %*f %*f %*f %*f %*f %f %f %*f '...
+dataformat = strcat(['%*f %*f %*f %*f %f %*f %*f %*f %*f %f %f %*f '...
     '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
 rawdatafname = [ETT.DefaultDirectory,'ProjectData\',ETT.Subjects(Subject).Name,'\SubjectData_',ETT.Subjects(Subject).Name,'.mat'];
@@ -135,7 +140,10 @@ try
 %         SR = find(min(abs(SRmat-(1000/mode(diff(tmicro(1,:))))))==abs(SRmat-(1000/mode(diff(tmicro(1,:)))))) ...
 %             * 60;
         
-        SR = SRmat(find(min(abs(SRmat-1000/mode(diff(tmicro(1,:)))))==abs(SRmat-1000/mode(diff(tmicro(1,:))))))
+        SR = SRmat(find(min(abs(SRmat-1000/mode(diff(tmicro(1,:)))))==abs(SRmat-1000/mode(diff(tmicro(1,:))))));
+        if length(SR)>1
+            keyboard
+        end
         
         subdata.SampleRate = SR;
         
