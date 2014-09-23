@@ -34,6 +34,9 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   properties were configured to use col 4 instead of 5.  This change had
 %   caused problems with normal data format, so reverting.  Should fix SR
 %   calculations.
+%   [SH] - 09/23/14:   Defaulted to placing values for additional entries
+%   into cells.  Should prevent errors when a given trial has strange
+%   properties, such as 1 value instead of many when previous had many.
 
 %%
 
@@ -112,15 +115,15 @@ try
                 add_vec = aerow{nae==nadditionalentries}(begindices(torg):endices(torg));
                 if length(unique(add_vec,'stable')) == 1
                     try
-                        subdata.(char(cols(1,nae))) = cat(1,subdata.(char(cols(1,nae))),unique(add_vec,'stable'));
-                    catch
-                        keyboard
+                        subdata.(char(cols(1,nae))){torg,1} = unique(add_vec,'stable');
+                    catch err 
+                        ett_errorhandle(err);
                     end
                 else
                     try
-                        subdata.(char(cols(1,nae))) = cat(2,subdata.(char(cols(1,nae))),add_vec);
-                    catch
-                        keyboard
+                        subdata.(char(cols(1,nae))){torg,1} = add_vec;
+                    catch err
+                        ett_errorhandle(err);
                     end
                 end
                 clear add_vec
@@ -180,8 +183,6 @@ try
     
 catch err
     Status = 0;
-    ErrorOutput = err;
-    disp(['Error during PreProcess for Subject ' ETT.Subjects(Subject).Name ' with error message'])
-    disp(ErrorOutput.message)
+    ett_errorhandle(err);
 end
 end

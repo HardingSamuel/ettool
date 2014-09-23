@@ -59,9 +59,7 @@ csvwrite([ETT.Config.GrafixExport{2},'\',ETT.Subjects(Subject).Name,'\GRAFIX_INP
 csvwrite([ETT.Config.GrafixExport{2},'\',ETT.Subjects(Subject).Name,'\GRAFIX_INPUT_SEGMENTS_' ETT.Subjects(Subject).Name '.csv'],segblock)
 catch err
     Status = 0;
-    ErrorOutput = err;
-    disp(['Error during PreProcess for Subject ' ETT.Subjects(Subject).Name ' with error message'])
-    disp(ErrorOutput.message)
+    ett_errorhandle(err);
 end
 Status = 1;
 

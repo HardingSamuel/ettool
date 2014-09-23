@@ -73,9 +73,7 @@ save(importfname,'subdata')
 Status = 1;
 catch err
     status = 0;
-    ErrorOutput = err;
-    disp(['Error during PreProcess for Subject ' ETT.Subjects(Subject).Name ' with error message'])
-    disp(ErrorOutput.message)
+    ett_errorhandle(err);
 end
 
 end
