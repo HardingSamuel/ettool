@@ -25,7 +25,7 @@ switch QG
         error(['Stopping due to error in ' ERROR.stack(1).name ' at line ' num2str(ERROR.stack(1).line) ...
             ' with message: ' ERROR.message]) 
     case 2
-        disp(['Error in Line ' num2str(ERROR.stack(1).line)])
+        disp(['Error in Line ' num2str(ERROR.stack(1).line) ' of file ' ERROR.stack(1).name])
         disp(['With message: ' ERROR.message])
         edit(ERROR.stack(1).file)
         keyboard
