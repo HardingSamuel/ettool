@@ -2,9 +2,9 @@ function ett_versioncheck
 
 toolpath = fileparts(which('ettool.m'));
 filename = dir(fullfile(toolpath, 'ETvers.m'));
-
-onlinevers = urlread('http://129.79.193.101:8000/ETTvers.txt');
 try
+onlinevers = urlread('http://129.79.193.101:8000/ETTvers.txt');
+
     fid = fopen(filename.name);
     fgets(fid);
     fgets(fid);
