@@ -28,7 +28,7 @@ switch QG
         disp(['Error in Line ' num2str(ERROR.stack(1).line) ' of file ' ERROR.stack(1).name])
         disp(['With message: ' ERROR.message])
         edit(ERROR.stack(1).file)
-        return
+        keyboard
 end
 
 end
