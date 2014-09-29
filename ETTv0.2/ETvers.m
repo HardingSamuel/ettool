@@ -1,3 +1,3 @@
 % EyeTracking Toolbox to process and organize ET data
 % Version:
-0.2.0.2d
+0.2.0.2e

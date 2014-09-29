@@ -3,9 +3,9 @@ function ett_versioncheck
 toolpath = fileparts(which('ettool.m'));
 filename = dir(fullfile(toolpath, 'ETvers.m'));
 try
-    onlinevers = urlread('http://129.79.193.101:8000/ETTvers.txt','Timeout',2);
+    onlinevers = urlread('http://www.indiana.edu/~dcnlab/ETTversion/ETTvers.txt','Timeout',2);
 catch err
-    msgbox('Could not connect to Host - Sam''s computer is probably off');
+    msgbox('Could not connect to Host - contact Sam');
     return
 end
 try
