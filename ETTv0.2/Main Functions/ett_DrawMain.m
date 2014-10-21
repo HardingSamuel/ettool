@@ -47,8 +47,9 @@ else
     text_col = [text_Icust, text_col];
     
     text_box = cat(2,text_box,[{ETT.ProjectName};{ETT.CreationDate};{num2str(ETT.nSubjects)};{text_col};{text_pre}]);    
+    text_box = arrayfun(@(X) strjoin(text_box(X,:)),1:size(text_box,1),'uni',0);
 end
-text_box = arrayfun(@(X) strjoin(text_box(X,:)),1:size(text_box,1),'uni',0);
+
 TitlePanel = uipanel('Title', 'ETTool v0.2', 'Position', [.05 .05 .9 .9], 'BackgroundColor', [.7 .8 .7],...
     'FontSize', 16, 'ForegroundColor', col_box);
 LeftText = uicontrol('Style','Text','BackgroundColor',[.7 .8 .7],'FontSize',14,'Position',[25 25 340 250],'HorizontalAlignment','Left',...
