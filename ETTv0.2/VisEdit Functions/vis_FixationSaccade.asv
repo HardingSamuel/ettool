@@ -265,7 +265,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         hlx = []; hly = []; plot_fix = []; text_fix = []; plot_fix_high = []; text_fix_high = [];
         
         text_tint = []; text_tbli = []; text_tgap  = [];
-        trilen = sum(~isnan(subdata.Filtered.FiltX(val_tri,:)));
+        trilen = sum(~is(subdata.Filtered.FiltX,2);
         tri_segs = cell(0,0);
         if trilen > seg_sizeP
             for trispl = 1:ceil(trilen/(seg_sizeP))
