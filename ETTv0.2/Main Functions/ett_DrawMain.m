@@ -47,7 +47,8 @@ else
     text_col = [text_Icust, text_col];
     
     text_box = cat(2,text_box,[{ETT.ProjectName};{ETT.CreationDate};{num2str(ETT.nSubjects)};{text_col};{text_pre}]);    
-    text_box = arrayfun(@(X) strjoin(' ',text_box(X,:)),1:size(text_box,1),'uni',0);
+    try; text_box = arrayfun(@(X) strjoin(' ',text_box(X,:)),1:size(text_box,1),'uni',0); catch
+        text_box = strcat(text_box(:,1),text_box(:,2)); end
 end
 
 TitlePanel = uipanel('Title', 'ETTool v0.2', 'Position', [.05 .05 .9 .9], 'BackgroundColor', [.7 .8 .7],...

@@ -91,6 +91,7 @@ try
         Leye.Validity = emptymat; Reye.Validity = emptymat;
         
         nadditionalentries = find(cat(2,cols{2,:})==0);
+        if isempty(cols{1,end}); nadditionalentries(end) = [];end
         for nae = nadditionalentries
             aerow{nae==nadditionalentries} = cat(1,datacell{:,11+nae})';
             subdata.(char(cols(1,nae))) = '';
