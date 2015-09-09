@@ -20,6 +20,8 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   of fixation edges.
 
 %%
+% get ML version to handle ui changes in 2014b
+mlVer = version('-release'); mlVer = mlVer(1:4); mlVer = str2num(mlVer);
 
 subdata = []; trilist = []; tri_segs = cell(0,0);
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
@@ -608,8 +610,8 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 
 %% Manual fixation editing
 
-    function fix_brush(~,~)
-        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
+    function fix_brush(~,~)      
+        brushothers = findobj(FixDetWin,'DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         wasbrushed = 0;
         minbrush = nan(1,3); maxbrush = nan(1,3);
         for brushes = 1:3
@@ -650,7 +652,14 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             plot_fixations([])
         end
         hManager = uigetmodemanager(gcf);
-        set(hManager.WindowListenerHandles,'Enable','Off')
+        if mlVer < 2014
+          set(hManager.WindowListenerHandles,'Enable','Off')
+        else
+          hmWlElen = length(hManager.WindowListenerHandles);
+          for eee = 1:hmWlElen
+            hManager.WindowListenerHandles(eee).Enabled = 0;
+          end
+        end
         set(FixDetWin,'WindowKeyPressFcn',@key_switch)
     end
 
@@ -660,7 +669,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     end
 
     function brushes_update(indices)
-        brushothers = findobj(FixDetWin,'-property','BrushData','DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
+        brushothers = findobj(FixDetWin,'DisplayName','Y-Gaze','-or','DisplayName','X-Gaze','-or','DisplayName','Velocity (scaled)');
         newbd = zeros(1,length(get(brushothers(1),'BrushData')));
         newbd(indices) = 1;
         for brushes = 1:3
