@@ -18,6 +18,8 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 %   and validity shading for each eye.
 %   [SH] - 09/02/14:   More keyboard shortcuts to facilitate easier editing
 %   of fixation edges.
+%   [SH] - 07/11/15:    Swapped colors on raw and filtered data for
+%   clarity.
 
 %%
 
@@ -253,6 +255,10 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 
     function disp_trial_gui(~,~)
         seg_sizeP = fix(min(str2double(get(WinSize,'String')),length(find(~isnan(subdata.Filtered.FiltX(val_tri,:))))*(1000/subdata.SampleRate))/(1000/subdata.SampleRate));
+        if seg_sizeP < 500
+          msgbox(['Warning: segment size too small, setting to 500ms'])
+          seg_sizeP = 500;
+        end
         set(WinSize,'String',num2str(fix(min(str2double(get(WinSize,'String')),size(subdata.Filtered.FiltX,2)*(1000/subdata.SampleRate)))))
         disp_trial
     end
@@ -353,11 +359,11 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
             end
         end
         
-        xplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotX(tri_segs{seg_vis}),'--o','Color',[.7 .7 .7],'MarkerSize',2);
-        yplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotY(tri_segs{seg_vis}),'--o','Color',[.9 .6 .6],'MarkerSize',2);
+        xplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotX(tri_segs{seg_vis}),'--o','Color',[1 1 1],'MarkerSize',2);
+        yplotraw = plot(GazeAxes,tri_segs{seg_vis},data.RawPlotY(tri_segs{seg_vis}),'--o','Color',[1 0 0],'MarkerSize',2);
         
-        xplot = plot(GazeAxes,tri_segs{seg_vis},data.PlotX(tri_segs{seg_vis}),'k','LineWidth',2);
-        yplot = plot(GazeAxes,tri_segs{seg_vis},1-data.PlotY(tri_segs{seg_vis}),'r','LineWidth',2);
+        xplot = plot(GazeAxes,tri_segs{seg_vis},data.PlotX(tri_segs{seg_vis}),'Color',[.7 .7 .7],'LineWidth',2);
+        yplot = plot(GazeAxes,tri_segs{seg_vis},1-data.PlotY(tri_segs{seg_vis}),'Color',[.9 .6 .6],'LineWidth',2);
         
         plot_velo(data.plotV)
         legend([xplot,yplot,vplot],'X-Gaze','Y-Gaze','Velocity (scaled)','location','northeast');
