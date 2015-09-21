@@ -5,7 +5,7 @@ for s = 1:nSubs
   ETT.Subjects(s).Data.Raw = ...
     strrep(ETT.Subjects(s).Data.Raw,oldstr,newstr);
   ETT.Subjects(s).Data.Import = ...
-    strrep(ETT.Subjects(s).Data.Raw,oldstr,newstr);
+    strrep(ETT.Subjects(s).Data.Import,oldstr,newstr);
   ETT.Subjects(s).Data.PreProcess = ...
-    strrep(ETT.Subjects(s).Data.Raw,oldstr,newstr);
+    strrep(ETT.Subjects(s).Data.PreProcess,oldstr,newstr);
 end
