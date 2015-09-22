@@ -39,6 +39,7 @@ switch mode
             save([newpath,newfile],'ETT')
             ETT.LastSaved = datestr(now);
             ETT.PathName = newpath; ETT.FileName = newfile;
+            ETT.DefaultDirectory = ETT.PathName;
             Status = 1;
         else
             Status = 0;
