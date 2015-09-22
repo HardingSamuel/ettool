@@ -96,7 +96,7 @@ try
             aerow{nae==nadditionalentries} = cat(1,datacell{:,11+nae})';
             % remove parens from column names and replace with -
             colName = (char(cols(1,nae)));
-            colName = strrep(strrep(colName,'(','-'),')','-');
+            colName = strrep(strrep(colName,'(','_'),')','_');
             subdata.(colName) = '';
         end
         for torg = 1:length(trilist)
