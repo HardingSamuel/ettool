@@ -1,4 +1,7 @@
 function ett_versioncheck
+% 09/22/15:   updated to check PC/Mac because Geno!
+global sla 
+if ispc; sla = '\'; elseif ismac; sla = '/'; else msgbox('What kind of computer are you using?'); end
 
 toolpath = fileparts(which('ettool.m'));
 filename = dir(fullfile(toolpath, 'ETvers.m'));

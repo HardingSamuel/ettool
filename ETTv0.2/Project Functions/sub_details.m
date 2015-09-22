@@ -16,7 +16,7 @@ function [ETT,subwinpos] = sub_details(ETT,selected,mode,subwinpos)
 %   [SH] - 05/01/14:    v1 - Creation
 
 %%
-
+global sla; % load pc/mac sensitive slash
 switch mode
     case 0
         title_addedit = 'Add Subject';
@@ -93,9 +93,9 @@ uicontrol('Style','PushButton','String','Finished','Position',[265 10 115 30],'F
                 set(DatafileText,'ForegroundColor',[.2 .75 .2],'String','Data File Loaded')
                 temp_dataloc = [filepath,filename];
             case 1                
-                sub_currdir = ETT.Subjects(selected).Data.Raw; sla = strfind(sub_currdir,'\');
-                if length(sla)>0
-                    sub_currfile = sub_currdir(sla(end)+1:end); sub_currdir = sub_currdir(1:sla(end));
+                sub_currdir = ETT.Subjects(selected).Data.Raw; slaLoc = strfind(sub_currdir,sla);
+                if length(slaLoc)>0
+                    sub_currfile = sub_currdir(slaLoc(end)+1:end); sub_currdir = sub_currdir(1:slaLoc(end));
                 else
                     sub_currdir = ETT.DefaultDirectory;
                     sub_currfile = '';
