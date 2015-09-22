@@ -94,7 +94,10 @@ try
         if isempty(cols{1,end}); nadditionalentries(end) = [];end
         for nae = nadditionalentries
             aerow{nae==nadditionalentries} = cat(1,datacell{:,11+nae})';
-            subdata.(char(cols(1,nae))) = '';
+            % remove parens from column names and replace with -
+            colName = (char(cols(1,nae)));
+            colName = strrep(strrep(colName,'(','-'),')','-');
+            subdata.(colName) = '';
         end
         for torg = 1:length(trilist)
             torg = trilist(torg);
