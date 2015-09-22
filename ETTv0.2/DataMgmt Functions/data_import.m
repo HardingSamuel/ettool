@@ -59,7 +59,7 @@ try
     fgets(datafid);
     [datacell,position] = textscan(...
         datafid,dataformat,'delimiter','\t','treatAsEmpty',{'-1.#INF','1.#INF','-1.#IND','1.#IND','-1.#QNAN','1.#QNAN','NF','ND'},'emptyvalue',-1,'CommentStyle','#');
-    if ~feof(datafid)
+    if ~fgets(datafid)==-1
         keyboard
     end
     fclose(datafid);
