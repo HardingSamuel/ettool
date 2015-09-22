@@ -119,13 +119,13 @@ try
                 add_vec = aerow{nae==nadditionalentries}(begindices(torg):endices(torg));
                 if length(unique(add_vec,'stable')) == 1
                     try
-                        subdata.(char(cols(1,nae))){torg,1} = unique(add_vec,'stable');
+                        subdata.(colName){torg,1} = unique(add_vec,'stable');
                     catch err 
                         ett_errorhandle(err);
                     end
                 else
                     try
-                        subdata.(char(cols(1,nae))){torg,1} = add_vec;
+                        subdata.(colName){torg,1} = add_vec;
                     catch err
                         ett_errorhandle(err);
                     end
