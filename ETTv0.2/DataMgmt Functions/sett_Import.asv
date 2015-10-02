@@ -102,9 +102,7 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
             arranged_columns(2,strcmp(selected_text,colheadings)) = {1};
 %       if we had previously classified a column, and we clicked this
 %       button again, put the existing column title back into the main list
-%       of titles, mark inside of "arranged_columns" that we DO NOT have a
-%       trial column specified, and then but "Trial Counter" back into the
-%       text of the button
+%       of titles, mark inside of "a
         else
             trial_col = 0;
             text_revert = get(Trial,'String');
@@ -125,10 +123,6 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
         end
     end
 
-%   same general principle as the trial button. If we haven't specified a
-%   column to perform this role, then put whichever highlighted column name
-%   into the button and store it in arranged_cols. If we have set one up
-%   previously, take it out and reset the button
     function phase(~,~)
         if phase_col == 0;
             phase_col = 1;
@@ -158,10 +152,6 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
         end
     end
 
-%   sometimes there is a column that is being finicky for some reason or
-%   another. I think we solved the majority of these, but in case one
-%   column in being problematic, allow the user to skip it during the
-%   import process
     function ignore(~,~)
         if ignore_col == 0;
             ignore_col = 1;
@@ -191,16 +181,12 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
         end
     end
 
-%   if we had set up custom import settings for this subject, remove them.
-%   May not be 100% functional, haven't test it in a while
     function clear_cust(~,~)
         remove_cust = 1;
         set(ClearCustom, 'enable','off');
         set(Done,'Enable','On');
     end
 
-%   we've finished specifying which columns do what, so go ahead and return
-%   that information to the caller
     function arrangedone(~,~)
         arranged_columns(:,find(sum(cellfun(@isempty, arranged_columns),1))) = [];
         for colcheck = 1:size(arranged_columns,2)
@@ -209,7 +195,7 @@ Done = uicontrol('Style','Pushbutton','Position',[245 30 125 30], 'String','Fini
         close(ColConfigFig)
     end
 
-% hold this figure open until they click the finished button or exit out
+
 waitfor(ColConfigFig)
 
 end

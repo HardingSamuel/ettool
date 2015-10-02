@@ -58,11 +58,9 @@ switch filt_type
                     FiltD(trinum,segstartnof(seginput):segendnof(seginput)) = subdata.Interpolation.InterpD(trinum,segstartnof(seginput):segendnof(seginput));
                     FiltP(trinum,segstartnof(seginput):segendnof(seginput)) = subdata.Interpolation.InterpP(trinum,segstartnof(seginput):segendnof(seginput));
                 end
-%                 record and store which sections of the data we did and
-%                 did not filter
+%                 record and store which sections of th
                 filtbegin{trinum} = segstartfilt; filtend{trinum} = segendfilt;
             else
-%               if all the data were nans
                 filtbegin{trinum} = nan; filtend{trinum} = nan;
                 FiltX(trinum,:) = nan(1,size(subdata.Interpolation.InterpX,2));
                 FiltY(trinum,:) = nan(1,size(subdata.Interpolation.InterpY,2));
@@ -71,14 +69,13 @@ switch filt_type
             end
         end
 end
-% store the filtered data into the subdata 
+
 subdata.Filtered.FiltX = FiltX;
 subdata.Filtered.FiltY = FiltY;
 subdata.Filtered.FiltD = FiltD;
 subdata.Filtered.FiltP = FiltP;
 
 subdata.Filtered.Indices = [filtbegin;filtend]';
-% based on this new filtered data, how much of the original raw data can we
-% use? Useful for assessing data quality
+
 subdata.GoodData.Filtered = cell2mat(arrayfun(@(X) length(find(~isnan(FiltX(X,:))))/subdata.TrialLengths(X),1:size(FiltX,1),'uni',0))';
 end

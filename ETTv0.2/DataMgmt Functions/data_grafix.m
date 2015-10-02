@@ -16,8 +16,10 @@ function [Status,ErrorOutput] = data_grafix(ETT,Subject)
 global sla; % load pc/mac sensitive slash
 Status = 0; ErrorOutput = [];
 
+% read in the subject's data
 importfname = ETT.Subjects(Subject).Data.Import;
 load(importfname)
+
 
 try
 datablock = nan(sum(subdata.TrialLengths),8);

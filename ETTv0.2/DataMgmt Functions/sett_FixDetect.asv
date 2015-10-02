@@ -18,8 +18,7 @@ function [Settings] = sett_FixDetect(ETT,mode,existsettings)
 % if we have existing settings, use them
 Settings = existsettings;
 % we can call this from 2 places, either in the interface before jumping
-% into the fixation detection window itself, or once we've open up the
-% editor
+% into the fixation detection 
 switch mode
     case 0
         text_done = 'Finished';

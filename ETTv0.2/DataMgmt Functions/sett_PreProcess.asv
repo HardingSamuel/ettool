@@ -109,7 +109,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         end
         
         function slide_text(~,~)
-%           format the text on the slider in the interface
+%           set 
             text_ex = '';
             slidval = fix(get(sett2,'Value'));
             if slidval ==2
@@ -120,8 +120,6 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         end
         
         function sett_return(~,~)
-%           when user hits the "return" button after editing an individual
-%           filter's settings, send these updated values back 
             set(sett1,'Visible','Off')
             set(sett1txt,'Visible','Off')
             try
@@ -139,8 +137,6 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
     end
 
     function donerefresh(~,~)
-%       once the user is done viewing or changing these settings, return
-%       the new values to the caller
         if  filtsett(2) >= filtsett(1)
             filtsett(1) = 5 + 2 * filtsett(2);
             errordlg(['Error while filtering:  SGOlay Filter Order must be less than the window length.' char(10) 'Adjusting Window to length:' char(10) num2str(filtsett(1))  '   (5 + 2 * Filter Order)']);
@@ -151,9 +147,7 @@ uicontrol('Style','Pushbutton','String',text_done,'BackgroundColor',[.8 .8 .8],.
         Settings = [curr_fil,interpval,blinkval,filtsett];
         uiresume(PPFig)
     end
-% ths may be unnecessary, but goal is to enforce certain windows to be on
-% top of each other and not allow background windows to execute while
-% manipulations in this window are still pending
+
 uiwait(PPFig)
 try
 close(PPFig)
