@@ -25,7 +25,7 @@ function [ETT] = vis_FixationSaccade(ETT,subslist)
 % get ML version to handle ui changes in 2014b
 mlVer = version('-release'); mlVer = mlVer(1:4); mlVer = str2num(mlVer);
 
-subdata = []; trilist = []; tri_segs = cell(0,0);
+subdata = []; trilist = []; tri_segs = cell(0,0); sampleTime = [];
 text_sub = num2str(subslist(1)); val_sub = subslist(1);
 text_tri = '1'; val_tri = 1; val_maxtri = 99;
 seg_vis = 1; seg_sizeP = []; fixdetset = ETT.Config.FixDetect; preprocset = ETT.Config.PreProcess;
@@ -170,7 +170,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 
   function fix_x(~,~)
     xticks = get(GazeAxes,'xtick');
-    set(GazeAxes,'xticklabel',(1000/subdata.SampleRate)*xticks)
+    set(GazeAxes,'xticklabel',(sampleTime)*xticks)
     set(TagAxes,'ylim',[0 1])
   end
 
@@ -188,11 +188,11 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
       maxnext = 1;
     end
     val_tri = str2double(text_tri);
-    seg_sizeP = fix(3000 / (1000/subdata.SampleRate));
+    seg_sizeP = fix(3000 / (sampleTime));
     set(WinSize,'String','3000')
     if maxnext
       seg_sizeP = fix(length(find(~isnan(subdata.Filtered.FiltX(val_tri,:)))));
-      set(WinSize,'String',num2str(fix(seg_sizeP * (1000/subdata.SampleRate))))
+      set(WinSize,'String',num2str(fix(seg_sizeP * (sampleTime))))
     end
     set(Sel_Tri,'Title',['Trial: ' text_tri])
     disp_trial
@@ -217,11 +217,12 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     subdata = load(ETT.Subjects(val_sub).Data.Import);
     delete(diagfig)
     subdata = subdata.subdata;
+    sampleTime = 1000/subdata.SampleRate; % how much time each sample represents
     
     set(Slide_Tri','Enable','On')
     val_maxtri = size(subdata.TrialLengths,1);
     val_tri = 1;
-    seg_sizeP = fix(str2double(get(WinSize,'String'))/(1000/subdata.SampleRate));
+    seg_sizeP = fix(str2double(get(WinSize,'String'))/sampleTime);
     set(Slide_Tri,'Max',val_maxtri,'SliderStep',...
       [1/(val_maxtri-1), 1/(val_maxtri-1)])
     trilist = 1:val_maxtri;
@@ -265,7 +266,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
       currVal = 500;
     end
     maxTime = length(find(~isnan(subdata.Filtered.FiltX(val_tri,:))))*...
-      (1000/subdata.SampleRate);
+      (sampleTime);
     if currVal > maxTime
       currStr = num2str(maxTime);
       currVal = maxTime;
@@ -283,11 +284,12 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     hlx = []; hly = []; plot_fix = []; text_fix = []; plot_fix_high = []; text_fix_high = [];
     
     text_tint = []; text_tbli = []; text_tgap  = [];
-    trilen = sum(~isnan(subdata.Filtered.FiltX(val_tri,:)));
+    trilen = subdata.TrialLengths(val_tri);
     tri_segs = cell(0,0);
     if trilen > seg_sizeP
-      for trispl = 1:ceil(trilen/(seg_sizeP))
-        tri_segs{trispl} = fix(.75*seg_sizeP*(trispl-1)+1:.75*seg_sizeP*(trispl-1)+seg_sizeP+1);
+      nChunks = 1+ceil((trilen - seg_sizeP + .75*seg_sizeP) / (.75*seg_sizeP));
+      for trispl = 1:nChunks
+        tri_segs{trispl} = fix(.75*seg_sizeP*(trispl-1)+1:.75*seg_sizeP*(trispl-1)+seg_sizeP);
       end
       set(Scroll_Right,'Enable','On');
     else
@@ -383,7 +385,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     axes(GazeAxes)
     set(GazeAxes,'xlim',[tri_segs{seg_vis}(1), tri_segs{seg_vis}(end)])
     xticks = get(GazeAxes,'xtick');
-    set(GazeAxes,'xticklabel',(1000/subdata.SampleRate)*xticks)
+    set(GazeAxes,'xticklabel',(sampleTime)*xticks)
     tag_pre
   end
 
@@ -569,9 +571,9 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
 
   function estim_fixations
     [fixinfo] = fix_ivt(velo,fixdetset{1});
-    [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(1000/subdata.SampleRate)));
+    [fixinfo.ivtclean] = fix_rejectfix(fixinfo.ivt,floor(fixdetset{2}/(sampleTime)));
     [fixinfo] = fix_hmm(velo,fixinfo,fixdetset,fixinfo.ivtclean.states);
-    [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(1000/subdata.SampleRate)));
+    [fixinfo.hmmclean] = fix_rejectfix(fixinfo.hmm,floor(fixdetset{2}/(sampleTime)));
   end
 
   function orgdata = organize_fixations
@@ -579,7 +581,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     for tri_n = 1:val_maxtri
       orgdata{val_sub==subslist}{tri_n}.fixbegin = find(fixinfo.hmmclean.fixbegin(tri_n,:));
       orgdata{val_sub==subslist}{tri_n}.fixend = find(fixinfo.hmmclean.fixend(tri_n,:));
-      orgdata{val_sub==subslist}{tri_n}.fixdurations = (orgdata{val_sub==subslist}{tri_n}.fixend - orgdata{val_sub==subslist}{tri_n}.fixbegin + 1) * (1000/subdata.SampleRate);
+      orgdata{val_sub==subslist}{tri_n}.fixdurations = (orgdata{val_sub==subslist}{tri_n}.fixend - orgdata{val_sub==subslist}{tri_n}.fixbegin + 1) * (sampleTime);
     end
   end
 
@@ -719,7 +721,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
           tempdata{val_sub==subslist}{val_tri}.fixbegin(newfixnum+1:length(tempdata{val_sub==subslist}{val_tri}.fixbegin)+1) = restoffixes(1,:);
           tempdata{val_sub==subslist}{val_tri}.fixend(newfixnum+1:length(tempdata{val_sub==subslist}{val_tri}.fixend)+1) = restoffixes(2,:);
         end
-        tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
+        tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (sampleTime);
       end
     end
     set(FineMMM,'Enable','On'); set(FineM,'Enable','On'); set(FineP,'Enable','On'); set(FinePPP,'Enable','On');
@@ -751,7 +753,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
       tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected(2:end)) = [];
       tempdata{val_sub==subslist}{val_tri}.fixend(fixselected(2:end)) = [];
       tempdata{val_sub==subslist}{val_tri}.fixend(fixselected(1)) = newend;
-      tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
+      tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (sampleTime);
       list_fix
       plot_fixations([])
     end
@@ -769,7 +771,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
           tempdata{val_sub==subslist}{val_tri}.fixbegin(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixbegin)+1) = restoffixes(1,:);
           tempdata{val_sub==subslist}{val_tri}.fixend(fixselected+2:length(tempdata{val_sub==subslist}{val_tri}.fixend)+1) = restoffixes(2,:);
         end
-        tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (1000/subdata.SampleRate);
+        tempdata{val_sub==subslist}{val_tri}.fixdurations = (tempdata{val_sub==subslist}{val_tri}.fixend - tempdata{val_sub==subslist}{val_tri}.fixbegin + 1) * (sampleTime);
         list_fix
         plot_fixations([])
       end

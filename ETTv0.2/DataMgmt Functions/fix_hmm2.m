@@ -33,44 +33,71 @@ mode = fixdetset{5};
 
 veloest = max(ceil(velo/binsize),1); veloest(isnan(velo)) = [];
 stateest = states; stateest(isnan(velo)) = [];
-
-
+% velo2 = velo(~isnan(velo));
+% keyboard
 switch mode
     case 1
-        [counts] = arrayfun(@(state) histc(veloest(stateest==state),1:max(max(veloest))),1:3,'uni',0);
-        velodist = arrayfun(@(state) cell2mat(counts(state))/sum(cell2mat(counts(state))),1:3,'uni',0);
-        velodist = cat(1,velodist{:}); velodist = max(1e-5,velodist); velodist = arrayfun(@(state) velodist(state,:)/sum(velodist(state,:),2),1:size(velodist,1),'uni',0);
-        velodist = cat(1,velodist{:});
+      for sta = 1:3
+        myVelo{sta} = velo(states==sta);% myVelo(isnan(myVelo)) = [];
+        counts(sta,:) = histc(myVelo{sta},1:max(max(velo)));
+        nvals(sta,:) = length(myVelo{sta});
+        stds(sta,1) = std(myVelo{sta},1);
+        iqrs(sta,1) = iqr(myVelo{sta})/1.34;
+      end
+%       figure
+%       plot(counts')
+%         [counts] = arrayfun(@(state) histc(veloest(stateest==state),1:max(max(veloest))),1:3,'uni',0);
+%         velodist = arrayfun(@(state) cell2mat(counts(state))/sum(cell2mat(counts(state))),1:3,'uni',0);
+%         velodist = cat(1,velodist{:}); velodist = max(1e-5,velodist); velodist = arrayfun(@(state) velodist(state,:)/sum(velodist(state,:),2),1:size(velodist,1),'uni',0);
+%         velodist = cat(1,velodist{:});
                 
 %         [ESTTR, ESTEMIT] = hmmtrain(veloest,trmat,velodist,'verbose','true','tolerance',1e-2);
-        distcent = nan(1,3);
+%         distcent = nan(1,3);
+%         for sta = 1:3
+%             if ~all(velodist(sta,:)==0)
+%                 distcent(sta) = find(max(velodist(sta,:))==(velodist(sta,:)));
+%             end
+%         end
+        n = 10;
+        bins  = linspace(0,max(max(velo)),2^n);        
+        hMat = .9 * min(stds,iqrs) .* (nvals.^(-1/5));
+        ESTEMIT = [];        
+        mufits = nan(3,1); sdfits = mufits;
         for sta = 1:3
-            if ~all(velodist(sta,:)==0)
-                distcent(sta) = find(max(velodist(sta,:))==(velodist(sta,:)),1,'first');
-            end
+          [epa,bin] = ksdensity(myVelo{sta},bins,'kernel','epanechnikov','width',hMat(sta));
+          ESTEMIT(sta,:) = epa;
         end
-%         distcent = arrayfun(@(sta) find(max(velodist(sta,:))==(velodist(sta,:))),1:3);  
-        ESTEMIT = [velodist(1,:);...
-            pdf('normal',1:length(velodist),distcent(2),2*distcent(2));
-            pdf('normal',1:length(velodist),distcent(3),2*distcent(3))];
-        velodist = mean(cat(3,ESTEMIT,velodist),3);
 %         figure
-%         hold on
-%         plot(velodist(2,:))
-%         plot(velodist(3,:))
+        ESTEMIT = max(ESTEMIT,1e-5);
+        ESTEMIT = ESTEMIT ./ (sum(ESTEMIT,2) * ones(1,length(bins)));
+%         plot(bins,ESTEMIT')    
+        
+%         velodist = mean(cat(3,ESTEMIT,velodist),3);
+
         
         for trinum = 1:size(states,1)
             try
-                trivec = max(ceil(velo(trinum,:)/binsize),1); nonnandex = find(~isnan(velo(trinum,:)));
+                trivec = velo(trinum,:); nonnandex = find(~isnan(velo(trinum,:)));
+                for v = 1:length(trivec)
+                  if ~isnan(trivec(v))
+                    trivecBin(v) = find(trivec(v)>=bins,1,'last');
+                  else
+                    trivecBin(v) = nan;
+                  end
+                end
                 
-                [stateout] = hmmviterbi(trivec(nonnandex),trmat,velodist);
+                [stateout] = hmmviterbi(trivecBin(nonnandex),trmat,ESTEMIT);
                 nanrow = nan(1,length(trivec)); nanrow(~isnan(velo(trinum,:))) = stateout;
                 estim_states(trinum,:) = nanrow;
             catch err
                 disp(['Error on Trial ' num2str(trinum)])
                 keyboard
             end
-        end                
+        end
+        
+%         figure
+%         plot(stateout)
+%         keyboard
     case 2
         for trinum = 1:size(states,1)
             counts{trinum} = arrayfun(@(state) histc(velo(states(trinum,:)==state),0:binsize:binsize*ceil(max(max(velo))/binsize)),1:3,'uni',0);
