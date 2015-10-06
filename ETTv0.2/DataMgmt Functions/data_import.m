@@ -96,7 +96,7 @@ try
       aerow{nae==nadditionalentries} = cat(1,datacell{:,11+nae})';
       % remove parens from column names and replace with -
       colName = (char(cols(1,nae)));
-      colName = strrep(strrep(colName,'(','_'),')','_');
+      colName = strrep(strrep(colName,'(',''),')','');
       subdata.(colName) = '';
     end
     for torg = 1:length(trilist)
@@ -117,7 +117,7 @@ try
       TBegin(torg,1:2) = [begindices(torg),endices(torg)];
       for nae = nadditionalentries
         colName = (char(cols(1,nae)));
-        colName = strrep(strrep(colName,'(','_'),')','_');
+        colName = strrep(strrep(colName,'(',''),')','');
         add_vec = aerow{nae==nadditionalentries}(begindices(torg):endices(torg));
         if length(unique(add_vec,'stable')) == 1
           try

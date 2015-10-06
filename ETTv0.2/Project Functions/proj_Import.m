@@ -73,7 +73,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 10 360 46
         
         hascustom = ~isempty(col_cust);
         datafid = fopen(ETT.Subjects(selected(1)).Data.Raw);
-        colheadings = strsplit(fgets(datafid),'\t');
+        colheadings = strsplit(fgets(datafid));
         fclose(datafid);
         
         switch mode
