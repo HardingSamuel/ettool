@@ -7,6 +7,7 @@ ett_versioncheck
 
 %%
 ETT = [];
+% make dynamic based on screen size
 ETTFig = figure('Position', [40 570 400 330], 'Name', 'Eyetracking Tool v0.2', 'NumberTitle', 'off', 'MenuBar', 'none',...
     'Color', [.65 .75 .65]);
 ett_DrawMain(ETT,ETTFig);
