@@ -214,7 +214,16 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     set(Sel_Tri,'Title', 'Trial: 1');
     set(FileMenu,'Enable','On')
     gen_diag(['Loading Subject ', ETT.Subjects(val_sub).Name])
-    subdata = load(ETT.Subjects(val_sub).Data.Import);
+    
+    subFName = ETT.Subjects(val_sub).Data.Import;
+    pD = strfind(subFName,'ProjectData');
+    subFName = [ETT.DefaultDirectory 'ProjectData\' subFName(pD+12:end)];
+    try
+      subdata = load(subFName);
+    catch
+      msgbox('Error Loading Subject - try updating the Default Directory');
+    end
+        
     delete(diagfig)
     subdata = subdata.subdata;
     sampleTime = 1000/subdata.SampleRate; % how much time each sample represents
@@ -223,8 +232,12 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     val_maxtri = size(subdata.TrialLengths,1);
     val_tri = 1;
     seg_sizeP = fix(str2double(get(WinSize,'String'))/sampleTime);
+    if val_maxtri == 1
+      set(Slide_Tri,'enable','off')
+    else
     set(Slide_Tri,'Max',val_maxtri,'SliderStep',...
       [1/(val_maxtri-1), 1/(val_maxtri-1)])
+    end
     trilist = 1:val_maxtri;
     
     try
@@ -928,7 +941,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
   end
 
   function gen_diag(in_str)
-    diagfig=dialog('Color',[.7 .8 .7], 'Name', 'Please Wait','Position',[1200 498.75 200 100],'CloseRequestFcn','','Visible','On');
+    diagfig=dialog('Color',[.7 .8 .7], 'Name', 'Please Wait','Position',[1200 498.75 200 100],'Visible','On');
     uicontrol('Style','Text','Parent',diagfig,'String',in_str,'BackgroundColor',[.7 .8 .7],'FontSize',14,...
       'Position',[5 10 190 80])
     pause(.1)
