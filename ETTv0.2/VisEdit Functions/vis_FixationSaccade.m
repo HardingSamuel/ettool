@@ -877,16 +877,24 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
       case 'Only this Subject'
         gen_diag('Saving Only this Subject, please wait')
         subdata.Fixations = tempdata{val_sub==subslist};
-        save(ETT.Subjects(val_sub).Data.Import,'subdata')
+        subFName = ETT.Subjects(val_sub).Name;    
+        subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
+        save(subFName,'subdata')
         issaved = 1;
         delete(diagfig)
       case 'All Subjects, All Trials'
         gen_diag('Saving All Subjects, please wait')
         for subn = subslist
-          subdata = load(ETT.Subjects(subn).Data.Import);
+          subFName = ETT.Subjects(subn).Name;
+          subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
+          try
+            subdata = load(subFName);
+          catch
+            msgbox('Error Loading Subject - try updating the Default Directory');
+          end
           subdata = subdata.subdata;
           subdata.Fixations = tempdata{subn==subslist};
-          save(ETT.Subjects(subn).Data.Import)
+          save(subFName,'subdata')
           issaved = 1;
         end
         delete(diagfig)
