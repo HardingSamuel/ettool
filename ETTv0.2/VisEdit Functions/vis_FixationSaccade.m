@@ -215,9 +215,8 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     set(FileMenu,'Enable','On')
     gen_diag(['Loading Subject ', ETT.Subjects(val_sub).Name])
     
-    subFName = ETT.Subjects(val_sub).Data.Import;
-    pD = strfind(subFName,'ProjectData');
-    subFName = [ETT.DefaultDirectory 'ProjectData\' subFName(pD+12:end)];
+    subFName = ETT.Subjects(val_sub).Name;    
+    subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
     try
       subdata = load(subFName);
     catch
