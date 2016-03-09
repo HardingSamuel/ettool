@@ -17,7 +17,6 @@ function [ETT,ERRORS] = proj_GrafixExport(ETT)
 %   [SH] - 07/15/14:   fixing interface bugs
 
 %%
-global sla; % load pc/mac sensitive slash
 [ETT] = proj_CheckUpdate(ETT);
 
 ERRORS = [];
@@ -93,7 +92,7 @@ DirectText = uicontrol('Style','Edit','Enable','On','String',curr_dir,'Position'
         catch
             curr_dir = uigetdir('Select Grafix output directory location');
         end
-        if strcmp(curr_dir(end),sla)
+        if strcmp(curr_dir(end),filesep)
             curr_dir = curr_dir(1:end-1);
         end
         set(DirectText,'String',curr_dir)

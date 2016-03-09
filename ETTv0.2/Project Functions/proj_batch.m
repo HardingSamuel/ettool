@@ -14,7 +14,6 @@ function [ETT,ERRORS] = proj_batch(ETT,selected,mode)
 %   [SH] - 05/01/14:    v1 - Creation
 
 %%
-global sla; % load pc/mac sensitive slash
 switch mode
     case 1
         text_mode = 'Import';
@@ -64,7 +63,7 @@ set(DoneButton,'Enable','On')
         switch mode
             case 1
                 [status,ERRORS,usedcustom] = data_import(ETT,selected(batchi));
-                importdatafname = [ETT.DefaultDirectory,'ProjectData',sla,ETT.Subjects(selected(batchi)).Name,sla,'SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
+                importdatafname = [ETT.DefaultDirectory,'ProjectData',filesep,ETT.Subjects(selected(batchi)).Name,filesep,'SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
                 ETT.Subjects(selected(batchi)).Data.Import = importdatafname;
                 addtext = '';
                 if usedcustom
@@ -73,7 +72,7 @@ set(DoneButton,'Enable','On')
                 ETT.Subjects(selected(batchi)).Status.Import = [datestr(now), addtext];
             case 2
                 [status,ERRORS,usedcustom] = data_preprocess(ETT,selected(batchi));
-                procdatafname = [ETT.DefaultDirectory,'ProjectData',sla,ETT.Subjects(selected(batchi)).Name,sla,'SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
+                procdatafname = [ETT.DefaultDirectory,'ProjectData',filesep,ETT.Subjects(selected(batchi)).Name,filesep,'SubjectData_',ETT.Subjects(selected(batchi)).Name,'.mat'];
                 ETT.Subjects(selected(batchi)).Data.PreProcess = procdatafname;
                 addtext = '';
                 if usedcustom

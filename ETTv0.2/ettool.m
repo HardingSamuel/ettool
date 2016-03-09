@@ -2,7 +2,6 @@ close all
 clear all
 
 %% Check version
-global sla
 ett_versioncheck
 
 %%

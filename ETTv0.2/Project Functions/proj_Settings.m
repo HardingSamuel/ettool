@@ -13,7 +13,6 @@ function [ETT] = proj_Settings(ETT)
 %   [SH] - 04/29/14:    v1 - Creation 
 
 %%
-global sla; % load pc/mac sensitive slash
 SettingFig = figure('Name', 'Project Settings', 'pos', [40 570 400 330], 'NumberTitle', 'Off', 'MenuBar', 'None',...
     'Color', [.65 .75 .65]);
 
@@ -43,7 +42,7 @@ uicontrol('Style', 'PushButton', 'String', 'Finished', 'Position', [20 20 360 50
     end
 
     function defaultdir(~,~)
-        ETT.DefaultDirectory = strcat(uigetdir(ETT.PathName,'Select a Default Directory'),sla);
+        ETT.DefaultDirectory = strcat(uigetdir(ETT.PathName,'Select a Default Directory'),filesep);
     end
 
 waitfor(SettingFig)

@@ -39,7 +39,6 @@ function [Status,ErrorOutput,usedcustom] = data_import(ETT,Subject)
 %   properties, such as 1 value instead of many when previous had many.
 
 %%
-global sla; % load pc/mac sensitive slash
 Status = 0; ErrorOutput = [];
 
 cols = ETT.Config.Import; usedcustom = 0;
@@ -51,7 +50,7 @@ end
 dataformat = strcat(['%*f %*f %*f %*f %f %*f %*f %*f %*f %f %f %*f '...
   '%*f %f %f %f %f %f %*f %*f %f %f %f '], repmat(' %s', 1, size(cols,2)));
 
-rawdatafname = [ETT.DefaultDirectory,'ProjectData',sla,ETT.Subjects(Subject).Name,sla,'SubjectData_',ETT.Subjects(Subject).Name,'.mat'];
+rawdatafname = [ETT.DefaultDirectory,'ProjectData',filesep,ETT.Subjects(Subject).Name,filesep,'SubjectData_',ETT.Subjects(Subject).Name,'.mat'];
 
 %% Retrieve the Data
 try
@@ -172,11 +171,11 @@ try
     subdata.WhatsOn.Begindices = wobegin';
     subdata.WhatsOn.Endices = woends';
     
-    if ~exist([ETT.DefaultDirectory,'ProjectData',sla],'dir')
+    if ~exist([ETT.DefaultDirectory,'ProjectData',filesep],'dir')
       mkdir(ETT.DefaultDirectory,'ProjectData')
     end
-    if ~exist([ETT.DefaultDirectory,'ProjectData',sla,ETT.Subjects(Subject).Name],'dir')
-      mkdir([ETT.DefaultDirectory,'ProjectData',sla],ETT.Subjects(Subject).Name)
+    if ~exist([ETT.DefaultDirectory,'ProjectData',filesep,ETT.Subjects(Subject).Name],'dir')
+      mkdir([ETT.DefaultDirectory,'ProjectData',filesep],ETT.Subjects(Subject).Name)
     end
     
     save(rawdatafname,'subdata');

@@ -13,7 +13,6 @@ function [Status,ErrorOutput] = data_grafix(ETT,Subject)
 %   [SH] - 06/25/14:   v1 - Creation 
 
 %%
-global sla; % load pc/mac sensitive slash
 Status = 0; ErrorOutput = [];
 
 % read in the subject's data
@@ -54,12 +53,12 @@ if ~exist(ETT.Config.GrafixExport{2},'dir')
     mkdir(ETT.Config.GrafixExport{2})
 end
 
-if ~exist([ETT.Config.GrafixExport{2},sla,ETT.Subjects(Subject).Name],'dir')
-    mkdir([ETT.Config.GrafixExport{2},sla,ETT.Subjects(Subject).Name])
+if ~exist([ETT.Config.GrafixExport{2},filesep,ETT.Subjects(Subject).Name],'dir')
+    mkdir([ETT.Config.GrafixExport{2},filesep,ETT.Subjects(Subject).Name])
 end
 
-csvwrite([ETT.Config.GrafixExport{2},sla,ETT.Subjects(Subject).Name,sla,'GRAFIX_INPUT_DATA_' ETT.Subjects(Subject).Name '.csv'],datablock)
-csvwrite([ETT.Config.GrafixExport{2},sla,ETT.Subjects(Subject).Name,sla,'GRAFIX_INPUT_SEGMENTS_' ETT.Subjects(Subject).Name '.csv'],segblock)
+csvwrite([ETT.Config.GrafixExport{2},filesep,ETT.Subjects(Subject).Name,filesep,'GRAFIX_INPUT_DATA_' ETT.Subjects(Subject).Name '.csv'],datablock)
+csvwrite([ETT.Config.GrafixExport{2},filesep,ETT.Subjects(Subject).Name,filesep,'GRAFIX_INPUT_SEGMENTS_' ETT.Subjects(Subject).Name '.csv'],segblock)
 catch err
     Status = 0;
     ett_errorhandle(err);
