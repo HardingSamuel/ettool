@@ -216,7 +216,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     gen_diag(['Loading Subject ', ETT.Subjects(val_sub).Name])
     
     subFName = ETT.Subjects(val_sub).Name;    
-    subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
+    subFName = [ETT.DefaultDirectory subFName filesep 'SubjectData_' subFName '.mat'];
     try
       subdata = load(subFName);
     catch
@@ -878,7 +878,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         gen_diag('Saving Only this Subject, please wait')
         subdata.Fixations = tempdata{val_sub==subslist};
         subFName = ETT.Subjects(val_sub).Name;    
-        subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
+        subFName = [ETT.DefaultDirectory subFName filesep 'SubjectData_' subFName '.mat'];
         save(subFName,'subdata')
         issaved = 1;
         delete(diagfig)
@@ -886,7 +886,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
         gen_diag('Saving All Subjects, please wait')
         for subn = subslist
           subFName = ETT.Subjects(subn).Name;
-          subFName = [ETT.DefaultDirectory subFName '\' 'SubjectData_' subFName '.mat'];
+          subFName = [ETT.DefaultDirectory subFName filesep 'SubjectData_' subFName '.mat'];
           try
             subdata = load(subFName);
           catch
