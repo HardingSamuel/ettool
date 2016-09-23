@@ -28,8 +28,13 @@ ETT = [];
 Status = [];
 
 % make the figure
-NewProjectFig = figure('Name', 'Create a New Project', 'pos', [40 800 400 100], 'NumberTitle', 'Off', 'MenuBar', 'None',...
-    'Color', [.65 .75 .65]);
+NewProjectFig = figure;
+NewProjectFig.Name = 'Create a New Project';
+NewProjectFig.Units = 'Normalized';
+NewProjectFig.Position = [.2 .41 .37 .09];
+NewProjectFig.NumberTitle = 'Off';
+NewProjectFig.MenuBar = 'None';
+NewProjectFig.Color = [.65 .75 .65];
 % add the text label
 uipanel('Title', 'Project Name (press enter to continue)', 'Position', [.05 .05 .9 .9], 'BackgroundColor', [.7 .8 .7], 'FontSize', 12, 'ForegroundColor', [.1 .1 .1]);
 % add the editable text box with callback to execute local function called

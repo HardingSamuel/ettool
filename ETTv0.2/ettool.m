@@ -1,14 +1,31 @@
+%% Main function for running ettool
+
+%   [SH] - 09/23/16:   Converted windows positions to relative coordinates,
+%   changed figure settings to new formatting (e.g. handle.property = )
+
+%% Initialize the shared data array
+
+% close other figures, clear other data
 close all
 clear all
 
-%% Check version
-ett_versioncheck
-
-%%
 ETT = [];
-% make dynamic based on screen size
-ETTFig = figure('Position', [40 570 400 330], 'Name', 'Eyetracking Tool v0.2', 'NumberTitle', 'off', 'MenuBar', 'none',...
-    'Color', [.65 .75 .65]);
+%% Check version
+ettVers = ett_versioncheck;
+%% Get settings that are shared between functions (colors, positions etc...)
+global ettLib
+load('ettLib');
+
+
+%% Make the main window
+ETTFig = figure;
+ETTFig.Units = 'Normalized';
+ETTFig.Position = [.001 .6 .3 .35];
+ETTFig.Name = ['Eyetracking Tool v' num2str(ettVers)];
+ETTFig.NumberTitle = 'Off';
+ETTFig.MenuBar = 'None';
+ETTFig.Color = ettLib.Colors.LightGreen;
+
 ett_DrawMain(ETT,ETTFig);
 
 % Main Figure Config
