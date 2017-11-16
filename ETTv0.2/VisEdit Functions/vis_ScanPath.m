@@ -282,6 +282,7 @@ drawnow
         V.gaze.Y.round = nan;
       end
     else
+      videoStop
       writeM
     end
   end
