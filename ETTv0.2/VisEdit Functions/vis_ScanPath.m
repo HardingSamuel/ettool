@@ -17,6 +17,7 @@ function [] = vis_ScanPath(subdata)
 %% LOCAL VARS
 G = [];
 V = [];
+D = [];
 LOOP = 1;
 
 %% CHECK DATA
@@ -26,9 +27,9 @@ if ~isfield(subdata,'Fixations')
   uiwait(msgbox('Error: No fixations in input ''subdata''','Check Fixations','modal'));
   return;
 else
-  nTrials = length(subdata.Fixations);
-  trialNums = [1:nTrials]';
-  trialString = num2str(trialNums);
+  D.nTrials = length(subdata.Fixations);
+  D.trialNums = [1:D.nTrials]';
+  D.trialString = num2str(D.trialNums);
 end
 
 %% GRAPHICS
@@ -54,7 +55,7 @@ G.UI(1).H.BackgroundColor = [1 1 1];
 G.UI(2).H = uicontrol();
 G.UI(2).H.Parent = G.FIG.H;
 G.UI(2).H.Style = 'popupmenu';
-G.UI(2).H.String = trialString;
+G.UI(2).H.String = D.trialString;
 G.UI(2).H.Units = 'normalized';
 G.UI(2).H.Position = [.01 .895 .15 .05];
 G.UI(2).H.Callback = @selectTrial;
@@ -94,7 +95,7 @@ G.AX.H.Units = 'normalized';
 G.AX.H.Position = [.01 .15 .98 .75];
 % G.AX.H.Visible = 'off';
 G.AX.H.NextPlot = 'add';
-G.AX.H.UserData.randPlot = plot(G.AX.H,rand(100),rand(100));
+G.AX.H.UserData.gazePlot = [];
 G.AX.H.XLim = [0 1];
 G.AX.H.YLim = [0 1];
 G.AX.H.XTick = [];
@@ -116,7 +117,7 @@ G.IMAGES(3).image = imread(G.IMAGES(3).name);
 %% VIDEO CONTROLS
 V = [];
 V.isPlaying = 0;
-V.Frame = 0;
+V.Frame = 1;
 V.FrameRate = 30;
 V.FrameTime = 1/V.FrameRate;
 
@@ -135,9 +136,10 @@ while 1
     V.drawNow = shouldDraw;
     if V.drawNow
       V.lastDraw = drawNow;
+      V.Frame = V.Frame + 1;
     end
+    drawnow
   end
-  drawnow
 end
 
 %% FUNCTIONS
@@ -148,25 +150,36 @@ end
     G.BUT(2).H.CData = G.IMAGES(3).image;
   end
 % % selection
-  function selectTrial(~,~)
+  function selectTrial(O,~)
+    % get the data from this subject
+    D.currentTrial = D.trialNums(O.Value,:);
+    D.X = subdata.Filtered.FiltX(D.currentTrial,:);
+    D.Y = subdata.Filtered.FiltY(D.currentTrial,:);
     % clear the plotting axes
     clearAxes
-    % plot new data
-    G.AX.H.UserData.randPlot = plot(G.AX.H,rand(100),rand(100));
   end
 
 % % playback
   function drawBin = shouldDraw
-    elapsedTime = (GetSecs - V.lastDraw)
-    drawBin = elapsedTime >= V.FrameTime
+    elapsedTime = (GetSecs - V.lastDraw);
+    drawBin = elapsedTime >= V.FrameTime;
   end
 
   function drawTime = drawNow
+    drawGaze;
     drawTime = GetSecs;
   end
 
+  function drawGaze
+    G.AX.H.UserData.gazePlot = scatter(D.X(V.Frame),D.Y(V.Frame));
+  end
+
+  function drawRand
+    G.AX.H.UserData.randPlot = plot(G.AX.H,rand(100),rand(100));
+  end
+
   function videoPlayPause(~,~)
-    V.isPlaying = ~V.isPlaying;
+    V.isPlaying = ~V.isPlaying
     drawPlayPause
   end
 
