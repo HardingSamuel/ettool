@@ -1,6 +1,5 @@
 function [ETT] = vis_FixationSaccade(ETT,subslist)
 
-%test
 %
 % vis_FixationSaccade
 % Visualize and edit fixation and saccade detection for a given
@@ -394,7 +393,7 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     yplot = plot(GazeAxes,tri_segs{seg_vis},1-data.PlotY(tri_segs{seg_vis}),'Color',[.9 .6 .6],'LineWidth',2);
     
     plot_velo(data.plotV)
-    legend([xplot,yplot,vplot],'X-Gaze','Y-Gaze','Velocity (scaled)','location','northeast');
+%     legend([xplot,yplot,vplot],'X-Gaze','Y-Gaze','Velocity (scaled)','location','northeast');
     
     axes(GazeAxes)
     set(GazeAxes,'xlim',[tri_segs{seg_vis}(1), tri_segs{seg_vis}(end)])
