@@ -36,7 +36,7 @@ end
 
 %% GRAPHICS
 % figure
-G.FIG.H = fig(100,'cf');
+G.FIG.H = figure(100); clf; hold
 G.FIG.H.MenuBar = 'none';
 G.FIG.H.Color = [1 1 1];
 % G.FIG.H.CloseRequestFcn = 'LOOP = 0;';
@@ -160,7 +160,7 @@ drawnow
   function setupF
     % setup the filter
     F.dDeg = 5; % desired standard deviation of the kernel in degrees
-    F.dPix = vac_pix(F.dDeg,'h'); % desired standard deviation of the kern in pix
+    F.dPix = smh_vac_pix(F.dDeg,'h'); % desired standard deviation of the kern in pix
     
     F.scaledSig = F.dPix * (V.map.size(2) ./ 1920);
     F.xLims = floor(norminv(.01,0,F.scaledSig));
