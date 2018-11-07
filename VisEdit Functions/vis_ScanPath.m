@@ -392,4 +392,8 @@ drawnow
         close(V)
     end
   end
+
+  function T = GetSecs
+    T = cputime;
+  end
 end
