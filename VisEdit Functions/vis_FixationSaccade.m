@@ -791,7 +791,9 @@ set(fixbrush,'ActionPostCallback',@fix_brush,'Color',[1 .7 .7])
     end
   end
 
-%% Edge editing functions
+
+
+% Edge editing functions
   function edge_select(~,eventdata)
     curr_edge = get(eventdata.NewValue,'UserData');
   end
